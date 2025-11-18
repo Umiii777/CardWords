@@ -1409,7 +1409,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardPool: {fileID: 716188989}
-  currentLevelNum: 0
+  canvas: {fileID: 801774033}
+  currentLevelDeckTotalNum: 0
 --- !u!1 &1678051393
 GameObject:
   m_ObjectHideFlags: 0
