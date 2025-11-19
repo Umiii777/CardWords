@@ -33,18 +33,19 @@ public class Card : MonoBehaviour
     private int textStackOffsetPos = 100;
     private int textStackOffsetSize = 30;
 
+    //触发的事件
+    public CardDataEventSO deckSuccessDrag;
+
 
     //private BoxCollider2D collider;
     private void Awake()
     {
         localTransform = gameObject.GetComponent<RectTransform>();
         cardBaseStyle = gameObject.GetComponent<Image>();
-
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
     public void SetCardVisual()
     {
-
         if (isFront)
         {
             if (cardData.isMainCard)

@@ -120,6 +120,7 @@ MonoBehaviour:
   stackIndex: 0
   isInStack: 0
   childCards: []
+  deckSuccessDrag: {fileID: 11400000, guid: 1cf403b968aebb14c82ee19aa90966b7, type: 2}
 --- !u!225 &2429184787772230549
 CanvasGroup:
   m_ObjectHideFlags: 0

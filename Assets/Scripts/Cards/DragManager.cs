@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public enum RowType
+public static class DragManager
 {
-    normal,
-    unlocked,
-    main
-};
+    
+}

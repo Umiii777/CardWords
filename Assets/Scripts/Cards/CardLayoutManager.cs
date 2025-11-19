@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
 public class CardLayoutManager
 {
-    private float cardSpacing = 80 / 6;
-    private float cardWidth = 200;
-
+    
+    private float cardSpacing = 80 / 6; //卡牌间距空隙
+    private float cardWidth = 200;      //卡牌宽度
 
     private float[] rowTransformsX;
     private float[] mainRowTransforms;
@@ -23,6 +22,7 @@ public class CardLayoutManager
         }
         return rowTransformsX;
     }
+    //设置
     public float[] SetMainRowLayoutX(int mainRows)
     {
         mainRowTransforms = new float[mainRows];

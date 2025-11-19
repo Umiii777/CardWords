@@ -54,9 +54,6 @@ public class DeckManager : MonoBehaviour
             GameObject cardObj = cardPool.Get();
             SetACardFromDeck(cardObj);
             //currentCardRect.SetParent(dragla)
-
-
-
         }
     }
     private void SetACardFromDeck(GameObject cardObj)
