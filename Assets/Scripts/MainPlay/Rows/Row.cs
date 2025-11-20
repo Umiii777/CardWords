@@ -10,6 +10,7 @@ public class Row : MonoBehaviour, IDropHandler
     public RowType rowType;
     public bool isEmpty;
 
+
     public void OnDrop(PointerEventData eventData)
     {
         CardData currentCardData = eventData.pointerDrag.GetComponent<Card>().cardData;

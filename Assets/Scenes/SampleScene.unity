@@ -318,6 +318,7 @@ MonoBehaviour:
   mainRowpool: {fileID: 716188986}
   stepManager: {fileID: 1251390662}
   cardDeck: {fileID: 1578489379}
+  slotManager: {fileID: 935997349}
 --- !u!1 &389368427
 GameObject:
   m_ObjectHideFlags: 0
@@ -806,8 +807,53 @@ Transform:
   - {fileID: 716188988}
   - {fileID: 1678051394}
   - {fileID: 2075187688}
+  - {fileID: 935997348}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &935997347
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 935997348}
+  - component: {fileID: 935997349}
+  m_Layer: 0
+  m_Name: SlotManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &935997348
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935997347}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 891787479}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &935997349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935997347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfb7a7c1bcbde504b8a41c6969100153, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &984718502
 GameObject:
   m_ObjectHideFlags: 0
@@ -1374,6 +1420,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1578489378}
   - component: {fileID: 1578489379}
+  - component: {fileID: 1578489380}
   m_Layer: 0
   m_Name: CardDeckManager
   m_TagString: Untagged
@@ -1411,6 +1458,22 @@ MonoBehaviour:
   cardPool: {fileID: 716188989}
   canvas: {fileID: 801774033}
   currentLevelDeckTotalNum: 0
+--- !u!114 &1578489380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1578489376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f170b88ea232e547b8a68dabcb9ae20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSO: {fileID: 0}
+  response:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1678051393
 GameObject:
   m_ObjectHideFlags: 0

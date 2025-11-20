@@ -27,6 +27,7 @@ public class LevelManager : MonoBehaviour
     private Transform dragLayer;
     private Transform rowLayer;
     public DeckManager cardDeck;
+    public SlotManager slotManager;
 
     public CardLayoutManager cardLayoutManager;
 
@@ -46,6 +47,7 @@ public class LevelManager : MonoBehaviour
     private List<CardData> currentCardDeckDatas = new List<CardData>();
     private float[] currentRowX;
     private float[] currentMainRowX;
+
 
     private void Awake()
     {
@@ -90,8 +92,9 @@ public class LevelManager : MonoBehaviour
         //初始化牌组内容
 
 
-        //表现层，根据排列数组生成卡牌
+        //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
         SetLevelCardLayout(normalRows);
+        slotManager.InitSlots(normalRows, currentTotalCardDatas.ToArray());
 
     }
     //加载关卡配置，TODO：初始化对象池
@@ -107,8 +110,6 @@ public class LevelManager : MonoBehaviour
         int mainRows = currentLevelData.column;
 
         SetLevelLayout(normalRows.Count(), mainRows);
-
-
     }
     //完成关卡，玩家数据加1
     public void OnLevelComplete(int currentLevelID)
