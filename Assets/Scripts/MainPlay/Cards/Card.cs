@@ -18,6 +18,7 @@ public class Card : MonoBehaviour
     //展示相关的变量
     public bool isFront;
     public Sprite[] sprites; //0是卡背面，1是显示字的内容面
+    public bool isFromDeck=false;
 
 
     //跟拖拽相关的变量
@@ -30,11 +31,16 @@ public class Card : MonoBehaviour
     public bool isInStack = false;
     public List<Card> childCards = new List<Card>();
 
+    public int slotCount = 0;
+
+
     private int textStackOffsetPos = 100;
     private int textStackOffsetSize = 30;
 
     //触发的事件
     public CardDataEventSO deckSuccessDrag;
+
+
 
 
     //private BoxCollider2D collider;
@@ -48,6 +54,8 @@ public class Card : MonoBehaviour
     {
         if (isFront)
         {
+            tmContent.alpha = 1f;
+
             if (cardData.isMainCard)
             {
                 //TODO;再增加一个Sprite数组内容，用于放置MainCard专属的东西
@@ -57,12 +65,14 @@ public class Card : MonoBehaviour
             }
             else
             {
+                Debug.Log(cardData.cardContent);
+                
                 tmContent.text = cardData.cardContent;
                 cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
                 tmLength.text = "";
                 if (isInStack)
                 {
-                    Debug.Log("执行了更新卡牌样式的方法");
+                    Debug.Log("执行了更新堆叠卡牌样式的方法");
                     //设置卡牌的别样样式
                     InStackStyle();
                 }
@@ -75,6 +85,15 @@ public class Card : MonoBehaviour
             cardBaseStyle.sprite = CardVisualManager.Instance.spriteBack;
         }
     }
+    public void SetFront()
+    {
+        if (!isFront)
+        {
+            isFront = true;
+            SetCardVisual();
+        }
+    }
+
 
     public void InStackStyle()
     {

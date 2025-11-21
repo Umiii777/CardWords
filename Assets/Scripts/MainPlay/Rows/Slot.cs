@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Slot 
 {
-    public Stack<CardData> slotDatas;
+    public Stack<Card> slotDatas;
     public Slot()
     {
-        slotDatas = new Stack<CardData>();
+        slotDatas = new Stack<Card>();
     }
 }

@@ -55,6 +55,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isDragging: 0
+  onSlotDrag: {fileID: 11400000, guid: 6ceb046a97b42994898a2d99bf86cf2d, type: 2}
+  endSlotDrag: {fileID: 11400000, guid: 3cc72be1684beb44cb7c393df6985df9, type: 2}
+  OnSuccessDrag: {fileID: 11400000, guid: b897fb87407b5ba46a3e7f889917cee8, type: 2}
 --- !u!222 &3247448607967087724
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -120,7 +123,10 @@ MonoBehaviour:
   stackIndex: 0
   isInStack: 0
   childCards: []
+  slotCount: 0
   deckSuccessDrag: {fileID: 11400000, guid: 1cf403b968aebb14c82ee19aa90966b7, type: 2}
+  onSlotDrag: {fileID: 0}
+  endSlotDrag: {fileID: 0}
 --- !u!225 &2429184787772230549
 CanvasGroup:
   m_ObjectHideFlags: 0

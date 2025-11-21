@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,6 +23,13 @@ public class CardDragHandler : MonoBehaviour,
     private Canvas canvas;
     private bool canDrag = true;
 
+    [Header("事件部分")]
+    public CardEventSO onSlotDrag;
+    public CardEventSO endSlotDrag;
+
+    public ObjectEventSO OnSuccessDrag;
+
+
     private Transform dragLayer;
 
     private void Awake()
@@ -33,7 +41,13 @@ public class CardDragHandler : MonoBehaviour,
     public void OnBeginDrag(PointerEventData eventData)
     {
         // 获取被点击的 card（trigger 所在的卡）
+
+
+
         Card clicked = GetComponent<Card>();
+
+        onSlotDrag.RaiseEvent(clicked, this);
+
         if (clicked == null) return;
 
         // 如果在 stack 中，拖动应该转发到 top（堆顶）
@@ -127,7 +141,7 @@ public class CardDragHandler : MonoBehaviour,
 
         // 下面使用 currentCard（top）来判断落点
         currentCardData = currentCard.cardData;
-
+        endSlotDrag.RaiseEvent(otherCard, this);
         // 如果落到主row
         if (row && row.rowType == RowType.main)
         {
@@ -136,6 +150,7 @@ public class CardDragHandler : MonoBehaviour,
                 rectTransform.anchoredPosition = row.GetComponent<RectTransform>().anchoredPosition;
                 currentCard.isOnMainRow = true;
                 MoveChildStack(currentCard);
+                OnSuccessDrag.RaiseEvent(this, this);
                 return;
             }
             else
@@ -159,6 +174,7 @@ public class CardDragHandler : MonoBehaviour,
             {
                 rectTransform.anchoredPosition = row.GetComponent<RectTransform>().anchoredPosition;
                 MoveChildStack(currentCard);
+                OnSuccessDrag.RaiseEvent(this, this);
                 return;
             }
         }
@@ -170,6 +186,7 @@ public class CardDragHandler : MonoBehaviour,
             {
                 rectTransform.anchoredPosition = otherCard.GetComponent<RectTransform>().anchoredPosition;
                 MoveChildStack(currentCard);
+                OnSuccessDrag.RaiseEvent(this, this);
                 return;
             }
             else
@@ -183,13 +200,18 @@ public class CardDragHandler : MonoBehaviour,
         // 落在普通卡上（合并）
         if (otherCard && !otherCard.cardData.isMainCard)
         {
+
             // 如果是同一个主题词，合并到 otherCard 的 top 中
             if (currentCardData.mainId == otherCard.cardData.mainId && otherCard.isOnRow)
             {
                 AddToStack(parentCard: otherCard, childCard: currentCard);
                 MoveChildStack(currentCard);
+                // 成功合并事件，如果原本位置下面有牌，则将底下的翻面事件
+               
+                    OnSuccessDrag.RaiseEvent(this, this);
                 return;
             }
+
         }
 
         // 默认：回到原点

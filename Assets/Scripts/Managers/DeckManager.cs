@@ -60,6 +60,7 @@ public class DeckManager : MonoBehaviour
     {
         Card currentCard = cardObj.GetComponent<Card>();
         currentCard.isFront = true;
+        currentCard.isFromDeck = true;
         currentCard.cardData = currentDeckCardDatas[currentDeckCount];
         //currentDeckCardDatas.Remove(currentCard.cardData);      //从当前的数据库中移出这个数据
         currentCard.SetCardVisual();
