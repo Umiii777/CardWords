@@ -32,10 +32,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7871114056491730974}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 40.929993, y: 6.0899963}
-  m_SizeDelta: {x: -81.85, y: -12.17}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 40, y: 6}
+  m_SizeDelta: {x: 300, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1719626513617911979
 CanvasRenderer:
@@ -44,7 +44,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 61452497184464867}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &7156462474118870874
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,15 +161,15 @@ RectTransform:
   m_GameObject: {fileID: 1317296755143057349}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.00032, y: 1.00032, z: 1.00032}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7552594513926664342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 101, y: 6.960022}
-  m_SizeDelta: {x: -232.3766, y: -13.91}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 100, y: 7}
+  m_SizeDelta: {x: 94, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8466545361508135675
 CanvasRenderer:
@@ -178,7 +178,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1317296755143057349}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &868905478753600440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -571,7 +571,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -300}
-  m_SizeDelta: {x: 396.13, y: 161}
+  m_SizeDelta: {x: 400, y: 160}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6825322903550528652
 CanvasRenderer:
@@ -580,7 +580,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5017591813737911013}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &8393508464533883667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -711,7 +711,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5563261292515950972}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &4021582847301466850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -795,7 +795,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c22c4a09eeb625045bfd73b5e279611d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  coinsCountText: {fileID: 868905478753600440}
+  coinCountText: {fileID: 868905478753600440}
 --- !u!1 &6871684688684055753
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,7 +835,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -500}
-  m_SizeDelta: {x: 325.83, y: 140.93}
+  m_SizeDelta: {x: 325, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6468398363257112399
 CanvasRenderer:
@@ -844,7 +844,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6871684688684055753}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &4230080955584081655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1038,10 +1038,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7552594513926664342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -79, y: 6.959999}
-  m_SizeDelta: {x: -189.8751, y: -13.91}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -80, y: 7}
+  m_SizeDelta: {x: 136, y: 140}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2107007399677759657
 CanvasRenderer:
@@ -1050,7 +1050,7 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7817335736431498817}
-  m_CullTransparentMesh: 1
+  m_CullTransparentMesh: 0
 --- !u!114 &3011939033161422397
 MonoBehaviour:
   m_ObjectHideFlags: 0
