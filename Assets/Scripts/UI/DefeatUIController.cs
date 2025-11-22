@@ -15,11 +15,11 @@ public class DefeatUIController : MonoBehaviour
     /// <summary>
     /// 要显示的游戏完成进度（0到1之间）
     /// </summary>
-    public static float progress = 0.01f;
+    public static float progress = 1f / 100;
     /// <summary>
     /// 要显示在重玩按钮上的体力值（请代入负数）
     /// </summary>
-    public static int numEnergy = 0;
+    public static int numEnergy = -1;
     /// <summary>
     /// 返回主界面按钮回调
     /// </summary>
@@ -41,6 +41,10 @@ public class DefeatUIController : MonoBehaviour
 #endregion
 
 #region 私有字段
+    /// <summary>
+    /// 游戏完成进度条每帧默认填充量
+    /// </summary>
+    private const float DEFAULT_DELTA_PROGRESS = 0.5f / 100;
     /// <summary>
     /// 完成度进度条的最小宽度
     /// </summary>
@@ -79,7 +83,7 @@ public class DefeatUIController : MonoBehaviour
     }
 #endregion
 
-    void Awake()
+    void Start()
     {
         energyCountText.text = numEnergy.ToString();
         progressBarParentTransform = progressBarTransform.parent.GetComponent<RectTransform>();
@@ -88,12 +92,33 @@ public class DefeatUIController : MonoBehaviour
 
     private IEnumerator CoroutineUpdate()
     {
+        float startProgress = progress, filledProgress = 0f;
+
         runningCoroutine?.Invoke();
-        progressText.text = progress.ToString("P0");
+        Action updateProgress = progress.Equals(startProgress)
+            ? () =>
+            {
+                DisplayProgress(filledProgress);
+                if (filledProgress < progress)
+                    filledProgress += DEFAULT_DELTA_PROGRESS;
+            }
+            : () => DisplayProgress(progress);
+
+        while (true)
+        {
+            updateProgress();
+            yield return null;
+
+            runningCoroutine?.Invoke();
+        }
+    }
+
+    private void DisplayProgress(float p)
+    {
+        progressText.text = p.ToString("P0");
         progressBarTransform.sizeDelta = new Vector2(
-            Math.Max(progressBarParentTransform.sizeDelta.x * progress, LEAST_PROGRESS_BAR_WIDTH),
+            Math.Max(progressBarParentTransform.sizeDelta.x * p, LEAST_PROGRESS_BAR_WIDTH),
             progressBarTransform.sizeDelta.y
         );
-        yield return null;
     }
 }

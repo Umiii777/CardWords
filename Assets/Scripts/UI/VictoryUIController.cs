@@ -13,7 +13,7 @@ public class VictoryUIController : MonoBehaviour
     /// <summary>
     /// 要显示在领取金币按钮上的金币数量
     /// </summary>
-    public static int numCoinsToRecieve = 0;
+    public static int numCoinsToRecieve = 10;
     /// <summary>
     /// 返回主界面按钮回调
     /// </summary>
@@ -49,7 +49,7 @@ public class VictoryUIController : MonoBehaviour
     }
 #endregion
 
-    void Awake()
+    void Start()
     {
         coinCountText.text = numCoinsToRecieve.ToString();
     }
