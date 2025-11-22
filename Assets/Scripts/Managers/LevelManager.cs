@@ -45,6 +45,9 @@ public class LevelManager : MonoBehaviour
     private List<CardData> currentTotalCardDatas = new List<CardData>();
 
     private List<CardData> currentCardDeckDatas = new List<CardData>();
+
+    private List<Card> currentCardsOnSlot = new List<Card>();
+
     private float[] currentRowX;
     private float[] currentMainRowX;
 
@@ -68,6 +71,9 @@ public class LevelManager : MonoBehaviour
         currentMainCardDatas.Clear();
         currentTotalCardDatas.Clear();
         currentWordsData.Clear();//用于从words表中获取内容的操作列表
+        currentCardDeckDatas.Clear();
+        currentCardsOnSlot.Clear();
+
         currentCardInitNum = 0;// 根据这个顺序先给下方的卡牌赋值
 
         //数据层
@@ -94,7 +100,7 @@ public class LevelManager : MonoBehaviour
 
         //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
         SetLevelCardLayout(normalRows);
-        slotManager.InitSlots(normalRows, currentTotalCardDatas.ToArray());
+        slotManager.InitSlots(normalRows, currentCardsOnSlot.ToArray());
 
     }
     //加载关卡配置，TODO：初始化对象池
@@ -165,7 +171,10 @@ public class LevelManager : MonoBehaviour
                 //使用对象池生成卡牌GameObject，初始化carddata
                 GameObject cardObj = cardPool.Get();
                 Card card = cardObj.GetComponent<Card>();
+
                 card.cardData = currentTotalCardDatas[currentCardInitNum];
+                
+                card.slotCount = i;
                 //确认生成的牌，如果在最底部，贼直接揭示，如果不是，则先背面朝上，TODO，待优化为一个处理的事件Check
                 if (j + 1 == rows[i])
                 {
@@ -179,6 +188,8 @@ public class LevelManager : MonoBehaviour
                 }
                 //场上的卡设置为在场上
                 card.isOnRow = true;
+                //初始化结束后，加入slot
+                currentCardsOnSlot.Add(card);
 
                 //改变生成的卡牌的布局
                 RectTransform currentTransform = card.GetComponent<RectTransform>();

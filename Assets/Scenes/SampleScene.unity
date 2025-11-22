@@ -821,6 +821,9 @@ GameObject:
   m_Component:
   - component: {fileID: 935997348}
   - component: {fileID: 935997349}
+  - component: {fileID: 935997352}
+  - component: {fileID: 935997351}
+  - component: {fileID: 935997350}
   m_Layer: 0
   m_Name: SlotManager
   m_TagString: Untagged
@@ -855,6 +858,92 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfb7a7c1bcbde504b8a41c6969100153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  onDragCard: {fileID: 0}
+  endDragCard: {fileID: 0}
+--- !u!114 &935997350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935997347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9629827cf685d84681c605e9ea2821d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSO: {fileID: 11400000, guid: b897fb87407b5ba46a3e7f889917cee8, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 935997349}
+        m_TargetAssemblyTypeName: SlotManager, Assembly-CSharp
+        m_MethodName: OnSuccessDragCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &935997351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935997347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac5ebd16dc1ef4f4f854138371480cf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSO: {fileID: 11400000, guid: 3cc72be1684beb44cb7c393df6985df9, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 935997349}
+        m_TargetAssemblyTypeName: SlotManager, Assembly-CSharp
+        m_MethodName: setEndDragCard
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &935997352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 935997347}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac5ebd16dc1ef4f4f854138371480cf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventSO: {fileID: 11400000, guid: 6ceb046a97b42994898a2d99bf86cf2d, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 935997349}
+        m_TargetAssemblyTypeName: SlotManager, Assembly-CSharp
+        m_MethodName: SetDragCard
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &984718502
 GameObject:
   m_ObjectHideFlags: 0
