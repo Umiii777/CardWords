@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
@@ -22,20 +24,26 @@ public class DefeatUIController : MonoBehaviour
     public static int numEnergy = -1;
     /// <summary>
     /// 返回主界面按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
     public static UnityAction clickingHome;
     /// <summary>
     /// 继续游戏按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingContinue;
+    public static Func<Task> clickingContinue;
     /// <summary>
     /// 重玩按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
     public static UnityAction clickingReplay;
     /// <summary>
     /// 该委托在 DefeatUIController 的协程中每帧执行一次
     /// <br/><br/>
-    /// 在这里使用 DefeatUIController.progress += ... 可以实现进度条逐渐填充
+    /// 在这里使用 DefeatUIController.progress += ... 可以控制进度条填充速度
     /// </summary>
     public static UnityAction runningCoroutine;
 #endregion
@@ -69,17 +77,17 @@ public class DefeatUIController : MonoBehaviour
 #endregion
 
 #region 按钮回调方法
-    public void OnClickHome()
-    {
-        clickingHome?.Invoke();
-    }
+    public void OnClickHome() => clickingHome?.Invoke();
+    public void OnClickReplay() => clickingReplay?.Invoke();
     public void OnClickContinue()
     {
-        clickingContinue?.Invoke();
-    }
-    public void OnClickReplay()
-    {
-        clickingReplay?.Invoke();
+        static async Task Process()
+        {
+            if (clickingContinue is not null)
+                foreach (var f in clickingContinue.GetInvocationList().Cast<Func<Task>>())
+                    await f();
+        }
+        _ = Process();
     }
 #endregion
 

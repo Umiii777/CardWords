@@ -1,7 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
-using System.Collections;
 
 /// <summary>
 /// 大厅界面控制器
@@ -112,7 +112,24 @@ public class HomeUIController : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI energyForPlayText;
 #endregion
-    
+
+#region 商店按钮右上角红点
+    public static bool IsShopHintShown
+    {
+        get => isShopHintShown;
+        set
+        {
+            if (sharedShopHint != null)
+                sharedShopHint.SetActive(value);
+            isShopHintShown = value;
+        }
+    }
+    private static bool isShopHintShown = true;
+    private static GameObject sharedShopHint;
+    [SerializeField]
+    private GameObject shopHint;
+#endregion
+
 #region 静态委托
     /// <summary>
     /// 设置按钮回调
@@ -137,21 +154,13 @@ public class HomeUIController : MonoBehaviour
 #endregion
 
 #region 按钮回调方法
-    public void OnClickSettings()
-    {
-        clickingSettings?.Invoke();
-    }
-    public void OnClickAddEnergy()
-    {
-        clickingAddEnergy?.Invoke();
-    }
+    public void OnClickSettings() => clickingSettings?.Invoke();
+    public void OnClickAddEnergy() => clickingAddEnergy?.Invoke();
+    public void OnClickStart() => clickingStart?.Invoke();
     public void OnClickShop()
     {
         clickingSettings?.Invoke();
-    }
-    public void OnClickStart()
-    {
-        clickingStart?.Invoke();
+        IsShopHintShown = false;
     }
 #endregion
 
@@ -177,11 +186,13 @@ public class HomeUIController : MonoBehaviour
         sharedMaxEnergyTips = maxEnergyTips;
         sharedLevelNameText = levelNameText;
         sharedEnergyForPlayText = energyForPlayText;
+        sharedShopHint = shopHint;
 
         sharedCoinCountText.text = numCoins.ToString();
         sharedEnergyCountText.text = numEnergy.ToString();
         sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
         sharedLevelNameText.text = levelName;
         sharedEnergyForPlayText.text = numEnergyForPlay.ToString();
+        sharedShopHint.SetActive(isShopHintShown);
     }
 }

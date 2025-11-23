@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
@@ -16,14 +19,20 @@ public class VictoryUIController : MonoBehaviour
     public static int numCoinsToRecieve = 10;
     /// <summary>
     /// 返回主界面按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
     public static UnityAction clickingHome;
     /// <summary>
     /// 十倍领取按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingRecieveMore;
+    public static Func<Task> clickingRecieveMore;
     /// <summary>
     /// 领取金币按钮回调
+    /// <br/><br/>
+    /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
     public static UnityAction clickingRecieve;
 #endregion
@@ -35,17 +44,17 @@ public class VictoryUIController : MonoBehaviour
     private TextMeshProUGUI coinCountText;
 
 #region 按钮回调方法
-    public void OnClickHome()
-    {
-        clickingHome?.Invoke();
-    }
+    public void OnClickHome() => clickingHome?.Invoke();
+    public void OnClickRecieve() => clickingRecieve?.Invoke();
     public void OnClickRecieveMore()
     {
-        clickingRecieveMore?.Invoke();
-    }
-    public void OnClickRecieve()
-    {
-        clickingRecieve?.Invoke();
+        static async Task Process()
+        {
+            if (clickingRecieveMore is not null)
+                foreach (var f in clickingRecieveMore.GetInvocationList().Cast<Func<Task>>())
+                    await f();
+        }
+        _ = Process();
     }
 #endregion
 
