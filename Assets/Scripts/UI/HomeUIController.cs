@@ -3,6 +3,11 @@ using UnityEngine.Events;
 using TMPro;
 using System.Collections;
 
+/// <summary>
+/// 大厅界面控制器
+/// <br/><br/>
+/// 为该类的静态属性或字段赋值以更新各个组件的显示内容及行为
+/// </summary>
 public class HomeUIController : MonoBehaviour
 {
 #region 玩家金币数量
@@ -72,20 +77,20 @@ public class HomeUIController : MonoBehaviour
     /// <summary>
     /// 要显示在进入关卡按钮上的关卡名称
     /// </summary>
-    public static string StageName
+    public static string LevelName
     {
-        get => stageName;
+        get => levelName;
         set
         {
-            if (sharedStageNameText != null)
-                sharedStageNameText.text = value.ToString();
-            stageName = value;
+            if (sharedLevelNameText != null)
+                sharedLevelNameText.text = value.ToString();
+            levelName = value;
         }
     }
-    private static string stageName = "关卡1";
-    private static TextMeshProUGUI sharedStageNameText;
+    private static string levelName = "关卡1";
+    private static TextMeshProUGUI sharedLevelNameText;
     [SerializeField]
-    private TextMeshProUGUI stageNameText;
+    private TextMeshProUGUI levelNameText;
 #endregion
 
 #region 进关卡扣除的体力值
@@ -170,13 +175,13 @@ public class HomeUIController : MonoBehaviour
         sharedCoinCountText = coinCountText;
         sharedEnergyCountText = energyCountText;
         sharedMaxEnergyTips = maxEnergyTips;
-        sharedStageNameText = stageNameText;
+        sharedLevelNameText = levelNameText;
         sharedEnergyForPlayText = energyForPlayText;
 
         sharedCoinCountText.text = numCoins.ToString();
         sharedEnergyCountText.text = numEnergy.ToString();
         sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
-        sharedStageNameText.text = stageName;
+        sharedLevelNameText.text = levelName;
         sharedEnergyForPlayText.text = numEnergyForPlay.ToString();
     }
 }
