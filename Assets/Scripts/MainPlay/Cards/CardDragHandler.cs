@@ -1,11 +1,15 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class CardDragHandler : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     private Card card;
     private Card top;
+    private Card onDropCard;
+
     private Canvas canvas;
     private CanvasGroup cg;
 
@@ -24,7 +28,7 @@ public class CardDragHandler : MonoBehaviour,
         card = GetComponent<Card>();
         cg = GetComponent<CanvasGroup>();
     }
-
+    #region Drag接口实现
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (!card.isFront)
@@ -83,6 +87,8 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        offset = Vector2.zero;
+
         Debug.Log("执行了onEndDrag");
         if (top == null)
         {
@@ -93,8 +99,6 @@ public class CardDragHandler : MonoBehaviour,
 
         Card best = FindBestOverlapCard();
         Row bestRow = FindBestOverlapRow();
-
-
         // 1. 落到 Row 上
         if (bestRow)
         {
@@ -111,9 +115,7 @@ public class CardDragHandler : MonoBehaviour,
         // 2. 落到卡上（合并逻辑）
         if (best)
         {
-            
             TryMerge(best);
-
             return;
         }
 
@@ -122,12 +124,31 @@ public class CardDragHandler : MonoBehaviour,
         top.rectTransform.anchoredPosition = originalPos;
         CardStack.UpdateStackPositions(top);
     }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+
+        onDropCard = card;
+        if (card.isOnMainRow && top.cardData.mainId == onDropCard.cardData.mainId)
+        {
+            Debug.Log("执行了OnDrop");
+            List<Card> eliminateCards = top.childCards;
+            OnCardEliminate(eliminateCards);
+        }
+        else
+        {
+            return;
+        }
+    }
+    #endregion
+    #region 私有工具类
+
     private Card FindBestOverlapCard()
     {
         float maxArea = 0;
         Card best = null;
 
-       
+
         foreach (var c in CardManager.Instance.allCards)
         {
             if (c == top) continue;
@@ -183,6 +204,7 @@ public class CardDragHandler : MonoBehaviour,
         else if (row.rowType == RowType.main && top.cardData.isMainCard)
         {
             top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
+            top.isOnMainRow = true;
             CardStack.UpdateStackPositions(top);
             OnSuccessDrag.RaiseEvent(this, this);
             //row.DragOncard(top);
@@ -199,27 +221,42 @@ public class CardDragHandler : MonoBehaviour,
         Debug.Log($"Trying merge: {top.cardData.cardContent}  vs  {target.cardData.cardContent}");
         // if (target.cardData.mainId == top.cardData.mainId &&
         //     target.isOnRow && target.isFront)
+        //第一种情况,单到单
         if (target.cardData.mainId == top.cardData.mainId &&
          target.isFront && !target.isInStack)
         {
             CardStack.AddToStack(target, top);
             target.InStackStyle();
-            OnEndDragCard.RaiseEvent(target, this);
 
+            OnEndDragCard.RaiseEvent(top, this);
             OnSuccessDrag.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
             return;
         }
-
-        // 不满足合并，回原位
-        top.rectTransform.anchoredPosition = originalPos;
-        CardStack.UpdateStackPositions(top);
+        //第二种情况，单到多
+        else
+        {
+            return;
+            top.rectTransform.anchoredPosition = originalPos;
+            CardStack.UpdateStackPositions(top);
+        }
+        //
+        // top.rectTransform.anchoredPosition = originalPos;
+        // CardStack.UpdateStackPositions(top);
     }
 
     //成功拖动时，改变card的slotCount
 
+    //消除卡牌的行为
+    public void OnCardEliminate(List<Card> eliminateCards)
+    {
+        foreach (var item in eliminateCards)
+        {
+            Destroy(item.gameObject);
+        }
+    }
 
-
+    #endregion
 }
 
 

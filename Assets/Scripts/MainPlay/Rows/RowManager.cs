@@ -7,8 +7,8 @@ public class RowManager : MonoBehaviour
     public List<Row> rows;
     public List<Row> mainRows;
 
-    public int beginNum = 0;
-    public int endNum = 0;
+    public int beginNum = -1;
+    public int endNum = -1;
 
     // public void InitRows(List<Row> inRows)
     // {
@@ -42,11 +42,23 @@ public class RowManager : MonoBehaviour
     {
 
         rows[beginNum].cardCount--;
-        rows[endNum].cardCount++;
-        rows[beginNum].UpdateRowState();
-        rows[endNum].UpdateRowState();
-    }
 
+        if (endNum >= 0)
+        {
+            rows[endNum].cardCount++;
+            rows[endNum].UpdateRowState();
+        }
+
+        rows[beginNum].UpdateRowState();
+
+        ResetNums();
+
+    }
+    public void ResetNums()
+    {
+        beginNum = -1;
+        endNum = -1;
+    }
 
 
 }

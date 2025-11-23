@@ -9,11 +9,12 @@ public class CardStack
     // 添加 child 到 parent 堆顶
     public static void AddToStack(Card parent, Card child)
     {
-        Card top = parent.GetTop();
+        //parent是被堆叠的对象，child是当前操作的对象
+        Card top = parent.GetTop(); //获取被堆叠对象最顶部的对象
 
-        child.topParent = top;
-        child.isInStack = true;
-        top.childCards.Add(child);
+        child.topParent = top;  //将新进的顶部对象设置为顶部对象
+        child.isInStack = true; //新近对象为Instack
+        top.childCards.Add(child);  //只有顶部的卡会有一个List，储存所有的子对象
 
         child.transform.SetParent(top.transform.parent, true);
         UpdateStackPositions(top);
