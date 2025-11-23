@@ -5,5 +5,48 @@ using UnityEngine;
 public class RowManager : MonoBehaviour
 {
     public List<Row> rows;
-    
+    public List<Row> mainRows;
+
+    public int beginNum = 0;
+    public int endNum = 0;
+
+    // public void InitRows(List<Row> inRows)
+    // {
+    //     rows = new List<Row>();
+    //     rows = inRows;
+
+    // }
+    // public void InitMainRows(int mainRowCount)
+    // {
+    //     mainRows = new List<Row>();
+
+    //     for (int i = 0; i < mainRowCount; i++)
+    //     {
+    //         Row newMainRow = new Row();
+    //         newMainRow.cardCount = 0;
+    //         newMainRow.isEmpty = true;
+    //         mainRows.Add(newMainRow);
+    //     }
+    // }
+    public void SetDragCard(Card card)
+    {
+        Debug.Log("正在执行RowSetDragCard");
+        beginNum = card.slotCount;
+    }
+    public void setEndDragCard(Card card)
+    {
+        Debug.Log("正在执行RowsetEndDragCard");
+        endNum = card.slotCount;
+    }
+    public void OnSuccessDragCard(Object obj)
+    {
+
+        rows[beginNum].cardCount--;
+        rows[endNum].cardCount++;
+        rows[beginNum].UpdateRowState();
+        rows[endNum].UpdateRowState();
+    }
+
+
+
 }
