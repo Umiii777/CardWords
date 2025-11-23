@@ -4,18 +4,13 @@ using UnityEngine;
 
 public class RowManager : MonoBehaviour
 {
-    public List<Row> rows;
-    public List<Row> mainRows;
+    public List<Row> rows = new List<Row>();
+    public List<Row> mainRows = new List<Row>();
 
     public int beginNum = -1;
     public int endNum = -1;
 
-    // public void InitRows(List<Row> inRows)
-    // {
-    //     rows = new List<Row>();
-    //     rows = inRows;
 
-    // }
     // public void InitMainRows(int mainRowCount)
     // {
     //     mainRows = new List<Row>();
@@ -40,16 +35,22 @@ public class RowManager : MonoBehaviour
     }
     public void OnSuccessDragCard(Object obj)
     {
-
+        Debug.Log("row变更数据");
+        Debug.Log(beginNum);
+        Debug.Log(endNum);
         rows[beginNum].cardCount--;
-
-        if (endNum >= 0)
+        if (endNum < 0)
+        {
+            return;
+        }
+        else
         {
             rows[endNum].cardCount++;
             rows[endNum].UpdateRowState();
-        }
+            rows[beginNum].UpdateRowState();
+            Debug.Log("更新完成");
 
-        rows[beginNum].UpdateRowState();
+        }
 
         ResetNums();
 

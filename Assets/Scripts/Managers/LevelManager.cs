@@ -148,7 +148,7 @@ public class LevelManager : MonoBehaviour
             currentRow.UpdateRowState();
             rowManager.rows.Add(currentRow);
 
-            Debug.Log("第"+(i+1)+"row有多少牌"+currentRow.cardCount);
+
 
             //层级位置设置
             currentTransform.SetParent(canvas, false);
@@ -156,7 +156,9 @@ public class LevelManager : MonoBehaviour
             currentTransform.SetParent(rowLayer, false);
             //normalRow.transform.position = new Vector2(rowx[i] + (float)startX, rowY);
 
+
         }
+        Debug.Log(rowManager.rows);
     }
     //生成关卡的主列分布
     public void SetLevelMainRow(float[] mainRowx)

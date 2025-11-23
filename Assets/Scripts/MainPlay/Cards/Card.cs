@@ -69,7 +69,7 @@ public class Card : MonoBehaviour
             }
             else
             {
-                Debug.Log(cardData.cardContent);
+
 
                 tmContent.text = cardData.cardContent;
                 cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;

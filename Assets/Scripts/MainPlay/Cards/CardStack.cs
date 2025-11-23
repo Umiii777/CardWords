@@ -13,6 +13,7 @@ public class CardStack
         Card top = parent.GetTop(); //获取被堆叠对象最顶部的对象
 
         child.topParent = top;  //将新进的顶部对象设置为顶部对象
+
         child.isInStack = true; //新近对象为Instack
         top.childCards.Add(child);  //只有顶部的卡会有一个List，储存所有的子对象
 

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -46,8 +47,12 @@ public class CardDragHandler : MonoBehaviour,
 
         originalPos = top.rectTransform.anchoredPosition;
 
-        top.transform.SetParent(UIManager.Instance.dragLayer, true);
-        top.transform.SetAsLastSibling();
+        if (!top.isInStack)
+        {
+            top.transform.SetParent(UIManager.Instance.dragLayer, true);
+            top.transform.SetAsLastSibling();
+        }
+
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
@@ -109,6 +114,9 @@ public class CardDragHandler : MonoBehaviour,
             }
             else
             {
+                // 如果不是空行，按你的规则决定是否允许放置；这里先回退
+                top.rectTransform.anchoredPosition = originalPos;
+                CardStack.UpdateStackPositions(top);
                 return;
             }
         }
@@ -125,15 +133,43 @@ public class CardDragHandler : MonoBehaviour,
         CardStack.UpdateStackPositions(top);
     }
 
+    // 修复：正确从 eventData 指向的被拖拽物体获取拖拽的 top（不要依赖本实例的 private top）
     public void OnDrop(PointerEventData eventData)
     {
+        onDropCard = card; // 当前接收 Drop 的卡
 
-        onDropCard = card;
-        if (card.isOnMainRow && top.cardData.mainId == onDropCard.cardData.mainId)
+        // 从 pointerDrag 找到真正的被拖拽物（可能是原始卡，或其所在对象）
+        if (eventData == null || eventData.pointerDrag == null)
         {
-            Debug.Log("执行了OnDrop");
-            List<Card> eliminateCards = top.childCards;
-            OnCardEliminate(eliminateCards);
+            return;
+        }
+
+        var draggedCardComp = eventData.pointerDrag.GetComponent<Card>();
+        if (draggedCardComp == null)
+        {
+            // pointerDrag 可能是包含其他组件的对象，尝试用 GetComponentInParent
+            draggedCardComp = eventData.pointerDrag.GetComponentInParent<Card>();
+            if (draggedCardComp == null) return;
+        }
+
+        var draggedTop = draggedCardComp.GetTop(); // 安全地取得真正的 top（如果实现了 GetTop）
+        Debug.Log("Ondrag" + draggedTop);
+        if (draggedTop == null) return;
+
+        // 只有当目标和拖拽物都是在主行，且 mainId 相同，才进行消除逻辑
+        if (onDropCard.isOnMainRow && draggedTop.cardData.mainId == onDropCard.cardData.mainId)
+        {
+            Debug.Log("执行了OnDrop - 匹配到相同 mainId，开始消除");
+            if (draggedTop.childCards != null)
+            {
+                List<Card> eliminateCards = draggedTop.childCards;
+                OnCardEliminate(eliminateCards);
+            }
+            else
+            {
+                OnCardEliminate(draggedTop);
+            }
+
         }
         else
         {
@@ -216,33 +252,42 @@ public class CardDragHandler : MonoBehaviour,
 
         CardStack.UpdateStackPositions(top);
     }
+
     private void TryMerge(Card target)
     {
         Debug.Log($"Trying merge: {top.cardData.cardContent}  vs  {target.cardData.cardContent}");
-        // if (target.cardData.mainId == top.cardData.mainId &&
-        //     target.isOnRow && target.isFront)
-        //第一种情况,单到单
+
+        // 第一种情况: 单到单（目标是单张且正面）
         if (target.cardData.mainId == top.cardData.mainId &&
-         target.isFront && !target.isInStack)
+            target.isFront && !target.isInStack)
         {
             CardStack.AddToStack(target, top);
             target.InStackStyle();
 
-            OnEndDragCard.RaiseEvent(top, this);
+            OnEndDragCard.RaiseEvent(target, this);
             OnSuccessDrag.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
             return;
         }
-        //第二种情况，单到多
-        else
+
+        // 第二种情况: 单到多（把单张加入到已有的 stack 顶部）
+        if (target.cardData.mainId == top.cardData.mainId &&
+            (target.isInStack || target.isFront))
         {
+            // 允许把单张放到已有堆栈（需要 CardStack.AddToStack 能处理 target 已经是 stack 的情况）
+            CardStack.AddToStack(target, top);
+            //target.InStackStyle();
+
+            OnEndDragCard.RaiseEvent(target, this);
+            OnSuccessDrag.RaiseEvent(top, this);
+            top.slotCount = target.slotCount;
             return;
-            top.rectTransform.anchoredPosition = originalPos;
-            CardStack.UpdateStackPositions(top);
         }
-        //
-        // top.rectTransform.anchoredPosition = originalPos;
-        // CardStack.UpdateStackPositions(top);
+
+        // 默认：不匹配，回退
+        top.rectTransform.anchoredPosition = originalPos;
+        CardStack.UpdateStackPositions(top);
+        return;
     }
 
     //成功拖动时，改变card的slotCount
@@ -255,10 +300,12 @@ public class CardDragHandler : MonoBehaviour,
             Destroy(item.gameObject);
         }
     }
+    public void OnCardEliminate(Card eliminateCard)
+    {
+
+        Destroy(eliminateCard);
+
+    }
 
     #endregion
 }
-
-
-
-
