@@ -47,9 +47,9 @@ public class SlotManager : MonoBehaviour
         else
         {
             int startSlot = onDragCard.slotCount;
-            if (slots[startSlot].slotDatas.Count == 0)
+            if (slots[startSlot].slotDatas.Count <= 0)
             {
-
+                return;
             }
             else
             {
