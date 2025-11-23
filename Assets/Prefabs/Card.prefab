@@ -9,11 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8009611425715909616}
+  - component: {fileID: 7777482835022992142}
   - component: {fileID: 3247448607967087724}
   - component: {fileID: 3643965561932178464}
   - component: {fileID: 1983081177670052515}
   - component: {fileID: 2429184787772230549}
-  - component: {fileID: 1206875321486787767}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -42,6 +42,22 @@ RectTransform:
   m_AnchoredPosition: {x: 275, y: -540}
   m_SizeDelta: {x: 201, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &7777482835022992142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8423613253864375214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daf74a1df8fdcf241b646393d0de023d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isDragging: 0
+  onSlotDrag: {fileID: 11400000, guid: 6ceb046a97b42994898a2d99bf86cf2d, type: 2}
+  endSlotDrag: {fileID: 11400000, guid: 3cc72be1684beb44cb7c393df6985df9, type: 2}
+  OnSuccessDrag: {fileID: 11400000, guid: b897fb87407b5ba46a3e7f889917cee8, type: 2}
 --- !u!222 &3247448607967087724
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -92,7 +108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fc29de1366888c419f267d57ba8a45f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectTransform: {fileID: 0}
+  localTransform: {fileID: 8009611425715909616}
   spr: {fileID: 0}
   tmContent: {fileID: 1662122123367594324}
   tmLength: {fileID: 8405524618525127691}
@@ -101,16 +117,16 @@ MonoBehaviour:
   sprites:
   - {fileID: 21300000, guid: d2ac44e7db31202429f6c35e35224281, type: 3}
   - {fileID: 21300000, guid: f70a2d65d5e52a34e93cdb04d3b8c1be, type: 3}
-  isFromDeck: 0
   isOnRow: 0
   isOnMainRow: 0
-  cg: {fileID: 0}
   topParent: {fileID: 0}
   stackIndex: 0
   isInStack: 0
   childCards: []
   slotCount: 0
   deckSuccessDrag: {fileID: 11400000, guid: 1cf403b968aebb14c82ee19aa90966b7, type: 2}
+  onSlotDrag: {fileID: 0}
+  endSlotDrag: {fileID: 0}
 --- !u!225 &2429184787772230549
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -123,21 +139,6 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1206875321486787767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8423613253864375214}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: daf74a1df8fdcf241b646393d0de023d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnBeginCardDrag: {fileID: 11400000, guid: 6ceb046a97b42994898a2d99bf86cf2d, type: 2}
-  OnEndDragCard: {fileID: 11400000, guid: 3cc72be1684beb44cb7c393df6985df9, type: 2}
-  OnSuccessDrag: {fileID: 11400000, guid: b897fb87407b5ba46a3e7f889917cee8, type: 2}
 --- !u!1 &8679315250516797434
 GameObject:
   m_ObjectHideFlags: 0

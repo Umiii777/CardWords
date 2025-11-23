@@ -28,7 +28,6 @@ public class LevelManager : MonoBehaviour
     private Transform rowLayer;
     public DeckManager cardDeck;
     public SlotManager slotManager;
-    public RowManager rowManager;
 
     public CardLayoutManager cardLayoutManager;
 
@@ -74,7 +73,6 @@ public class LevelManager : MonoBehaviour
         currentWordsData.Clear();//用于从words表中获取内容的操作列表
         currentCardDeckDatas.Clear();
         currentCardsOnSlot.Clear();
-        rowManager.rows.Clear();
 
         currentCardInitNum = 0;// 根据这个顺序先给下方的卡牌赋值
 
@@ -94,7 +92,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log(mainRows);
 
         //设置关卡的列排布
-        SetLevelLayout(normalRows, mainRows);
+        SetLevelLayout(normalRows.Count(), mainRows);
         //初始化关卡数据,得到的总卡结果是：currentTotalCardDatas
         SetLevelCardsData(currentLevelData);
         //初始化牌组内容
@@ -117,40 +115,31 @@ public class LevelManager : MonoBehaviour
         int[] mainGroup = currentLevelData.mainGroup;
         int mainRows = currentLevelData.column;
 
-        SetLevelLayout(normalRows, mainRows);
+        SetLevelLayout(normalRows.Count(), mainRows);
     }
     //完成关卡，玩家数据加1
     public void OnLevelComplete(int currentLevelID)
     {
         PlayerProgress.SetCurrentLevel(currentLevelID + 1);
     }
-    public void SetLevelLayout(int[] rows, int mainRow)
+    public void SetLevelLayout(int rows, int mainRow)
     {
         //规定行列的高
         //数据层，获得rows的所有排列方式
-        currentRowX = cardLayoutManager.SetRowLayoutX(rows.Count());
+        currentRowX = cardLayoutManager.SetRowLayoutX(rows);
         currentMainRowX = cardLayoutManager.SetMainRowLayoutX(mainRow);
         //处理row
-        SetLevelRow(currentRowX,rows);
+        SetLevelRow(currentRowX);
         //处理mainrow
         SetLevelMainRow(currentMainRowX);
     }
     //生成关卡的普通列分布
-    public void SetLevelRow(float[] rowx,int[] rows)
+    public void SetLevelRow(float[] rowx)
     {
         for (int i = 0; i < rowx.Count(); i++)
         {
-            //初始化内容
             GameObject normalRow = rowPool.Get();
             RectTransform currentTransform = normalRow.GetComponent<RectTransform>();
-            Row currentRow = normalRow.GetComponent<Row>();
-            currentRow.cardCount = rows[i];
-            currentRow.UpdateRowState();
-            rowManager.rows.Add(currentRow);
-
-            Debug.Log("第"+(i+1)+"row有多少牌"+currentRow.cardCount);
-
-            //层级位置设置
             currentTransform.SetParent(canvas, false);
             currentTransform.anchoredPosition = new Vector2(rowx[i] + startX, rowY);
             currentTransform.SetParent(rowLayer, false);
@@ -164,10 +153,7 @@ public class LevelManager : MonoBehaviour
         for (int i = 0; i < mainRowx.Count(); i++)
         {
             GameObject mainRow = mainRowpool.Get();
-            Row currentMainRow = mainRow.GetComponent<Row>();
-            RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
-            currentMainRow.isEmpty = true;
-            rowManager.mainRows.Add(currentMainRow);
+            RectTransform currentTransform = mainRow.GetComponent<RectTransform>();
             currentTransform.SetParent(canvas, false);
             currentTransform.anchoredPosition = new Vector2(mainRowx[i] + startX, mainRowY);
             currentTransform.SetParent(rowLayer, false);
