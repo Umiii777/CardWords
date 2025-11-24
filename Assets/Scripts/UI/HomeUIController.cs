@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
@@ -43,11 +43,12 @@ public class HomeUIController : MonoBehaviour
             {
                 sharedEnergyCountText.text = value.ToString();
                 sharedMaxEnergyTips.SetActive(value >= maxEnergy);
+                sharedAddEnergyButton.SetActive(value < maxEnergy);
             }
             numEnergy = value;
         }
     }
-    private static int numEnergy = 0;
+    private static int numEnergy;
     private static TextMeshProUGUI sharedEnergyCountText;
     [SerializeField]
     private TextMeshProUGUI energyCountText;
@@ -63,11 +64,14 @@ public class HomeUIController : MonoBehaviour
         set
         {
             if (sharedMaxEnergyTips != null)
+            {
                 sharedMaxEnergyTips.SetActive(value <= numEnergy);
+                sharedAddEnergyButton.SetActive(value > numEnergy);
+            }
             maxEnergy = value;
         }
     }
-    private static int maxEnergy = 999;
+    private static int maxEnergy;
     private static GameObject sharedMaxEnergyTips;
     [SerializeField]
     private GameObject maxEnergyTips;
@@ -113,6 +117,12 @@ public class HomeUIController : MonoBehaviour
     private TextMeshProUGUI energyForPlayText;
 #endregion
 
+#region 补充体力按钮
+    private static GameObject sharedAddEnergyButton;
+    [SerializeField]
+    private GameObject addEnergyButton;
+#endregion
+
 #region 商店按钮右上角红点
     public static bool IsShopHintShown
     {
@@ -134,23 +144,23 @@ public class HomeUIController : MonoBehaviour
     /// <summary>
     /// 设置按钮回调
     /// </summary>
-    public static UnityAction clickingSettings;
+    public static Action clickingSettings;
     /// <summary>
     /// 补充体力按钮回调
     /// </summary>
-    public static UnityAction clickingAddEnergy;
+    public static Action clickingAddEnergy;
     /// <summary>
     /// 商店按钮回调
     /// </summary>
-    public static UnityAction clickingShop;
+    public static Action clickingShop;
     /// <summary>
     /// 进入关卡按钮回调
     /// </summary>
-    public static UnityAction clickingStart;
+    public static Action clickingStart;
     /// <summary>
     /// 该委托在 HomeUIController 的协程中每帧执行一次
     /// </summary>
-    public static UnityAction runningCoroutine;
+    public static Action runningCoroutine;
 #endregion
 
 #region 按钮回调方法
@@ -168,6 +178,8 @@ public class HomeUIController : MonoBehaviour
     {
         InitSharedFields();
         StartCoroutine(nameof(CoroutineUpdate));
+        NumEnergy = PlayerEnergy.GetEnergy();
+        MaxEnergy = PlayerEnergy.MaxEnergy;
     }
 
     private IEnumerator CoroutineUpdate()
@@ -186,6 +198,7 @@ public class HomeUIController : MonoBehaviour
         sharedMaxEnergyTips = maxEnergyTips;
         sharedLevelNameText = levelNameText;
         sharedEnergyForPlayText = energyForPlayText;
+        sharedAddEnergyButton = addEnergyButton;
         sharedShopHint = shopHint;
 
         sharedCoinCountText.text = numCoins.ToString();
@@ -193,6 +206,7 @@ public class HomeUIController : MonoBehaviour
         sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
         sharedLevelNameText.text = levelName;
         sharedEnergyForPlayText.text = numEnergyForPlay.ToString();
+        sharedAddEnergyButton.SetActive(numEnergy < maxEnergy);
         sharedShopHint.SetActive(isShopHintShown);
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
@@ -59,7 +58,7 @@ public class ShopUIController : MonoBehaviour
     /// <summary>
     /// 玩家体力值上限
     /// </summary>
-    private static readonly int maxEnergy = HomeUIController.MaxEnergy;
+    private static int maxEnergy = 0;
     private static GameObject sharedMaxEnergyTips;
     [SerializeField]
     private GameObject maxEnergyTips;
@@ -69,25 +68,25 @@ public class ShopUIController : MonoBehaviour
     /// <summary>
     /// 设置按钮回调
     /// </summary>
-    public static UnityAction clickingSettings;
+    public static Action clickingSettings;
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
     /// 应将 Destroy(shopUI) 加到最后
     /// </summary>
-    public static UnityAction clickingClose;
+    public static Action clickingClose;
     /// <summary>
     /// 领取金币按钮回调
     /// </summary>
-    public static Func<int, int, Task> clickingRecieve;
+    public static Func<int, int, Task> clickingReceive;
     /// <summary>
     /// 购买礼包按钮回调
     /// </summary>
-    public static UnityAction<ItemType, int, int> clickingBuy;
+    public static Action<ItemType, int, int> clickingBuy;
     /// <summary>
     /// 该委托在 ShopUIController 的协程中每帧执行一次
     /// </summary>
-    public static UnityAction runningCoroutine;
+    public static Action runningCoroutine;
 #endregion
 
     [SerializeField]
@@ -104,18 +103,13 @@ public class ShopUIController : MonoBehaviour
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         clickingBuy?.Invoke((ItemType)c[0], c[1], c[2]);
     }
-    public void OnClickRecieve(string config)
-    {
-        int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
-        async Task Process(int numCoins, int numAds)
-        {
-            if (clickingRecieve is not null)
-                foreach (var f in clickingRecieve.GetInvocationList().Cast<Func<int, int, Task>>())
-                    await f(numCoins, numCoins);
-            UpdateWatchedAdText();
-        }
-        _ = Process(c[0], c[1]);
-    }
+    public void OnClickReceive(string config) => _ = PlayerAd.ProcessAd(
+        clickingReceive,
+        UpdateWatchedAdText,
+        config.Split(',')
+            .Select(s => int.Parse(s.Trim()))
+            .Cast<object>().ToArray()
+    );
 #endregion
 
     void Start()
@@ -123,6 +117,8 @@ public class ShopUIController : MonoBehaviour
         InitSharedFields();
         InitWatchedAdText();
         UpdateWatchedAdText();
+        NumEnergy = PlayerEnergy.GetEnergy();
+        maxEnergy = PlayerEnergy.MaxEnergy;
     }
 
     private void InitSharedFields()

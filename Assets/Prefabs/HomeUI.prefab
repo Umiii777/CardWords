@@ -73,7 +73,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 240, y: 63}
+  m_SizeDelta: {x: 200, y: 63}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &6505183269368904447
 CanvasRenderer:
@@ -641,8 +641,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 93, y: 0}
-  m_SizeDelta: {x: 160, y: 50}
+  m_AnchoredPosition: {x: 80, y: 0}
+  m_SizeDelta: {x: 80, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9188291410612384193
 CanvasRenderer:
@@ -672,7 +672,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 999
+  m_text: 10
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fe966a8007578dc448ae5aaab21960e7, type: 2}
   m_sharedMaterial: {fileID: 1154072781650728738, guid: fe966a8007578dc448ae5aaab21960e7, type: 2}
@@ -776,7 +776,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 240, y: 63}
+  m_SizeDelta: {x: 200, y: 63}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7747318795313487000
 CanvasRenderer:
@@ -851,8 +851,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: 182.4, y: -1.3}
-  m_SizeDelta: {x: 54.399994, y: 55}
+  m_AnchoredPosition: {x: 142, y: -1.3}
+  m_SizeDelta: {x: 54.4, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2814569411698268981
 CanvasRenderer:
@@ -981,10 +981,10 @@ RectTransform:
   - {fileID: 5158739341361911545}
   m_Father: {fileID: 3419364044362974628}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -19.94, y: -3.99}
-  m_SizeDelta: {x: 1371.8, y: 2230.82}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -19.940002, y: -3.9899902}
+  m_SizeDelta: {x: 1271.8, y: 2130.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &515755548334927757
 CanvasRenderer:
@@ -1467,6 +1467,7 @@ MonoBehaviour:
   maxEnergyTips: {fileID: 800142351290304865}
   levelNameText: {fileID: 4467088120647342106}
   energyForPlayText: {fileID: 3887393296039572550}
+  addEnergyButton: {fileID: 2750574968163771264}
   shopHint: {fileID: 671484076706175475}
 --- !u!114 &8956968496835212622
 MonoBehaviour:

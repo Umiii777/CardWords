@@ -599,7 +599,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8188723824494120873}
         m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieveMore
+        m_MethodName: OnClickReceiveMore
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -880,7 +880,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8188723824494120873}
         m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieve
+        m_MethodName: OnClickReceive
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -922,10 +922,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2422548839208846338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -19.94, y: -3.99}
-  m_SizeDelta: {x: 1371.8, y: 2230.82}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -19.940002, y: -3.9899902}
+  m_SizeDelta: {x: 1271.8, y: 2130.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6760228486905440188
 CanvasRenderer:

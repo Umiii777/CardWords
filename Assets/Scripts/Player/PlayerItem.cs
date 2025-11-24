@@ -1,7 +1,17 @@
 using System;
 using UnityEngine;
 
-public enum ItemType { Hint, Refresh }
+public enum ItemType
+{
+    /// <summary>
+    /// 提示
+    /// </summary>
+    Hint,
+    /// <summary>
+    /// 洗牌
+    /// </summary>
+    Shuffle
+}
 struct Prop
 {
     public Func<int> get;
@@ -11,7 +21,7 @@ struct Prop
 public class PlayerItem
 {
     private const string Key_Hint = "ItemHint";
-    private const string Key_Refresh = "ItemRefresh";
+    private const string Key_Shuffle = "ItemShuffle";
 
     private static int Hint
     {
@@ -22,20 +32,20 @@ public class PlayerItem
             PlayerPrefs.Save();
         }
     }
-    private static int Refresh
+    private static int Shuffle
     {
-        get => PlayerPrefs.GetInt(Key_Refresh, 0);
+        get => PlayerPrefs.GetInt(Key_Shuffle, 0);
         set
         {
-            PlayerPrefs.SetInt(Key_Refresh, value);
+            PlayerPrefs.SetInt(Key_Shuffle, value);
             PlayerPrefs.Save();
         }
     }
 
     private static Prop[] props =
     {
-        new Prop { get = () => Hint, set = v => Hint = v },
-        new Prop { get = () => Refresh, set = v => Refresh = v }
+        new() { get = () => Hint, set = v => Hint = v },
+        new() { get = () => Shuffle, set = v => Shuffle = v }
     };
 
     public static int GetItem(ItemType type) => props[(int)type].get();

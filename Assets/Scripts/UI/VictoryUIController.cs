@@ -1,8 +1,6 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
@@ -16,25 +14,25 @@ public class VictoryUIController : MonoBehaviour
     /// <summary>
     /// 要显示在领取金币按钮上的金币数量
     /// </summary>
-    public static int numCoinsToRecieve = 10;
+    public static int numCoinsToReceive = 10;
     /// <summary>
     /// 返回主界面按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingHome;
+    public static Action clickingHome;
     /// <summary>
     /// 十倍领取按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static Func<Task> clickingRecieveMore;
+    public static Func<Task> clickingReceiveMore;
     /// <summary>
     /// 领取金币按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingRecieve;
+    public static Action clickingReceive;
 #endregion
 
     /// <summary>
@@ -45,21 +43,12 @@ public class VictoryUIController : MonoBehaviour
 
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
-    public void OnClickRecieve() => clickingRecieve?.Invoke();
-    public void OnClickRecieveMore()
-    {
-        static async Task Process()
-        {
-            if (clickingRecieveMore is not null)
-                foreach (var f in clickingRecieveMore.GetInvocationList().Cast<Func<Task>>())
-                    await f();
-        }
-        _ = Process();
-    }
+    public void OnClickReceive() => clickingReceive?.Invoke();
+    public void OnClickReceiveMore() => _ = PlayerAd.ProcessAd(clickingReceiveMore);
 #endregion
 
     void Start()
     {
-        coinCountText.text = numCoinsToRecieve.ToString();
+        coinCountText.text = numCoinsToReceive.ToString();
     }
 }

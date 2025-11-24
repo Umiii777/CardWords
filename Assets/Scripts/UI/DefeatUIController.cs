@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
 
 /// <summary>
@@ -27,7 +25,7 @@ public class DefeatUIController : MonoBehaviour
     /// <br/><br/>
     /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingHome;
+    public static Action clickingHome;
     /// <summary>
     /// 继续游戏按钮回调
     /// <br/><br/>
@@ -39,13 +37,13 @@ public class DefeatUIController : MonoBehaviour
     /// <br/><br/>
     /// 应将 Destroy(victoryUI) 加到最后
     /// </summary>
-    public static UnityAction clickingReplay;
+    public static Action clickingReplay;
     /// <summary>
     /// 该委托在 DefeatUIController 的协程中每帧执行一次
     /// <br/><br/>
     /// 在这里使用 DefeatUIController.progress += ... 可以控制进度条填充速度
     /// </summary>
-    public static UnityAction runningCoroutine;
+    public static Action runningCoroutine;
 #endregion
 
 #region 私有字段
@@ -79,16 +77,7 @@ public class DefeatUIController : MonoBehaviour
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
     public void OnClickReplay() => clickingReplay?.Invoke();
-    public void OnClickContinue()
-    {
-        static async Task Process()
-        {
-            if (clickingContinue is not null)
-                foreach (var f in clickingContinue.GetInvocationList().Cast<Func<Task>>())
-                    await f();
-        }
-        _ = Process();
-    }
+    public void OnClickContinue() => _ = PlayerAd.ProcessAd(clickingContinue);
 #endregion
 
     void Start()

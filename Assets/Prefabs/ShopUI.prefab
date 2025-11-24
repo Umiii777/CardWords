@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8802885918913246132}
   - component: {fileID: 4427889668921634750}
   m_Layer: 5
-  m_Name: guanggao_recieve
+  m_Name: guanggao_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -450,7 +450,7 @@ GameObject:
   - component: {fileID: 3025411383468241898}
   - component: {fileID: 8421096869488265642}
   m_Layer: 5
-  m_Name: shuliang_guanggao_recieve
+  m_Name: price_text_buy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2907,10 +2907,10 @@ RectTransform:
   - {fileID: 3387627706953529273}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: -980, y: -1820}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4154039431515968401
 MonoBehaviour:
@@ -2941,7 +2941,7 @@ GameObject:
   - component: {fileID: 8082376065069544793}
   - component: {fileID: 6933163067829107154}
   m_Layer: 5
-  m_Name: text_recieve
+  m_Name: text_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3189,7 +3189,7 @@ GameObject:
   - component: {fileID: 3581499005258854979}
   - component: {fileID: 3045649341006990686}
   m_Layer: 5
-  m_Name: text_recieve
+  m_Name: text_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3385,8 +3385,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4292030099
-  m_fontColor: {r: 0.5761143, g: 0.17931636, b: 0.82641506, a: 1}
+    rgba: 4289730982
+  m_fontColor: {r: 0.6509804, g: 0.09803922, b: 0.6901961, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -3496,7 +3496,7 @@ GameObject:
   - component: {fileID: 7112036439847518735}
   - component: {fileID: 5992114449671984138}
   m_Layer: 5
-  m_Name: guanggao_recieve
+  m_Name: guanggao_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3954,7 +3954,7 @@ GameObject:
   - component: {fileID: 7472567927239146047}
   - component: {fileID: 4578331544248643668}
   m_Layer: 5
-  m_Name: text_recieve
+  m_Name: text_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4203,7 +4203,7 @@ GameObject:
   - component: {fileID: 6623222673262682804}
   - component: {fileID: 195705741003149887}
   m_Layer: 5
-  m_Name: lingqu_recieve
+  m_Name: lingqu_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4315,7 +4315,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4154039431515968401}
         m_TargetAssemblyTypeName: ShopUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieve
+        m_MethodName: OnClickReceive
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4338,7 +4338,7 @@ GameObject:
   - component: {fileID: 7179917696134281651}
   - component: {fileID: 8840368789890567972}
   m_Layer: 5
-  m_Name: lingqu_recieve
+  m_Name: lingqu_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4450,7 +4450,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4154039431515968401}
         m_TargetAssemblyTypeName: ShopUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieve
+        m_MethodName: OnClickReceive
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5174,7 +5174,7 @@ GameObject:
   - component: {fileID: 4720537101484597339}
   - component: {fileID: 196480781844140679}
   m_Layer: 5
-  m_Name: lingqu_recieve
+  m_Name: lingqu_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5286,7 +5286,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4154039431515968401}
         m_TargetAssemblyTypeName: ShopUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieve
+        m_MethodName: OnClickReceive
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5406,7 +5406,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 190, y: 63}
+  m_SizeDelta: {x: 200, y: 63}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &7231462657717771178
 CanvasRenderer:
@@ -5459,7 +5459,7 @@ GameObject:
   - component: {fileID: 6891363734778813243}
   - component: {fileID: 3871183857014824135}
   m_Layer: 5
-  m_Name: lingqu_recieve
+  m_Name: lingqu_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5571,7 +5571,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4154039431515968401}
         m_TargetAssemblyTypeName: ShopUIController, Assembly-CSharp
-        m_MethodName: OnClickRecieve
+        m_MethodName: OnClickReceive
         m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6183,7 +6183,7 @@ GameObject:
   - component: {fileID: 3256346672517958946}
   - component: {fileID: 187162878859385390}
   m_Layer: 5
-  m_Name: guanggao_recieve
+  m_Name: guanggao_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6258,7 +6258,7 @@ GameObject:
   - component: {fileID: 5523526389959711932}
   - component: {fileID: 6115264589939018591}
   m_Layer: 5
-  m_Name: text_recieve
+  m_Name: text_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6489,8 +6489,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 93, y: 0}
-  m_SizeDelta: {x: 160, y: 50}
+  m_AnchoredPosition: {x: 80, y: 0}
+  m_SizeDelta: {x: 80, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3120658274620965103
 CanvasRenderer:
@@ -6520,7 +6520,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 999
+  m_text: 10
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fe966a8007578dc448ae5aaab21960e7, type: 2}
   m_sharedMaterial: {fileID: 1154072781650728738, guid: fe966a8007578dc448ae5aaab21960e7, type: 2}
@@ -6739,7 +6739,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -19.940002, y: -3.9899979}
+  m_AnchoredPosition: {x: -19.940002, y: -3.9899902}
   m_SizeDelta: {x: 1271.8, y: 2130.82}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3839024535217376014
@@ -6792,7 +6792,7 @@ GameObject:
   - component: {fileID: 1311088209516978410}
   - component: {fileID: 6737556318399036972}
   m_Layer: 5
-  m_Name: shuliang_guanggao_recieve
+  m_Name: price_text_buy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7175,7 +7175,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 190, y: 63}
+  m_SizeDelta: {x: 200, y: 63}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &4385368400718982165
 CanvasRenderer:
@@ -7377,7 +7377,7 @@ GameObject:
   - component: {fileID: 677134787981438428}
   - component: {fileID: 1823929957621275554}
   m_Layer: 5
-  m_Name: guanggao_recieve
+  m_Name: guanggao_receive
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
