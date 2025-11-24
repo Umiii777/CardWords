@@ -5,11 +5,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class CardDragHandler : MonoBehaviour,
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Card card;
     private Card top;
-    private Card onDropCard;
 
     private Canvas canvas;
     private CanvasGroup cg;
@@ -52,7 +51,7 @@ public class CardDragHandler : MonoBehaviour,
             top.transform.SetParent(UIManager.Instance.dragLayer, true);
             top.transform.SetAsLastSibling();
         }
-
+ 
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
@@ -92,7 +91,7 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        offset = Vector2.zero;
+        
 
         Debug.Log("执行了onEndDrag");
         if (top == null)
@@ -134,48 +133,7 @@ public class CardDragHandler : MonoBehaviour,
     }
 
     // 修复：正确从 eventData 指向的被拖拽物体获取拖拽的 top（不要依赖本实例的 private top）
-    public void OnDrop(PointerEventData eventData)
-    {
-        onDropCard = card; // 当前接收 Drop 的卡
-
-        // 从 pointerDrag 找到真正的被拖拽物（可能是原始卡，或其所在对象）
-        if (eventData == null || eventData.pointerDrag == null)
-        {
-            return;
-        }
-
-        var draggedCardComp = eventData.pointerDrag.GetComponent<Card>();
-        if (draggedCardComp == null)
-        {
-            // pointerDrag 可能是包含其他组件的对象，尝试用 GetComponentInParent
-            draggedCardComp = eventData.pointerDrag.GetComponentInParent<Card>();
-            if (draggedCardComp == null) return;
-        }
-
-        var draggedTop = draggedCardComp.GetTop(); // 安全地取得真正的 top（如果实现了 GetTop）
-        Debug.Log("Ondrag" + draggedTop);
-        if (draggedTop == null) return;
-
-        // 只有当目标和拖拽物都是在主行，且 mainId 相同，才进行消除逻辑
-        if (onDropCard.isOnMainRow && draggedTop.cardData.mainId == onDropCard.cardData.mainId)
-        {
-            Debug.Log("执行了OnDrop - 匹配到相同 mainId，开始消除");
-            if (draggedTop.childCards != null)
-            {
-                List<Card> eliminateCards = draggedTop.childCards;
-                OnCardEliminate(eliminateCards);
-            }
-            else
-            {
-                OnCardEliminate(draggedTop);
-            }
-
-        }
-        else
-        {
-            return;
-        }
-    }
+   
     #endregion
     #region 私有工具类
 

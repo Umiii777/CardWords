@@ -27,7 +27,6 @@ public class LevelManager : MonoBehaviour
     private Transform dragLayer;
     private Transform rowLayer;
     public DeckManager cardDeck;
-    public SlotManager slotManager;
     public RowManager rowManager;
 
     public CardLayoutManager cardLayoutManager;
@@ -102,7 +101,6 @@ public class LevelManager : MonoBehaviour
 
         //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
         SetLevelCardLayout(normalRows);
-        slotManager.InitSlots(normalRows, currentCardsOnSlot.ToArray());
 
     }
     //加载关卡配置，TODO：初始化对象池
@@ -145,8 +143,7 @@ public class LevelManager : MonoBehaviour
             RectTransform currentTransform = normalRow.GetComponent<RectTransform>();
             Row currentRow = normalRow.GetComponent<Row>();
             currentRow.cardCount = rows[i];
-            currentRow.UpdateRowState();
-            rowManager.rows.Add(currentRow);
+            rowManager.AddRow(currentRow);
 
 
 
@@ -206,6 +203,7 @@ public class LevelManager : MonoBehaviour
                 card.isOnRow = true;
                 //初始化结束后，加入slot
                 currentCardsOnSlot.Add(card);
+                rowManager.rows[i].cardsOnRow.Add(card);
 
                 //改变生成的卡牌的布局
                 RectTransform currentTransform = card.GetComponent<RectTransform>();
