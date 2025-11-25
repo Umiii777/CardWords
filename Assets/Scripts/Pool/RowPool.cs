@@ -13,7 +13,7 @@ public class RowPool : MonoBehaviour
 
     private IObjectPool<GameObject> pool;
 
-    private void Awake()
+    private void Start()
     {
         pool = new ObjectPool<GameObject>(
             createFunc: CreateRow,  

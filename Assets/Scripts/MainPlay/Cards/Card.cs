@@ -121,6 +121,26 @@ public class Card : MonoBehaviour
     {
         return GetTop() == this;
     }
+
+    //mainCard方法
+    public void SetMainCardVisualOnCombine()
+    {
+        cardData.currentLength++;
+        tmLength.text = cardData.currentLength.ToString() + "/" + cardData.mainTotalLength.ToString();
+        MainCardCheckLength();
+    }
+    public void MainCardCheckLength()
+    {
+        if (cardData.currentLength == cardData.mainTotalLength)
+        {
+            //执行maincard的消除逻辑和表现
+            CompleteMainCard();
+        }
+    }
+    
+
+
+
     private void OnEnable()
     {
         CardManager.Instance.allCards.Add(this);
@@ -130,6 +150,14 @@ public class Card : MonoBehaviour
     {
         CardManager.Instance.allCards.Remove(this);
     }
+    //消除表现
+    public void CompleteMainCard()
+    {
 
+    }
+    public void CompleteNormalCard()
+    {
+        gameObject.SetActive(false);
+    }
 
 }

@@ -61,6 +61,17 @@ public class Row : MonoBehaviour
         {
             Debug.Log("当前这张卡已经是正面了");
         }
-
     }
+
+    //CardManger加载保存
+    private void OnEnable()
+    {
+        CardManager.Instance.allRows.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        CardManager.Instance.allRows.Remove(this);
+    }
+
 }

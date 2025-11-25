@@ -33,7 +33,12 @@ public class CardDragHandler : MonoBehaviour,
     {
         if (!card.isFront)
         {
-            // 前置卡不可拖拽
+            // 翻面的卡不可拖拽
+            top = null;
+            return;
+        }
+        if (card.isOnMainRow)
+        {
             top = null;
             return;
         }
@@ -51,7 +56,7 @@ public class CardDragHandler : MonoBehaviour,
             top.transform.SetParent(UIManager.Instance.dragLayer, true);
             top.transform.SetAsLastSibling();
         }
- 
+
 
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
@@ -91,7 +96,7 @@ public class CardDragHandler : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        
+
 
         Debug.Log("执行了onEndDrag");
         if (top == null)
@@ -111,21 +116,19 @@ public class CardDragHandler : MonoBehaviour,
                 PlaceOnRow(bestRow);
                 return;
             }
-            else
-            {
-                // 如果不是空行，按你的规则决定是否允许放置；这里先回退
-                top.rectTransform.anchoredPosition = originalPos;
-                CardStack.UpdateStackPositions(top);
-                return;
-            }
+
         }
         // 2. 落到卡上（合并逻辑）
-        if (best)
+        if (!best.cardData.isMainCard)
         {
             TryMerge(best);
             return;
         }
-
+        else if (best.cardData.isMainCard)
+        {
+            Debug.Log("落在了主卡上");
+            PlaceOnMainCard(best);
+        }
 
         // 默认：回原位
         top.rectTransform.anchoredPosition = originalPos;
@@ -133,7 +136,7 @@ public class CardDragHandler : MonoBehaviour,
     }
 
     // 修复：正确从 eventData 指向的被拖拽物体获取拖拽的 top（不要依赖本实例的 private top）
-   
+
     #endregion
     #region 私有工具类
 
@@ -141,8 +144,6 @@ public class CardDragHandler : MonoBehaviour,
     {
         float maxArea = 0;
         Card best = null;
-
-
         foreach (var c in CardManager.Instance.allCards)
         {
             if (c == top) continue;
@@ -157,14 +158,15 @@ public class CardDragHandler : MonoBehaviour,
             }
         }
         Debug.Log("当前Allcard有多少牌" + CardManager.Instance.allCards.Count);
-
-        return maxArea > 1 ? best : null; // 用 maxArea，而不是 bestArea
+        Debug.Log("当前卡片的堆叠区域是" + maxArea);
+        return maxArea > 0.5 ? best : null; // 用 maxArea，而不是 bestArea
     }
     private Row FindBestOverlapRow()
     {
+        Debug.Log("执行了findBestRow");
         float maxArea = 0;
         Row best = null;
-
+        Debug.Log("当前CardmanagerInstance的row总量为" + CardManager.Instance.allRows.Count);
         foreach (var r in CardManager.Instance.allRows)
         {
             float area = CardOverlap.GetOverlapArea(
@@ -176,9 +178,10 @@ public class CardDragHandler : MonoBehaviour,
                 best = r;
             }
         }
-
-        return maxArea > 1 ? best : null;
+        Debug.Log("当前卡片的堆叠区域是" + maxArea);
+        return maxArea > 0.5 ? best : null; //和maxArea比较的值就是吸附的参数
     }
+
     private void PlaceOnRow(Row row)
     {
         if (row.rowType == RowType.main && !top.cardData.isMainCard)
@@ -197,8 +200,15 @@ public class CardDragHandler : MonoBehaviour,
         }
         else if (row.rowType == RowType.main && top.cardData.isMainCard)
         {
+            Debug.Log("主卡拖到了mainRow上面");
             top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
+
+            //变更拖拽上去的卡状态
             top.isOnMainRow = true;
+            top.isOnRow = false;
+            //变更row状态
+            row.isEmpty = false;    //主卡槽直接置空，TODO清空主卡槽的逻辑
+            //变更所有卡状态
             CardStack.UpdateStackPositions(top);
             OnSuccessDrag.RaiseEvent(this, this);
             //row.DragOncard(top);
@@ -209,6 +219,29 @@ public class CardDragHandler : MonoBehaviour,
         top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
 
         CardStack.UpdateStackPositions(top);
+    }
+
+    private void PlaceOnMainCard(Card target)
+    {
+        if (!target.isOnMainRow)
+        {
+            top.rectTransform.anchoredPosition = originalPos;
+            return;
+        }
+        else
+        {
+            if (top.cardData.mainId == target.cardData.mainId)
+            {
+                //触发card自身的被合成东西+表现
+                top.gameObject.SetActive(false);
+                target.SetMainCardVisualOnCombine();
+            }
+            else
+            {
+                top.rectTransform.anchoredPosition = originalPos;
+                return;
+            }
+        }
     }
 
     private void TryMerge(Card target)
