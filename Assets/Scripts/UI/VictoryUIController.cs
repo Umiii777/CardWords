@@ -18,19 +18,19 @@ public class VictoryUIController : MonoBehaviour
     /// <summary>
     /// 返回主界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
     public static Action clickingHome;
     /// <summary>
     /// 十倍领取按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
     public static Func<Task> clickingReceiveMore;
     /// <summary>
     /// 领取金币按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
     public static Action clickingReceive;
 #endregion
@@ -44,7 +44,7 @@ public class VictoryUIController : MonoBehaviour
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
     public void OnClickReceive() => clickingReceive?.Invoke();
-    public void OnClickReceiveMore() => _ = PlayerAd.ProcessAd(clickingReceiveMore);
+    public void OnClickReceiveMore() => SystemUIManager.ProcessAd(clickingReceiveMore);
 #endregion
 
     void Start()

@@ -101,20 +101,20 @@ public class HomeUIController : MonoBehaviour
     /// <summary>
     /// 进入关卡时要扣除的体力值（请代入负数）
     /// </summary>
-    public static int NumEnergyForPlay
+    public static int NumEnergyToPlay
     {
-        get => numEnergyForPlay;
+        get => numEnergyToPlay;
         set
         {
-            if (sharedEnergyForPlayText != null)
-                sharedEnergyForPlayText.text = value.ToString();
-            numEnergyForPlay = value;
+            if (sharedEnergyToPlayText != null)
+                sharedEnergyToPlayText.text = value.ToString();
+            numEnergyToPlay = value;
         }
     }
-    private static int numEnergyForPlay = -1;
-    private static TextMeshProUGUI sharedEnergyForPlayText;
+    private static int numEnergyToPlay = -1;
+    private static TextMeshProUGUI sharedEnergyToPlayText;
     [SerializeField]
-    private TextMeshProUGUI energyForPlayText;
+    private TextMeshProUGUI energyToPlayText;
 #endregion
 
 #region 补充体力按钮
@@ -197,7 +197,7 @@ public class HomeUIController : MonoBehaviour
         sharedEnergyCountText = energyCountText;
         sharedMaxEnergyTips = maxEnergyTips;
         sharedLevelNameText = levelNameText;
-        sharedEnergyForPlayText = energyForPlayText;
+        sharedEnergyToPlayText = energyToPlayText;
         sharedAddEnergyButton = addEnergyButton;
         sharedShopHint = shopHint;
 
@@ -205,7 +205,7 @@ public class HomeUIController : MonoBehaviour
         sharedEnergyCountText.text = numEnergy.ToString();
         sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
         sharedLevelNameText.text = levelName;
-        sharedEnergyForPlayText.text = numEnergyForPlay.ToString();
+        sharedEnergyToPlayText.text = numEnergyToPlay.ToString();
         sharedAddEnergyButton.SetActive(numEnergy < maxEnergy);
         sharedShopHint.SetActive(isShopHintShown);
     }

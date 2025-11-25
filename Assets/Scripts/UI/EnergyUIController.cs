@@ -42,7 +42,7 @@ public class EnergyUIController : MonoBehaviour
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(shopUI) 加到最后
+    /// 应将 Destroy(shopUI.gameObject) 加到最后
     /// </summary>
     static public Action clickingClose;
     /// <summary>
@@ -57,7 +57,7 @@ public class EnergyUIController : MonoBehaviour
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => _ = PlayerAd.ProcessAd(clickingReceive);
+    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingReceive);
     public void OcClickBuy(string price) => clickingBuy?.Invoke(int.Parse(price));
 #endregion
 

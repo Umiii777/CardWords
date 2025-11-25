@@ -72,7 +72,7 @@ public class ShopUIController : MonoBehaviour
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(shopUI) 加到最后
+    /// 应将 Destroy(shopUI.gameObject) 加到最后
     /// </summary>
     public static Action clickingClose;
     /// <summary>
@@ -103,7 +103,7 @@ public class ShopUIController : MonoBehaviour
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         clickingBuy?.Invoke((ItemType)c[0], c[1], c[2]);
     }
-    public void OnClickReceive(string config) => _ = PlayerAd.ProcessAd(
+    public void OnClickReceive(string config) => SystemUIManager.ProcessAd(
         clickingReceive,
         UpdateWatchedAdText,
         config.Split(',')

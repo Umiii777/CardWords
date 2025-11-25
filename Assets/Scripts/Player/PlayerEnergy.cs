@@ -44,9 +44,18 @@ public class PlayerEnergy
     /// <returns>本次回复是否造成了体力值溢出</returns>
     public static bool AddEnergy(int count)
     {
+        if (Energy >= MaxEnergy)
+            return false;
         int e = Energy + count;
         Energy = Math.Min(e, MaxEnergy);
         return Energy < e;
+    }
+    public static bool TryAddEnergy(int count)
+    {
+        if (Energy + count > MaxEnergy)
+            return false;
+        Energy += count;
+        return true;
     }
     public static bool TrySpendEnergy(int count)
     {

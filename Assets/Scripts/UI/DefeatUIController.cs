@@ -23,19 +23,19 @@ public class DefeatUIController : MonoBehaviour
     /// <summary>
     /// 返回主界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
     public static Action clickingHome;
     /// <summary>
     /// 继续游戏按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
     public static Func<Task> clickingContinue;
     /// <summary>
     /// 重玩按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
     public static Action clickingReplay;
     /// <summary>
@@ -50,7 +50,7 @@ public class DefeatUIController : MonoBehaviour
     /// <summary>
     /// 游戏完成进度条每帧默认填充量
     /// </summary>
-    private const float DEFAULT_DELTA_PROGRESS = 0.5f / 100;
+    private const float PROGRESS_FILLING_DURATION = 5f;
     /// <summary>
     /// 完成度进度条的最小宽度
     /// </summary>
@@ -77,7 +77,7 @@ public class DefeatUIController : MonoBehaviour
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
     public void OnClickReplay() => clickingReplay?.Invoke();
-    public void OnClickContinue() => _ = PlayerAd.ProcessAd(clickingContinue);
+    public void OnClickContinue() => SystemUIManager.ProcessAd(clickingContinue);
 #endregion
 
     void Start()
@@ -96,8 +96,10 @@ public class DefeatUIController : MonoBehaviour
             ? () =>
             {
                 DisplayProgress(filledProgress);
-                if (filledProgress < progress)
-                    filledProgress += DEFAULT_DELTA_PROGRESS;
+                filledProgress = Math.Min(
+                    progress,
+                    filledProgress + Time.deltaTime / PROGRESS_FILLING_DURATION / progress
+                );
             }
             : () => DisplayProgress(progress);
 

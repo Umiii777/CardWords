@@ -1466,7 +1466,7 @@ MonoBehaviour:
   energyCountText: {fileID: 8802427546765252390}
   maxEnergyTips: {fileID: 800142351290304865}
   levelNameText: {fileID: 4467088120647342106}
-  energyForPlayText: {fileID: 3887393296039572550}
+  energyToPlayText: {fileID: 3887393296039572550}
   addEnergyButton: {fileID: 2750574968163771264}
   shopHint: {fileID: 671484076706175475}
 --- !u!114 &8956968496835212622
