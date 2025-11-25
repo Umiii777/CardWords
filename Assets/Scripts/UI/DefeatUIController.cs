@@ -23,19 +23,19 @@ public class DefeatUIController : MonoBehaviour
     /// <summary>
     /// 返回主界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI) 加到最后
     /// </summary>
     public static Action clickingHome;
     /// <summary>
     /// 继续游戏按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI) 加到最后
     /// </summary>
     public static Func<Task> clickingContinue;
     /// <summary>
     /// 重玩按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(victoryUI) 加到最后
+    /// 应将 Destroy(defeatUI) 加到最后
     /// </summary>
     public static Action clickingReplay;
     /// <summary>
