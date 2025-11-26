@@ -2,6 +2,9 @@ using System;
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// 退出游戏确认界面控制器
+/// </summary>
 public class QuitUIController : MonoBehaviour
 {
 #region 静态公开字段

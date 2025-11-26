@@ -22,13 +22,13 @@ public class VictoryUIController : MonoBehaviour
     /// </summary>
     public static Action clickingHome;
     /// <summary>
-    /// 十倍领取按钮回调
+    /// 看广告领十倍奖励按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
     public static Func<Task> clickingReceiveMore;
     /// <summary>
-    /// 领取金币按钮回调
+    /// 领取奖励按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>

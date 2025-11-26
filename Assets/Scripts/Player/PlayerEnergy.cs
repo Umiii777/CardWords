@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using UnityEditor;
 using UnityEngine;
 
 public class PlayerEnergy
@@ -75,7 +76,7 @@ public class PlayerEnergy
             {
                 Thread.Sleep(1000);
                 secondsToRecover = (secondsToRecover - 1 + SECONDS_TO_RECOVER) % SECONDS_TO_RECOVER;
-                unityContext.Post(_ =>
+                unityContext.Post(_=>
                 {
                     if (secondsToRecover == 0)
                         AddEnergy(1);
@@ -85,5 +86,9 @@ public class PlayerEnergy
         });
         timer.IsBackground = true;
         timer.Start();
+
+#if UNITY_EDITOR
+        EditorApplication.quitting += timer.Abort;
+#endif
     }
 }

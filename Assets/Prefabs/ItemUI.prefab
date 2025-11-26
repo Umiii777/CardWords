@@ -264,11 +264,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82e2bed51fbad3f4092fbda5a67295d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemType: 0
   price: 150
-  priceText: {fileID: 3255494179575844231}
   nameText: {fileID: 5520685576551762843}
   descriptionText: {fileID: 2218806604970468672}
   iconImage: {fileID: 2168080774568532034}
+  priceText: {fileID: 3255494179575844231}
 --- !u!1 &4249033562232929684
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,7 +439,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 100}
-  m_SizeDelta: {x: -512, y: -512}
+  m_SizeDelta: {x: -537, y: -535}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3776053534851369249
 CanvasRenderer:
@@ -1252,8 +1253,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4291132830
-  m_fontColor: {r: 0.6192724, g: 0.48896402, b: 0.7735849, a: 1}
+    rgba: 4290273176
+  m_fontColor: {r: 0.59745574, g: 0.3739764, b: 0.7207546, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1270,8 +1271,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56
-  m_fontSizeBase: 56
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

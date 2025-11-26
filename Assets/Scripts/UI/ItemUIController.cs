@@ -4,35 +4,44 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class ItemUIController : MonoBehaviour
+public abstract class NonSingletonAdProcessor : MonoBehaviour
 {
-#region 静态委托
+    /// <summary>
+    /// 看广告领东西按钮回调
+    /// </summary>
+    public Func<Task> clickingWatchAd;
+}
+
+/// <summary>
+/// 道具获取界面控制器
+/// </summary>
+public class ItemUIController : NonSingletonAdProcessor
+{
+#region 按钮回调委托
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
-    /// 应将 Destroy(shopUI.gameObject) 加到最后
+    /// 应将 Destroy(itemUI.gameObject) 加到最后
     /// </summary>
-    static public Action clickingClose;
+    public Action clickingClose;
     /// <summary>
     /// 购买道具按钮回调
     /// </summary>
-    static public Action<int> clickingBuy;
-    /// <summary>
-    /// 领取道具按钮回调
-    /// </summary>
-    static public Func<Task> clickingReceive;
+    public Action<int> clickingBuy;
 #endregion
 
-    public int itemId;
+    public ItemType itemType;
     public int price = 150;
-    public TextMeshProUGUI priceText;
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI descriptionText;
     public Image iconImage;
 
+    [SerializeField]
+    private TextMeshProUGUI priceText;
+
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingReceive);
+    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingWatchAd);
     public void OcClickBuy() => clickingBuy?.Invoke(price);
 #endregion
 

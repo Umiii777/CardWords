@@ -6,7 +6,7 @@ public enum ItemType
     /// <summary>
     /// 提示
     /// </summary>
-    Hint,
+    Hint = 1,
     /// <summary>
     /// 洗牌
     /// </summary>
@@ -14,8 +14,8 @@ public enum ItemType
 }
 struct Prop
 {
-    public Func<int> get;
-    public Action<int> set;
+    public Func<int> Get;
+    public Action<int> Set;
 }
 
 public class PlayerItem
@@ -44,13 +44,13 @@ public class PlayerItem
 
     private static Prop[] props =
     {
-        new() { get = () => Hint, set = v => Hint = v },
-        new() { get = () => Shuffle, set = v => Shuffle = v }
+        new() { Get = () => Hint, Set = v => Hint = v },
+        new() { Get = () => Shuffle, Set = v => Shuffle = v }
     };
 
-    public static int GetItem(ItemType type) => props[(int)type].get();
-    public static void SetItem(ItemType type, int count) => props[(int)type].set(count);
-    public static void AddHint(ItemType type, int count) => props[(int)type].set(GetItem(type) + count);
+    public static int GetItem(ItemType type) => props[(uint)type - 1].Get();
+    public static void SetItem(ItemType type, int count) => props[(uint)type - 1].Set(count);
+    public static void AddItem(ItemType type, int count) => props[(uint)type - 1].Set(GetItem(type) + count);
     public static bool TrySpendItem(ItemType type, int count = 1)
     {
         int item = GetItem(type);

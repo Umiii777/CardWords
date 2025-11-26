@@ -76,7 +76,7 @@ public class ShopUIController : MonoBehaviour
     /// </summary>
     public static Action clickingClose;
     /// <summary>
-    /// 领取金币按钮回调
+    /// 看广告领金币按钮回调
     /// </summary>
     public static Func<int, int, Task> clickingReceive;
     /// <summary>
