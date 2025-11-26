@@ -23,6 +23,7 @@ public class ItemUIController : MonoBehaviour
     static public Func<Task> clickingReceive;
 #endregion
 
+    public int itemId;
     public int price = 150;
     public TextMeshProUGUI priceText;
     public TextMeshProUGUI nameText;

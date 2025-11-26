@@ -4,6 +4,17 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum UIType
+{
+    Defeat,
+    Energy,
+    Home,
+    Item,
+    Quit,
+    Shop,
+    Victory
+}
+
 public class SystemUIManager : MonoBehaviour
 {
     public static SystemUIManager Instance;
@@ -18,39 +29,63 @@ public class SystemUIManager : MonoBehaviour
     private Dictionary<uint, string> itemIDInfos;
 #endregion
 
-#region 各界面预制体和引用
+    private object[] uiInstances;
+
+#region 各界面预制体
     [SerializeField]
     private DefeatUIController defeatUIPrefab;
-    private DefeatUIController defeatUI;
     [SerializeField]
     private EnergyUIController energyUIPrefab;
-    private EnergyUIController energyUI;
     [SerializeField]
     private HomeUIController homeUIPrefab;
-    private HomeUIController homeUI;
     [SerializeField]
     private ItemUIController itemUIPrefab;
-    private List<ItemUIController> itemUIs = new();
     [SerializeField]
     private QuitUIController quitUIPrefab;
-    private QuitUIController quitUI;
     [SerializeField]
     private ShopUIController shopUIPrefab;
-    private ShopUIController shopUI;
     [SerializeField]
     private VictoryUIController victoryUIPrefab;
-    private VictoryUIController victoryUI;
 #endregion
 
     void Awake()
     {
         Instance = this;
-        homeUI = CreateUI(null, homeUIPrefab, InitHomeUI);
+        uiInstances = new object[Enum.GetNames(typeof(UIType)).Length];
+        uiInstances[(uint)UIType.Item] = new List<ItemUIController>();
+        //homeUI = CreateUI(null, homeUIPrefab, InitHomeUI);
         itemIDInfos = itemInfos.ToDictionary(
             s => uint.Parse(s.Split('`', 2)[0]),
             s => s.Split('`', 2)[1].Replace('，', ',')
         );
-        defeatUI = CreateUI(null, defeatUIPrefab, () => InitDefeatUI(0.6f));
+    }
+
+    public static void LoadUI(UIType type, params object[] args)
+    {
+        switch (type)
+        {
+            case UIType.Defeat:
+                float progress;
+                if (args.Length > 0 && float.TryParse(args[0].ToString(), out progress))
+                    uiInstances[(uint)UIType.Defeat] = CreateUI(
+                        uiInstances[(uint)UIType.Defeat],
+                        defeatUIPrefab,
+                        () => InitDefeatUI(progress)
+                    );
+                break;
+            case UIType.Item:
+                uint itemId;
+                if (args.Length > 0 && uint.TryParse(args[0].ToString(), out itemId))
+                {
+                    ItemUIController itemUI = CreateUI(uiInstances[(uint)UIType.Item], itemUIPrefab);
+                    InitItemUI(itemUI, itemId);
+                    uiInstances[(uint)UIType.Item] = itemUI;
+                    //TODO: 把所有Prefab放进一个数组，依照UIType中的顺序进行排序
+                }
+                break;
+            default:
+                ;
+        }
     }
 
     public static async void ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
@@ -125,12 +160,13 @@ public class SystemUIManager : MonoBehaviour
         
     }
 
-    private void InitItemUI(uint id, ItemUIController ui)
+    private void InitItemUI(ItemUIController itemUI, uint itemId)
     {
         Task.Run(() =>
         {
-            string[] infos = itemIDInfos[id].Split('`');
-            ui.nameText.text = infos[0];
+            string[] infos = itemIDInfos[itemId].Split('`');
+            itemUI.itemId = itemId;
+            itemUI.nameText.text = infos[0];
         });
     }
 }
