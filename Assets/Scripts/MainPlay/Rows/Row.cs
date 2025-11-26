@@ -27,7 +27,7 @@ public class Row : MonoBehaviour
             rowType = RowType.main;
         }
     }
-    //每次成功拖动的时候应该调用
+    //每次在下方成功拖动的时候应该调用
     public void CheckIfRowEmpty()
     {
         SetCardCount();
@@ -39,11 +39,19 @@ public class Row : MonoBehaviour
         {
             isEmpty = false;
         }
-        else
+        else if (cardCount < 0)
         {
             Debug.LogError("他妈的row当前卡数量成负数了");
         }
+        SetCardFront();
     }
+    public void CheckIfMainRowEmpty()
+    {
+        
+    }
+
+
+
     //获得当前row的card总数
     public void SetCardCount()
     {
@@ -53,13 +61,17 @@ public class Row : MonoBehaviour
     //将当前cardsOnRow的最上层变成isFront
     public void SetCardFront()
     {
-        if (!cardsOnRow[cardsOnRow.Count - 1].isFront)
+        if (cardsOnRow[cardsOnRow.Count-1]&&!cardsOnRow[cardsOnRow.Count-1].isFront)
         {
-            cardsOnRow[cardsOnRow.Count - 1].isFront = true;
+            // Debug.Log("执行了设置卡翻面");
+            // Debug.Log(cardsOnRow[cardsOnRow.Count - 1].cardData.cardContent);
+            cardsOnRow[cardsOnRow.Count - 1].SetFront();
+            
         }
         else
         {
             Debug.Log("当前这张卡已经是正面了");
+            return;
         }
     }
 
@@ -73,5 +85,8 @@ public class Row : MonoBehaviour
     {
         CardManager.Instance.allRows.Remove(this);
     }
+
+
+    //TODO:传入多个Card
 
 }

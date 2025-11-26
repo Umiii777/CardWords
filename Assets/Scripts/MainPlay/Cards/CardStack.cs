@@ -11,12 +11,13 @@ public class CardStack
     {
         //parent是被堆叠的对象，child是当前操作的对象
         Card top = parent.GetTop(); //获取被堆叠对象最顶部的对象
-
+        top.isInStack = true;
         child.topParent = top;  //将新进的顶部对象设置为顶部对象
-
+        Debug.Log(top.cardData.cardContent);
         child.isInStack = true; //新近对象为Instack
+        
         top.childCards.Add(child);  //只有顶部的卡会有一个List，储存所有的子对象
-
+        Debug.Log(top.childCards.Count);
         child.transform.SetParent(top.transform.parent, true);
         UpdateStackPositions(top);
     }
@@ -31,6 +32,17 @@ public class CardStack
         {
             RectTransform cRT = top.childCards[i].rectTransform;
             cRT.anchoredPosition = topRT.anchoredPosition + new Vector2(0, -offsetY * (i + 1));
+        }
+    }
+
+    public static void ChangeAllStackSibings(Card currentCard)
+    {
+        Card top = currentCard.GetTop();
+
+        for(int i = 0; i < top.childCards.Count; i++)
+        {
+            top.childCards[i].transform.SetAsLastSibling();
+            Debug.Log(top.childCards[0].cardData.cardContent);
         }
     }
 }

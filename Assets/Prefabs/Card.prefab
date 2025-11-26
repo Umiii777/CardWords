@@ -109,6 +109,7 @@ MonoBehaviour:
   stackIndex: 0
   isInStack: 0
   childCards: []
+  cardNums: 1
   slotCount: 0
   deckSuccessDrag: {fileID: 11400000, guid: 1cf403b968aebb14c82ee19aa90966b7, type: 2}
 --- !u!225 &2429184787772230549
@@ -135,9 +136,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: daf74a1df8fdcf241b646393d0de023d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnBeginCardDrag: {fileID: 11400000, guid: 6ceb046a97b42994898a2d99bf86cf2d, type: 2}
-  OnEndDragCard: {fileID: 11400000, guid: 3cc72be1684beb44cb7c393df6985df9, type: 2}
-  OnSuccessDrag: {fileID: 11400000, guid: b897fb87407b5ba46a3e7f889917cee8, type: 2}
+  EndDragAdd: {fileID: 11400000, guid: 35b7e9641fce70d4fad398fc7a1b44f2, type: 2}
+  EndDragMinus: {fileID: 11400000, guid: 744b3d8419c4b7f4f9c33dbf8d081dff, type: 2}
 --- !u!1 &8679315250516797434
 GameObject:
   m_ObjectHideFlags: 0

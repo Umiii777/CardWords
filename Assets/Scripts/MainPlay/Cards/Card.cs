@@ -35,7 +35,9 @@ public class Card : MonoBehaviour
     public bool isInStack = false;
     public List<Card> childCards = new List<Card>();
 
-    public int slotCount = 0;
+    public int cardNums = 1;//代表这个牌未堆叠的时候，只有一张，用于传递给Row
+
+    public int slotCount = -1;  //用于给deck判断
 
 
     private int textStackOffsetPos = 100;
@@ -69,8 +71,6 @@ public class Card : MonoBehaviour
             }
             else
             {
-
-
                 tmContent.text = cardData.cardContent;
                 cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
                 tmLength.text = "";
@@ -102,6 +102,7 @@ public class Card : MonoBehaviour
 
     public void InStackStyle()
     {
+
         tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
         tmContent.fontSize = textStackOffsetSize;
     }
@@ -111,7 +112,9 @@ public class Card : MonoBehaviour
         tmContent.fontSize = textStackOffsetSize;
     }
 
-    
+
+    #region Stack相关
+
     public Card GetTop()
     {
         return topParent ? topParent : this;
@@ -122,7 +125,20 @@ public class Card : MonoBehaviour
         return GetTop() == this;
     }
 
-    //mainCard方法
+    #endregion
+
+    #region CardManger相关
+    private void OnEnable()
+    {
+        CardManager.Instance.allCards.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        CardManager.Instance.allCards.Remove(this);
+    }
+    #endregion
+    #region MainCard方法
     public void SetMainCardVisualOnCombine()
     {
         cardData.currentLength++;
@@ -137,24 +153,14 @@ public class Card : MonoBehaviour
             CompleteMainCard();
         }
     }
-    
 
-
-
-    private void OnEnable()
-    {
-        CardManager.Instance.allCards.Add(this);
-    }
-
-    private void OnDisable()
-    {
-        CardManager.Instance.allCards.Remove(this);
-    }
     //消除表现
     public void CompleteMainCard()
     {
 
     }
+    #endregion
+
     public void CompleteNormalCard()
     {
         gameObject.SetActive(false);

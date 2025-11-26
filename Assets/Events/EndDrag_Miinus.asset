@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de5ef19d960fafc4b8e389fbf2b28fc7, type: 3}
-  m_Name: Slot_BeginDrag
+  m_Name: EndDrag_Miinus
   m_EditorClassIdentifier: 
   description: 
   lastSender: 
