@@ -1,10 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public abstract class NonSingletonAdProcessor : MonoBehaviour
+public abstract class AdProcessor : MonoBehaviour
 {
     /// <summary>
     /// 看广告领东西按钮回调
@@ -15,8 +16,13 @@ public abstract class NonSingletonAdProcessor : MonoBehaviour
 /// <summary>
 /// 道具获取界面控制器
 /// </summary>
-public class ItemUIController : NonSingletonAdProcessor
+public class ItemUIController : AdProcessor
 {
+    static public Dictionary<
+        ItemType,
+        ValueTuple<Action, Action<int>, Func<Task>>
+    > dictCachedClickings = new();
+
 #region 按钮回调委托
     /// <summary>
     /// 关闭界面按钮回调

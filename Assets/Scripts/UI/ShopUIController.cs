@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -9,7 +8,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态属性或字段赋值以更新各个组件的显示内容及行为
 /// </summary>
-public class ShopUIController : MonoBehaviour
+public class ShopUIController : StaticAdProcessor<ShopUIController, string>
 {
 #region 玩家金币数量
     /// <summary>
@@ -76,10 +75,6 @@ public class ShopUIController : MonoBehaviour
     /// </summary>
     public static Action clickingClose;
     /// <summary>
-    /// 看广告领金币按钮回调
-    /// </summary>
-    public static Func<int, int, Task> clickingReceive;
-    /// <summary>
     /// 购买礼包按钮回调
     /// </summary>
     public static Action<ItemType, int, int> clickingBuy;
@@ -103,13 +98,7 @@ public class ShopUIController : MonoBehaviour
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         clickingBuy?.Invoke((ItemType)c[0], c[1], c[2]);
     }
-    public void OnClickReceive(string config) => SystemUIManager.ProcessAd(
-        clickingReceive,
-        UpdateWatchedAdText,
-        config.Split(',')
-            .Select(s => int.Parse(s.Trim()))
-            .Cast<object>().ToArray()
-    );
+    public void OnClickReceive(string config) => SystemUIManager.ProcessAd(clickingWatchAd, UpdateWatchedAdText, config);
 #endregion
 
     void Start()

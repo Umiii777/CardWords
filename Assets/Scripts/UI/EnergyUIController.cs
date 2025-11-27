@@ -1,9 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
-public class EnergyUIController : MonoBehaviour
+public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
 {
 #region 当前体力值
     /// <summary>
@@ -49,15 +48,11 @@ public class EnergyUIController : MonoBehaviour
     /// 购买体力按钮回调
     /// </summary>
     static public Action<int> clickingBuy;
-    /// <summary>
-    /// 领取体力按钮回调
-    /// </summary>
-    static public Func<Task> clickingReceive;
 #endregion
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingReceive);
+    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingWatchAd, null, 0);
     public void OcClickBuy(string price) => clickingBuy?.Invoke(int.Parse(price));
 #endregion
 

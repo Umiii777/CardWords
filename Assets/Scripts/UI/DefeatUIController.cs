@@ -115,7 +115,7 @@ public class DefeatUIController : MonoBehaviour
     private void DisplayProgress(float p)
     {
         progressText.text = p.ToString("P0");
-        progressBarTransform.sizeDelta = new Vector2(
+        progressBarTransform.sizeDelta = new(
             Math.Max(progressBarParentTransform.sizeDelta.x * p, LEAST_PROGRESS_BAR_WIDTH),
             progressBarTransform.sizeDelta.y
         );

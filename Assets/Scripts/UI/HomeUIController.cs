@@ -178,6 +178,7 @@ public class HomeUIController : MonoBehaviour
     {
         InitSharedFields();
         StartCoroutine(nameof(CoroutineUpdate));
+        NumCoins = PlayerCoin.GetCoin();
         NumEnergy = PlayerEnergy.GetEnergy();
         MaxEnergy = PlayerEnergy.MaxEnergy;
     }
