@@ -111,7 +111,7 @@ public class SystemUIManager : MonoBehaviour
     public static async Task LoadUI(UIType type, params object[] args)
     {
         if (Instance == null)
-            await Task.FromException(new Exception("SystemUIManager.Instance 还未初始化，无法调用 LoadUI"));
+            await Task.FromException(new InvalidOperationException("SystemUIManager.Instance 还未初始化，无法调用 LoadUI"));
         switch (type)
         {
             case UIType.Defeat:
@@ -178,17 +178,35 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
-    private static Func<Task> StartAdAndForbidClicking(NonSingletonAdProcessor uiInstance)
+    private static Func<Task> StartAdAndBlockClicking(NonSingletonAdProcessor uiInstance)
     {
-        Func<Task> clickingWatchAd = uiInstance.clickingWatchAd;
-        async Task startAdAndForbidClicking()
+        Func<Task> clicking = uiInstance.clickingWatchAd;
+        async Task startAdAndBlockClicking()
         {
-            uiInstance.clickingWatchAd = null;
-            await clickingWatchAd();
-            uiInstance.clickingWatchAd = clickingWatchAd + startAdAndForbidClicking;
+            uiInstance.clicking = null;
+            await clicking();
+            uiInstance.clicking = clicking + startAdAndBlockClicking;
         }
         ;
-        return startAdAndForbidClicking;
+        return startAdAndBlockClicking;
+    }
+
+    //TODO: 写方法注释
+    //TODO: ShopUIController.clickingReceive 和 VictoryUIController.clickingReceiveMore 都改成 Func<string, Task>
+    private static Func<T, Task> StartAdAndBlockClicking<T>(Type typeOfUIController, Func<T, Task> clickingFunc, string nameOfClickingFunc)
+    {
+      FieldInfo clickingField = typeOfUIController.GetField(nameOfClickingFunc, BindingFlags.Public | BindingFlags.Static);
+      Func<T, Task> clicking = clickingField?.GetValue(null) as Func<T, Task>;
+			if (clicking is null)
+				throw new ArgumentException($"类型 {typeOfUIController.Name} 中没有名为 \"{nameOfClickingFunc}\" 且类型为 Func<{typeof(T).Name}, Task> 的静态公开字段");
+
+			async Task startAdAndBlockClicking(T arg)
+			{
+				clickingField.SetValue(null, null);
+				await (clicking.Method.Invoke(clicking.Target, new object[] { arg }) as Task);
+				clickingField.SetValue(null, clicking + (async arg => await startAdAndBlockClicking(arg)));
+			}
+			return startAdAndBlockClicking;
     }
 
     public static async void ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
@@ -198,7 +216,7 @@ public class SystemUIManager : MonoBehaviour
                 .Select(d =>
                     d.Method.ReturnType == typeof(Task)
                     ? d.Method.Invoke(d.Target, toWaitArgs) as Task
-                    : Task.FromException(new Exception("SystemUIManager.ProcessAd的第一个参数只能是 Func<..., Task> 类型！"))
+                    : Task.FromException(new ArgumentException("SystemUIManager.ProcessAd的第一个参数只能是 Func<..., Task> 类型！"))
                 )
             );
         afterWait?.Invoke();
@@ -341,16 +359,16 @@ public class SystemUIManager : MonoBehaviour
             PlayerItem.AddItem(itemType, 1);
             _= PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
         };
-        itemUI.clickingWatchAd = StartAdAndForbidClicking(itemUI);
+        itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
     }
 
     private void InitShopUI()
     {
-        //TODO: 手动禁用看广告领金币按钮响应
+        //TODO: 通过 StartAdAndBlockClicking 禁用看广告领金币按钮响应
     }
 
     private void InitVictoryUI(int numRewardCoins)
     {
-        //TODO: 手动禁用看广告领十倍奖励按钮响应
+        //TODO: 通过 StartAdAndBlockClicking 禁用看广告领金币按钮响应
     }
 }
