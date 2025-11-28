@@ -10,14 +10,14 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
     /// </summary>
     public static Func<U, Task> clickingWatchAd;
 
-    public static async void ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
+    public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
         if (toWait is not null)
             await Task.WhenAll(toWait.GetInvocationList()
                 .Select(d =>
                     d.Method.ReturnType == typeof(Task)
                     ? d.Method.Invoke(d.Target, toWaitArgs) as Task
-                    : Task.FromException(new ArgumentException($"nameof(StaticAdProcessor<Tag, U>).nameof(ProcessAd) 的第一个参数只能是 Func<..., Task> 类型"))
+                    : Task.FromException(new ArgumentException($"{nameof(StaticAdProcessor<Tag, U>)}.{nameof(ProcessAd)} 的第一个参数只能是 Func<..., Task> 类型"))
                 )
             );
         afterWait?.Invoke();
@@ -31,6 +31,6 @@ public abstract class AdProcessor : MonoBehaviour
     /// </summary>
     public Func<Task> clickingWatchAd;
 
-    public static async void ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
-        StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
+    public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
+        await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
 }

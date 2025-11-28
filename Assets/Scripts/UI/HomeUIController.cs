@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -144,19 +145,19 @@ public class HomeUIController : MonoBehaviour
     /// <summary>
     /// 设置按钮回调
     /// </summary>
-    public static Action clickingSettings;
+    public static Func<Task> clickingSettings;
     /// <summary>
     /// 补充体力按钮回调
     /// </summary>
-    public static Action clickingAddEnergy;
+    public static Func<Task> clickingAddEnergy;
     /// <summary>
     /// 商店按钮回调
     /// </summary>
-    public static Action clickingShop;
+    public static Func<Task> clickingShop;
     /// <summary>
     /// 进入关卡按钮回调
     /// </summary>
-    public static Action clickingStart;
+    public static Func<Task> clickingStart;
     /// <summary>
     /// 该委托在 HomeUIController 的协程中每帧执行一次
     /// </summary>
@@ -164,12 +165,12 @@ public class HomeUIController : MonoBehaviour
 #endregion
 
 #region 按钮回调方法
-    public void OnClickSettings() => clickingSettings?.Invoke();
-    public void OnClickAddEnergy() => clickingAddEnergy?.Invoke();
-    public void OnClickStart() => clickingStart?.Invoke();
-    public void OnClickShop()
+    public async void OnClickSettings() => await (clickingSettings is null ? Task.CompletedTask : clickingSettings());
+    public async void OnClickAddEnergy() => await (clickingAddEnergy is null ? Task.CompletedTask : clickingAddEnergy());
+    public async void OnClickStart() => await(clickingStart is null ? Task.CompletedTask : clickingStart());
+    public async void OnClickShop()
     {
-        clickingSettings?.Invoke();
+        await (clickingShop is null ? Task.CompletedTask : clickingShop());
         IsShopHintShown = false;
     }
 #endregion
@@ -203,6 +204,6 @@ public class HomeUIController : MonoBehaviour
         NumEnergy = numEnergy;
         LevelName = levelName;
         NumEnergyToPlay = numEnergyToPlay;
-        IshopHintShown = isShopHintShown;
+        IsShopHintShown = isShopHintShown;
     }
 }

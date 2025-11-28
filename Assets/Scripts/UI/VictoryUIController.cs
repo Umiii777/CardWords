@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -19,13 +20,13 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
-    public static Action clickingHome;
+    public static Func<Task> clickingHome;
     /// <summary>
     /// 领取奖励按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
-    public static Action clickingReceive;
+    public static Func<Task> clickingReceive;
 #endregion
 
     /// <summary>
@@ -35,9 +36,9 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     private TextMeshProUGUI coinCountText;
 
 #region 按钮回调方法
-    public void OnClickHome() => clickingHome?.Invoke();
-    public void OnClickReceive() => clickingReceive?.Invoke();
-    public void OnClickReceiveMore() => AdProcesser.ProcessAd(clickingWatchAd, null, 0);
+    public async void OnClickHome() => await (clickingHome is null ? Task.CompletedTask : clickingHome());
+    public async void OnClickReceive() => await (clickingReceive is null ? Task.CompletedTask : clickingReceive());
+    public async Task OnClickReceiveMore() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
 #endregion
 
     void Start()

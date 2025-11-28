@@ -18,7 +18,6 @@ public class PlayerEnergy
     private static SynchronizationContext unityContext;
 #endregion
 
-    public static int NumEnergyToQuit { get; } = 1;
     public static int MaxEnergy
     {
         get => PlayerPrefs.GetInt(Key_MaxEnergy, 5);

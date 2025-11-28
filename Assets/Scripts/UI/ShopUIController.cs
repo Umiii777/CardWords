@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -57,7 +58,7 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
     /// <summary>
     /// 玩家体力值上限
     /// </summary>
-    private static int maxEnergy = 0;
+    public static int maxEnergy = 5;
     private static GameObject sharedMaxEnergyTips;
     [SerializeField]
     private GameObject maxEnergyTips;
@@ -92,7 +93,7 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
     /// <summary>
     /// 设置按钮回调
     /// </summary>
-    public static Action clickingSettings;
+    public static Func<Task> clickingSettings;
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
@@ -102,21 +103,21 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
     /// <summary>
     /// 购买礼包按钮回调
     /// </summary>
-    public static Action<ItemType, int, int> clickingBuy;
+    public static Func<ItemType, int, int, Task> clickingBuy;
 #endregion
 
 #region 按钮回调方法
-    public void OnClickSettings() => clickingSettings?.Invoke();
+    public async void OnClickSettings() => await (clickingSettings is null ? Task.CompletedTask : clickingSettings());
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OcClickBuy(string config)
+    public async void OcClickBuy(string config)
     {
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
-        clickingBuy?.Invoke((ItemType)c[0], c[1], c[2]);
+        await (clickingBuy is null ? Task.CompletedTask : clickingBuy((ItemType)c[0], c[1], c[2]));
     }
-    public void OnClickReceive(string config) => AdProcesser.ProcessAd(
+    public async void OnClickReceive(string config) => await AdProcessor.ProcessAd(
         clickingWatchAd,
-        UpdateWatchedAdText,
-        config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
+        null,
+        config.Split(',').Select(s => int.Parse(s.Trim())).ToArray()
     );
 #endregion
 

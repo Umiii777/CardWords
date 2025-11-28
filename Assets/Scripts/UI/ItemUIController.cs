@@ -12,7 +12,7 @@ public class ItemUIController : AdProcessor
 {
     static public Dictionary<
         ItemType,
-        ValueTuple<Action, Action<int>, Func<Task>>
+        ValueTuple<Action, Func<int, Task>, Func<Task>>
     > dictCachedClickings = new();
 
 #region 按钮回调委托
@@ -25,7 +25,7 @@ public class ItemUIController : AdProcessor
     /// <summary>
     /// 购买道具按钮回调
     /// </summary>
-    public Action<int> clickingBuy;
+    public Func<int, Task> clickingBuy;
 #endregion
 
     public ItemType itemType;
@@ -39,8 +39,8 @@ public class ItemUIController : AdProcessor
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => AdProcesser.ProcessAd(clickingWatchAd);
-    public void OcClickBuy() => clickingBuy?.Invoke(price);
+    public async void OnClickReceive() => await ProcessAd(clickingWatchAd);
+    public async void OcClickBuy() => await (clickingBuy is null ? Task.CompletedTask : clickingBuy(price));
 #endregion
 
     void Start()

@@ -25,7 +25,7 @@ public class DefeatUIController : MonoBehaviour
     /// <br/><br/>
     /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
-    public static Action clickingHome;
+    public static Func<Task> clickingHome;
     /// <summary>
     /// 继续游戏按钮回调
     /// <br/><br/>
@@ -37,7 +37,7 @@ public class DefeatUIController : MonoBehaviour
     /// <br/><br/>
     /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
-    public static Action clickingReplay;
+    public static Func<Task> clickingReplay;
     /// <summary>
     /// 该委托在 DefeatUIController 的协程中每帧执行一次
     /// <br/><br/>
@@ -75,9 +75,9 @@ public class DefeatUIController : MonoBehaviour
 #endregion
 
 #region 按钮回调方法
-    public void OnClickHome() => clickingHome?.Invoke();
-    public void OnClickReplay() => clickingReplay?.Invoke();
-    public void OnClickContinue() => AdProcesser.ProcessAd(clickingContinue);
+    public async void OnClickHome() => await (clickingHome is null ? Task.CompletedTask : clickingHome());
+    public async void OnClickReplay() => await (clickingReplay is null ? Task.CompletedTask : clickingReplay());
+    public async void OnClickContinue() => await AdProcessor.ProcessAd(clickingContinue);
 #endregion
 
     void Start()

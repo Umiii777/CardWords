@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -43,7 +44,7 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
             if (sharedClockText != null)
                 sharedClockText.text = numEnergy < maxEnergy
                     ? $"{value / 60:00}:{value % 60:00}"
-                    : "满"
+                    : "满";
             secondsToRecover = value;
         }
     }
@@ -63,13 +64,13 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
     /// <summary>
     /// 购买体力按钮回调
     /// </summary>
-    static public Action<int> clickingBuy;
+    static public Func<int, Task> clickingBuy;
 #endregion
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => AdProcesser.ProcessAd(clickingWatchAd, null, 0);
-    public void OcClickBuy(string price) => clickingBuy?.Invoke(int.Parse(price));
+    public async void OnClickReceive() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
+    public async void OcClickBuy(string price) => await (clickingBuy is null ? Task.CompletedTask : clickingBuy(int.Parse(price)));
 #endregion
 
     void Start()

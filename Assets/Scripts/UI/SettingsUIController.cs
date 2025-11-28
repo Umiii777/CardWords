@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
@@ -7,72 +8,45 @@ using TMPro;
 /// </summary>
 class  SettingsUIController : MonoBehaviour
 {
-#region 关卡内UI
-    public static GameObject sharedInLevelUI;
+#region 进关卡时扣除的体力值
+    public static int numEnergyToPlay = 1;
+    [SerializeField]
+    private TextMeshProUGUI energyCountText;
+#endregion
+
+    /// <summary>
+    /// 界面是否在关卡内打开
+    /// </summary>
+    public static bool isInLevel = false;
     [SerializeField]
     private GameObject inLevelUI;
-#endregion
-
-#region 关卡外UI
-    public static GameObject sharedOutLevelUI;
     [SerializeField]
     private GameObject outLevelUI;
-#endregion
-
-#region 按钮回调委托
-    public static Action clickingContinue;
-    public static Action clickingHome;
-    public static Action clickingReplay;
-#endregion
-
-    [SerializeField]
-    private string homeConfirmMessage;
-    [SerializeField]
-    private string replayConfirmMessage;
     [SerializeField]
     private GameObject confirmUI;
-    [SerializeField]
-    private string confirmTextName;
-    private TextMeshProUGUI confirmText;
-    private Action executing;
+
+
+#region 按钮回调委托
+    public static Action clickingClose;
+    public static Func<Task> clickingReplay;
+    public static Func<Task> clickingConfirm;
+#endregion
 
 #region 按钮回调方法
-    public void OnClickContinue() => clickingContinue?.Invoke();
+    public void OnClickClose() => clickingClose?.Invoke();
     public void OnClickHome()
     {
-        confirmText.text = homeConfirmMessage;
+        energyCountText.text = numEnergyToPlay.ToString();
         confirmUI.SetActive(true);
-        executing = clickingHome;
     }
-    public void OnClickReplay()
-    {
-        confirmText.text = replayConfirmMessage;
-        confirmUI.SetActive(true);
-        executing = clickingReplay)
-    }
-    public void OnClickConfirm()
-    {
-        executing?.Invoke();
-    }
-    public void OnClickCancel()
-    {
-        executing = null;
-        Destroy(confirmUI);
-    }
+    public async void OnClickReplay() => await (clickingReplay is null ? Task.CompletedTask : clickingReplay());
+    public async void OnClickConfirm() => await (clickingConfirm is null ? Task.CompletedTask : clickingConfirm());
+    public void OnClickCancel() => confirmUI.SetActive(false);
 #endregion
 
     void Start()
     {
-        InitSharedFields();
-        confirmText = confirmUI.GetComponentsInChildren<TextMeshProUGUI>(true).First(t => t.name == confirmTextName);
-    }
-
-    private void InitSharedFields()
-    {
-        sharedInLevelUI = inLevelUI;
-        sharedOutLevelUI = outLevelUI;
-
-        sharedInLevelUI.SetActive(false);
-        sharedOutLevelUI.SetActive(false);
+        inLevelUI.SetActive(isInLevel);
+        outLevelUI.SetActive(!isInLevel);
     }
 }
