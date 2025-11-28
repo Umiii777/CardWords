@@ -140,7 +140,7 @@ public class HomeUIController : MonoBehaviour
     private GameObject shopHint;
 #endregion
 
-#region 静态委托
+#region 按钮回调及协程内委托
     /// <summary>
     /// 设置按钮回调
     /// </summary>
@@ -178,9 +178,6 @@ public class HomeUIController : MonoBehaviour
     {
         InitSharedFields();
         StartCoroutine(nameof(CoroutineUpdate));
-        NumCoins = PlayerCoin.GetCoin();
-        NumEnergy = PlayerEnergy.GetEnergy();
-        MaxEnergy = PlayerEnergy.MaxEnergy;
     }
 
     private IEnumerator CoroutineUpdate()
@@ -202,12 +199,10 @@ public class HomeUIController : MonoBehaviour
         sharedAddEnergyButton = addEnergyButton;
         sharedShopHint = shopHint;
 
-        sharedCoinCountText.text = numCoins.ToString();
-        sharedEnergyCountText.text = numEnergy.ToString();
-        sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
-        sharedLevelNameText.text = levelName;
-        sharedEnergyToPlayText.text = numEnergyToPlay.ToString();
-        sharedAddEnergyButton.SetActive(numEnergy < maxEnergy);
-        sharedShopHint.SetActive(isShopHintShown);
+        NumCoins = numCoins;
+        NumEnergy = numEnergy;
+        LevelName = levelName;
+        NumEnergyToPlay = numEnergyToPlay;
+        IshopHintShown = isShopHintShown;
     }
 }

@@ -24,4 +24,9 @@ public class PlayerCoin
         Coin -= count;
         return true;
     }
+    public static void ResetCoin()
+    {
+        PlayerPrefs.DeleteKey(Key_Coin);
+        PlayerPrefs.Save();
+    }
 }

@@ -5,14 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public abstract class AdProcessor : MonoBehaviour
-{
-    /// <summary>
-    /// 看广告领东西按钮回调
-    /// </summary>
-    public Func<Task> clickingWatchAd;
-}
-
 /// <summary>
 /// 道具获取界面控制器
 /// </summary>
@@ -47,7 +39,7 @@ public class ItemUIController : AdProcessor
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingWatchAd);
+    public void OnClickReceive() => AdProcesser.ProcessAd(clickingWatchAd);
     public void OcClickBuy() => clickingBuy?.Invoke(price);
 #endregion
 

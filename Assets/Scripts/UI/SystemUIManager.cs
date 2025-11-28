@@ -42,6 +42,12 @@ public enum UIType
     /// </summary>
     Quit,
     /// <summary>
+    /// 设置界面
+    /// <br/><br/>
+    /// 生成时须再传一个表示玩家当前是否处于关卡内的 bool 值
+    /// </summary>
+    Settings,
+    /// <summary>
     /// 商店界面
     /// <br/><br/>
     /// 生成时不传其他参数
@@ -77,8 +83,10 @@ public class SystemUIManager : MonoBehaviour
     public static SystemUIManager Instance;
     /// <summary>
     /// 关卡加载委托
+    /// <br/><br/>
+    /// 第一个参数为要加载的关卡编号，第二个参数为额外信息
     /// </summary>
-    public static Func<string, bool, Task> loadingLevel;
+    public static Func<int, object, Task> loadingLevel;
 
 #region public 游戏内所有道具的信息和图标
     public string[] itemInfos;
@@ -127,8 +135,8 @@ public class SystemUIManager : MonoBehaviour
             );
             await Task.WhenAll(new Task[]
             {
-                //TODO: 下面这行加载关卡（loadingLevel(PlayerLevel.GetNextLevel(), bool)第一个参数表示玩家当前所在关卡，第二个参数表示重玩本关还是进下一关）
-                loadingLevel is null ? Task.CompletedTask : loadingLevel("", true),
+                //TODO: 下面这行执行关卡加载
+                loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null),
                 popUpMessage is null ? Task.CompletedTask : PopUpTips(popUpMessage)
             });
             Destroy(uiGameObj(type));
@@ -150,9 +158,9 @@ public class SystemUIManager : MonoBehaviour
                         return;
                     if (PlayerEnergy.TrySpendEnergy(1))
                     {
-                        Instance.OnUpdateEnergy();
-                        //TODO: 下面这行加载关卡（loadingLevel(PlayerLevel.GetNextLevel(), bool)第一个参数表示玩家当前所在关卡，第二个参数表示重玩本关还是进下一关）
-                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel("", false));
+                        //Instance.OnUpdateEnergy(); // 没必要调 OnUpdateEnergy
+                        //TODO: 下面这行执行关卡加载
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
                         Destroy(uiGameObj(UIType.Defeat));
                         Instance.uiInstances[(uint)UIType.Defeat] = null;
                         return;
@@ -198,10 +206,63 @@ public class SystemUIManager : MonoBehaviour
                 };
                 EnergyUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(EnergyUIController), EnergyUIController.clickingWatchAd);
                 return;
-            case UIType.Home: //TODO: 接着写大厅，然后写 OnUpdateCoin 和 OnUpdateEnergy
+            case UIType.Home:
+                HomeUIController.clickingSettings = () => _= LoadUI(UIType.Settings, false);
+                HomeUIController.clickingAddEnergy = () => _= LoadUI(UIType.Energy);
+                HomeUIController.clickingShop = () => _= LoadUI(UIType.Shop);
+                HomeUIController.clickingStart = async () =>
+                {
+                    if (PlayerEnergy.TrySpendEnergy(HomeUIController.EnergyToPlay))
+                    {
+                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
+                        //TODO: 下面这行执行关卡加载
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                        Destroy(uiGameObj(UIType.Home));
+                        Instance.uiInstances[(uint)UIType.Home] = null;
+                        return;
+                    }
+                    await LoadUI(UIType.Energy);
+                    _= PopUpTips(TIPS_ASKING_ENERGY);
+                };
+                return;
             case UIType.Item: return;
-            case UIType.Quit: //TODO: 问海一退出确认从哪里触发，能不能不做
-            case UIType.Shop: //TODO: 明天先写商店
+        case UIType.Quit: //TODO: 问海一退出确认j从哪里界面发，有无必要做
+            case UIType.Shop:
+                ShopUIController.clickingSettings = () => _= LoadUI(UIType.Settings, false);
+                ShopUIController.clickingClose = () =>
+                {
+                    PlayerAd.ResetWatchedAd();
+                    OnUpdateWatchedAd();
+                    Destroy(uiGameObj(UIType.Shop));
+                    Instance.uiInstances[(uint)UIType.Shop] = null;
+                };
+                ShopUIController.clickingBuy = (type, count, price) =>
+                {
+                    if (PlayerCoin.TrySpendCoin(price))
+                    {
+                        PlayerItem.AddItem(type, count);
+                        Instance.OnUpdateCoin();
+                        _= PopUpTips(TIPS_SUCCESSFUL_REDEEM);
+                        return;
+                    }
+                    _= PopUpTips(TIPS_COIN_LACK);
+                };
+                ShopUIController.clickingWatchAd = async configs =>
+                {
+                    await Task.Delay(3000); //假装播放3秒广告
+                    PlayerAd.AddWatchedAd();
+                    OnUpdateWatchedAd();
+                    if (PlayerAd.GetWatchedAd() >= configs[1])
+                    {
+                        PlayerCoin.AddCoin(configs[0]);
+                        PlayerAd.ResetWatchedAd();
+                        OnUpdateWatchedAd();
+                        Instance.OnUpdateCoin();
+                        _= PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                    }
+                };
+                ShopUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(ShopUIController), ShopUIController.clickingWatchAd);
+                return;
             case UIType.Victory:
                 VictoryUIController.clickingHome = () =>
                 {
@@ -213,12 +274,12 @@ public class SystemUIManager : MonoBehaviour
                 {
                     await clickingContinue(UIType.Victory, false, TIPS_SUCCESSFUL_RECEIVING);
                     PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
-                    Instance.OnUpdateCoin();
+                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
                 VictoryUIController.clickingWatchAd = async _=> {
                     await clickingContinue(UIType.Victory, true, TIPS_SUCCESSFUL_RECEIVING);
                     PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
-                    Instance.OnUpdateCoin();
+                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
                 VictoryUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
                 return;
@@ -243,7 +304,7 @@ public class SystemUIManager : MonoBehaviour
     {
         if (Instance == null)
             await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
-        if (args.Length > 0)
+        if (args is { Length: > 0 })
             switch (type)
             {
                 case UIType.Defeat:
@@ -271,7 +332,7 @@ public class SystemUIManager : MonoBehaviour
         switch (type)
         {
             case UIType.Victory:
-                int numCoinsToReceive = args.Length == 0
+                int numCoinsToReceive = args is null or { Length: 0 }
                     ? VictoryUIController.numCoinsToReceive
                     : int.TryParse(args[0].ToString(), out int numCoins)
                         ? numCoins
@@ -327,19 +388,6 @@ public class SystemUIManager : MonoBehaviour
         Destroy(rt.gameObject);
     }
 
-    public static async void ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
-    {
-        if (toWait is not null)
-            await Task.WhenAll(toWait.GetInvocationList()
-                .Select(d =>
-                    d.Method.ReturnType == typeof(Task)
-                    ? d.Method.Invoke(d.Target, toWaitArgs) as Task
-                    : Task.FromException(new ArgumentException("SystemUIManager.ProcessAd的第一个参数只能是 Func<..., Task> 类型！"))
-                )
-            );
-        afterWait?.Invoke();
-    }
-
     /// <summary>
     /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
     /// <br/><br/>
@@ -377,7 +425,7 @@ public class SystemUIManager : MonoBehaviour
     private static Func<T, Task> StartAdAndBlockClicking<T>(
         Type typeOfUIController,
         Func<T, Task> clickingFunc,
-        string nameOfClickingFunc = nameof(StaticAdProcessor<MonoBehaviour, T>.clickingWatchAd)
+        string nameOfClickingFunc = nameof(StaticAdProcessor<MonoBehaviour, object>.clickingWatchAd)
     )
     {
         FieldInfo clickingField = typeOfUIController.GetField(
@@ -423,10 +471,65 @@ public class SystemUIManager : MonoBehaviour
 #endif
     }
 
+    public void FireLoadingUI(string args)
+    {
+        if (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs))
+        {
+            _= LoadUI(type, loadUIArgs);
+            return;
+        }
+        throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+            .Replace("@", splitedArgs[0])
+            .Replace("#", nameof(UIType))
+        );
+    }
+
+    public async void WaitLoadingUI(string args)
+    {
+        await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
+            ? LoadUI(type, loadUIArgs)
+            : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                .Replace("@", splitedArgs[0])
+                .Replace("#", nameof(UIType))
+            ))
+        );
+    }
+
+    private bool TryParseLoadUIArgs(string str, out UIType type, out object[] args)
+    {
+        if (str is null or { Length: 0 })
+            return false;
+        string[] splitedArgs = str.Split(',').Select(s => s.Trim());
+        if (!Enum.TryParse<UIType>(splitedArgs[0], true, out type))
+            return false;
+        args = splitedArgs.Skip(1).Select(s =>
+            Enum.TryParse<ItemType>(s, true, out ItemType itemType)
+                ? itemType
+                : float.TryParse(s, out float floatNumber)
+                    ? floatNumber
+                    : s
+        );
+        return true;
+    }
+
 #region 各界面初始化方法
     private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
-    private void InitEnergy() => _= 0; //TODO: 把各个UI类与Player数据类之间的耦合转移到 SystemUIManager 里（包括体力补充界面）
-    private void InitHomeUI() => _= 0; //TODO: 把各个UI类与Player数据类之间的耦合转移到 SystemUIManager 里（包括大厅界面）
+    private void InitEnergy()
+    {
+        EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        EnergyUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+        EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
+        PlayerEnergy.timing += () => EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
+    }
+    private void InitHomeUI()
+    {
+        HomeUIController.NumCoins = PlayerCoin.GetCoin();
+        HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        HomeUIController.MaxEnergy = PlayerEnergy.MaxEnergy;
+        HomeUIController.LevelName = "关卡" + PlayerProgress.GetCurrentLevel();
+        //TODO: 下面这行从 PlayerProgress 类获取进关卡扣除的体力值数据
+        //HomeUIController.NumEnergyToPlay = PlayerProgress.GetNumEnergyToPlay();
+    }
     private void InitItemUI(ItemUIController itemUI, ItemType itemType)
     {
         ValueTuple<string, Sprite> itemInfoIcon = dictItemInfoIcons[itemType];
@@ -469,7 +572,13 @@ public class SystemUIManager : MonoBehaviour
         (itemUI.clickingClose, itemUI.clickingBuy, itemUI.clickingWatchAd) = clickings;
         itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
     }
-    private void InitShopUI() => _= 0;  //TODO: 通过 StartAdAndBlockClicking 禁用看广告领金币按钮响应
+    private void InitQuitUI() => QuitUIController.numEnergy = PlayerEnergy.NumEnergyToQuit; // 目前 PlayerEnergy.NumEnergyToQuit 为只读属性且值永远为1
+    private void InitShopUI()
+    {
+        ShopUIController.NumCoins = PlayerCoin.GetCoin();
+        ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        ShopUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+    }
     private void InitVictoryUI(int numRewardCoins) => VictoryUIController.numCoinsToReceive = numRewardCoins;
 #endregion
 
@@ -488,7 +597,8 @@ public class SystemUIManager : MonoBehaviour
         dictPrefabInitings = new()
         {
             { UIType.Energy, new(energyUIPrefab, InitEnergy) },
-            { UIType.Home, new(homeUIPrefab, InitHomeUI) }
+            { UIType.Home, new(homeUIPrefab, InitHomeUI) },
+            { UIType.Shop, new(shopUIPrefab, InitShopUI) }
         };
     }
 
@@ -504,11 +614,19 @@ public class SystemUIManager : MonoBehaviour
 
     private void OnUpdateCoin()
     {
-        //TODO: 更新各界面金币相关显示
+        HomeUIController.NumCoins = PlayerCoin.GetCoin();
+        ShopUIController.NumCoins = PlayerCoin.GetCoin();
     }
 
     private void OnUpdateEnergy()
     {
-        //TODO: 更新各界面体力值显示
+        EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
     }
+
+    private void OnUpdateWatchedAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
+
+    //private void OnUpdateItem() => _= 0; // 以后可能会用到
+    //private void OnUpdateMaxEnergy() => _= 0; // 以后可能会用到
 }

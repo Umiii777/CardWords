@@ -18,6 +18,7 @@ public class PlayerEnergy
     private static SynchronizationContext unityContext;
 #endregion
 
+    public static int NumEnergyToQuit { get; } = 1;
     public static int MaxEnergy
     {
         get => PlayerPrefs.GetInt(Key_MaxEnergy, 5);
@@ -65,7 +66,13 @@ public class PlayerEnergy
         Energy -= count;
         return true;
     }
-    
+    public static void ResetEnergy()
+    {
+        PlayerPrefs.DeleteKey(Key_Energy);
+        PlayerPrefs.DeleteKey(Key_MaxEnergy);
+        PlayerPrefs.Save();
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void StartTimer()
     {

@@ -77,7 +77,7 @@ public class DefeatUIController : MonoBehaviour
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
     public void OnClickReplay() => clickingReplay?.Invoke();
-    public void OnClickContinue() => SystemUIManager.ProcessAd(clickingContinue);
+    public void OnClickContinue() => AdProcesser.ProcessAd(clickingContinue);
 #endregion
 
     void Start()

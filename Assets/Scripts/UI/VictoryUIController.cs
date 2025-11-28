@@ -1,15 +1,6 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
-
-public abstract class StaticAdProcessor<UIControllerType, U> : MonoBehaviour where UIControllerType : MonoBehaviour
-{
-    /// <summary>
-    /// 看广告领东西按钮回调
-    /// </summary>
-    public static Func<U, Task> clickingWatchAd;
-}
 
 /// <summary>
 /// 胜利界面控制器
@@ -46,7 +37,7 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
 #region 按钮回调方法
     public void OnClickHome() => clickingHome?.Invoke();
     public void OnClickReceive() => clickingReceive?.Invoke();
-    public void OnClickReceiveMore() => SystemUIManager.ProcessAd(clickingWatchAd, null, 0);
+    public void OnClickReceiveMore() => AdProcesser.ProcessAd(clickingWatchAd, null, 0);
 #endregion
 
     void Start()

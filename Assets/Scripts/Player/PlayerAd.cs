@@ -17,4 +17,9 @@ public class PlayerAd
     public static int GetWatchedAd() => WatchedAd;
     public static void IncreaseWatchedAd() => WatchedAd++;
     public static void ResetWatchedAd() => WatchedAd = 0;
+    public static void ResetAd()
+    {
+        PlayerPrefs.DeleteKey(Key_WatchedAd);
+        PlayerPrefs.Save();
+    }
 }

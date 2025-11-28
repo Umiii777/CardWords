@@ -59,4 +59,10 @@ public class PlayerItem
         SetItem(type, item - count);
         return true;
     }
+    public static void ResetItem()
+    {
+        PlayerPrefs.DeleteKey(Key_Hint);
+        PlayerPrefs.DeleteKey(Key_Shuffle);
+        PlayerPrefs.Save();
+    }
 }

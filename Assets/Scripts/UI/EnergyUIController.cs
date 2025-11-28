@@ -28,16 +28,32 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
     /// <summary>
     /// 玩家体力值上限
     /// </summary>
-    private static int maxEnergy = 0;
+    public static int maxEnergy = 0;
 #endregion
 
-#region 距下一次恢复体力的时间
+#region 距下一次回复体力的时间
+    /// <summary>
+    /// 距下一次回复体力还有多少秒
+    /// </summary>
+    public static int SecondsToRecover
+    {
+        get => secondsToRecover;
+        set
+        {
+            if (sharedClockText != null)
+                sharedClockText.text = numEnergy < maxEnergy
+                    ? $"{value / 60:00}:{value % 60:00}"
+                    : "满"
+            secondsToRecover = value;
+        }
+    }
+    private static int secondsToRecover = 300;
     private static TextMeshProUGUI sharedClockText;
     [SerializeField]
     private TextMeshProUGUI clockText;
 #endregion
 
-#region 静态委托
+#region 按钮回调委托
     /// <summary>
     /// 关闭界面按钮回调
     /// <br/><br/>
@@ -52,17 +68,13 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public void OnClickReceive() => SystemUIManager.ProcessAd(clickingWatchAd, null, 0);
+    public void OnClickReceive() => AdProcesser.ProcessAd(clickingWatchAd, null, 0);
     public void OcClickBuy(string price) => clickingBuy?.Invoke(int.Parse(price));
 #endregion
 
     void Start()
     {
-        NumEnergy = PlayerEnergy.GetEnergy();
-        maxEnergy = PlayerEnergy.MaxEnergy;
         InitSharedFields();
-        UpdateClockText();
-        PlayerEnergy.timing += UpdateClockText;
     }
 
     private void InitSharedFields()
@@ -70,9 +82,7 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
         sharedEnergyCountText = energyCountText;
         sharedClockText = clockText;
 
-        sharedEnergyCountText.text = numEnergy.ToString();
+        NumEnergy = numEnergy;
+        SecondsToRecover = secondsToRecover;
     }
-
-    private static void UpdateClockText() => sharedClockText.text = numEnergy < maxEnergy ? GetTimeToRecover() : "满";
-    private static string GetTimeToRecover() => $"{PlayerEnergy.secondsToRecover / 60:00}:{PlayerEnergy.secondsToRecover % 60:00}";
 }

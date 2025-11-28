@@ -8,7 +8,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态属性或字段赋值以更新各个组件的显示内容及行为
 /// </summary>
-public class ShopUIController : StaticAdProcessor<ShopUIController, string>
+public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
 {
 #region 玩家金币数量
     /// <summary>
@@ -63,7 +63,32 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, string>
     private GameObject maxEnergyTips;
 #endregion
 
-#region 静态委托
+#region 已观看广告数
+    /// <summary>
+    /// 玩家本次进入商店后已观看的广告数
+    /// </summary>
+    public static int NumWatchedAd
+    {
+        get => numWatchedAd;
+        set
+        {
+            if (sharedWatchedAdTexts != null)
+            {
+                foreach (var t in sharedWatchedAdTexts)
+                    t.text = value + "/" + t.text.Split('/')[1];
+            }
+            numWatchedAd = value;
+        }
+    }
+    private static int numWatchedAd = 0;
+    private static TextMeshProUGUI[] sharedWatchedAdTexts;
+    [SerializeField]
+    private string watchedAdTextName;
+    [SerializeField]
+    private Transform coinPacksParent;
+#endregion
+
+#region 按钮回调委托
     /// <summary>
     /// 设置按钮回调
     /// </summary>
@@ -78,17 +103,7 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, string>
     /// 购买礼包按钮回调
     /// </summary>
     public static Action<ItemType, int, int> clickingBuy;
-    /// <summary>
-    /// 该委托在 ShopUIController 的协程中每帧执行一次
-    /// </summary>
-    public static Action runningCoroutine;
 #endregion
-
-    [SerializeField]
-    private string watchedAdTextName;
-    [SerializeField]
-    private Transform coinPacksParent;
-    private TextMeshProUGUI[] watchedAdTexts;
 
 #region 按钮回调方法
     public void OnClickSettings() => clickingSettings?.Invoke();
@@ -98,16 +113,16 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, string>
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         clickingBuy?.Invoke((ItemType)c[0], c[1], c[2]);
     }
-    public void OnClickReceive(string config) => SystemUIManager.ProcessAd(clickingWatchAd, UpdateWatchedAdText, config);
+    public void OnClickReceive(string config) => AdProcesser.ProcessAd(
+        clickingWatchAd,
+        UpdateWatchedAdText,
+        config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
+    );
 #endregion
 
     void Start()
     {
         InitSharedFields();
-        InitWatchedAdText();
-        UpdateWatchedAdText();
-        NumEnergy = PlayerEnergy.GetEnergy();
-        maxEnergy = PlayerEnergy.MaxEnergy;
     }
 
     private void InitSharedFields()
@@ -115,23 +130,12 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, string>
         sharedCoinCountText = coinCountText;
         sharedEnergyCountText = energyCountText;
         sharedMaxEnergyTips = maxEnergyTips;
-
-        sharedCoinCountText.text = numCoins.ToString();
-        sharedEnergyCountText.text = numEnergy.ToString();
-        sharedMaxEnergyTips.SetActive(numEnergy >= maxEnergy);
-    }
-
-    private void InitWatchedAdText()
-    {
-        watchedAdTexts = coinPacksParent.GetComponentsInChildren<Transform>(true)
+        sharedWatchedAdTexts = coinPacksParent.GetComponentsInChildren<TextMeshProUGUI>(true)
             .Where(t => t.name == watchedAdTextName)
-            .Select(t => t.GetComponent<TextMeshProUGUI>())
             .ToArray();
-    }
 
-    private void UpdateWatchedAdText()
-    {
-        foreach (var t in watchedAdTexts)
-            t.text = PlayerAd.GetWatchedAd() + "/" + t.text.Split('/')[1];
+        NumCoins = numCoins;
+        NumEnergy = numEnergy;
+        NumWatchedAd = numWatchedAd;
     }
 }
