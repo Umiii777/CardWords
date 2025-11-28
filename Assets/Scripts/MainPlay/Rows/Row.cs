@@ -7,6 +7,7 @@ public class Row : MonoBehaviour
     public RowType rowType;
     public bool isEmpty = false;
     public int cardCount = 0;
+    public int rowNum = -1;
 
     // 当前行上的卡（按从 top 到子牌顺序或你需要的顺序）
     public List<Card> cardsOnRow = new List<Card>();
@@ -47,7 +48,7 @@ public class Row : MonoBehaviour
     }
     public void CheckIfMainRowEmpty()
     {
-        
+
     }
 
 
@@ -61,12 +62,18 @@ public class Row : MonoBehaviour
     //将当前cardsOnRow的最上层变成isFront
     public void SetCardFront()
     {
-        if (cardsOnRow[cardsOnRow.Count-1]&&!cardsOnRow[cardsOnRow.Count-1].isFront)
+        if (cardsOnRow == null || cardsOnRow.Count == 0)
+        {
+            Debug.Log("列表为空，没有卡可以翻面");
+            return;
+        }
+        Card lastCard = cardsOnRow[cardsOnRow.Count - 1];
+        if (lastCard != null && !lastCard.isFront)
         {
             // Debug.Log("执行了设置卡翻面");
             // Debug.Log(cardsOnRow[cardsOnRow.Count - 1].cardData.cardContent);
             cardsOnRow[cardsOnRow.Count - 1].SetFront();
-            
+
         }
         else
         {

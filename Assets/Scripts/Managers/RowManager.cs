@@ -23,14 +23,19 @@ public class RowManager : MonoBehaviour
     //跟row添加Card相关的方法
     public void CardsOnRowChangeAdd(Card topCard)
     {
-        //传入的card本身只有原来的sloutCount
+        //传入的card本身只有原来的sloutCount,如果是从deck传上来的，顺便改下deckCard的东西
+        topCard.isFromDeck = false;
+
+
         rows[topCard.slotCount].cardsOnRow.Add(topCard);
         rows[topCard.slotCount].CheckIfRowEmpty();
     }
-    
+
     //和上面的中间必须有一个更改slotCount的间隔,先减再加
     public void CardOnRowChangeMinus(Card topCard)
     {
+
+
         rows[topCard.slotCount].cardsOnRow.Remove(topCard);
         rows[topCard.slotCount].CheckIfRowEmpty();
     }

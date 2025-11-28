@@ -143,6 +143,7 @@ public class LevelManager : MonoBehaviour
             RectTransform currentTransform = normalRow.GetComponent<RectTransform>();
             Row currentRow = normalRow.GetComponent<Row>();
             currentRow.cardCount = rows[i];
+            currentRow.rowNum = i;
             rowManager.AddRow(currentRow);
 
 

@@ -19,7 +19,7 @@ public class Card : MonoBehaviour
     public bool isFront;
     public Sprite[] sprites; //0是卡背面，1是显示字的内容面
     public bool isFromDeck = false;
-
+    private bool isStackStyleApplied = false;
 
     //跟拖拽相关的变量
     public bool isOnRow;
@@ -74,12 +74,7 @@ public class Card : MonoBehaviour
                 tmContent.text = cardData.cardContent;
                 cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
                 tmLength.text = "";
-                if (isInStack)
-                {
-                    Debug.Log("执行了更新堆叠卡牌样式的方法");
-                    //设置卡牌的别样样式
-                    InStackStyle();
-                }
+
             }
         }
         else
@@ -102,9 +97,13 @@ public class Card : MonoBehaviour
 
     public void InStackStyle()
     {
+        if (!isStackStyleApplied)
+        {
+            tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
+            tmContent.fontSize = textStackOffsetSize;
+            isStackStyleApplied = true;
+        }
 
-        tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
-        tmContent.fontSize = textStackOffsetSize;
     }
     public void InPresetStyle()
     {

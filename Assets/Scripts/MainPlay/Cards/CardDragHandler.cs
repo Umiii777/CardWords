@@ -19,8 +19,9 @@ public class CardDragHandler : MonoBehaviour,
     private float bestArea = 0f;
 
     //同时存在的时候先减再增加，传递给row的事件，让row帮助翻牌库的牌，同时检测是否为空
+    //对应事件由rowManager来订阅
     public CardEventSO EndDragAdd;      //从deck来的牌只增加不减少
-    public CardEventSO EndDragMinus;    //向上面走的时候只减少不增加
+    public CardEventSO EndDragMinus;    //向上面走的时候只减少不增加，
 
 
 
@@ -59,7 +60,7 @@ public class CardDragHandler : MonoBehaviour,
 
 
         }
-        if(top.isInStack)
+        if (top.isInStack)
         {
             //如果拖拽的卡是堆，那么直接用stack的方法遍历整个设置lastsibiling
             CardStack.ChangeAllStackSibings(top);
@@ -125,7 +126,7 @@ public class CardDragHandler : MonoBehaviour,
 
         }
         // 2. 落到卡上（合并逻辑）
-        if (best && !best.cardData.isMainCard && !best.isInStack)
+        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront)
         {
             TryMerge(best);
             return;
@@ -135,6 +136,7 @@ public class CardDragHandler : MonoBehaviour,
             Debug.Log("落在了主卡上");
             PlaceOnMainCard(best);
         }
+
 
         // 默认：回原位
         top.rectTransform.anchoredPosition = originalPos;
@@ -203,6 +205,11 @@ public class CardDragHandler : MonoBehaviour,
             top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
             CardStack.UpdateStackPositions(top);
 
+            //注意：从空row上转移的时候，应该只有一个top操作，已经获得到了row，直接用row赋值
+            EndDragMinus.RaiseEvent(top, this);
+            top.slotCount = row.rowNum;
+            EndDragAdd.RaiseEvent(top, this);
+
             return;
         }
         // 主卡可以放到mainRow
@@ -244,6 +251,7 @@ public class CardDragHandler : MonoBehaviour,
                 //触发card自身的被合成东西+表现
                 top.gameObject.SetActive(false);
                 target.SetMainCardVisualOnCombine();
+                EndDragMinus.RaiseEvent(top, this);
             }
             else
             {
@@ -261,13 +269,13 @@ public class CardDragHandler : MonoBehaviour,
         if (target.cardData.mainId == top.cardData.mainId &&
             target.isFront && !target.isInStack)
         {
-            CardStack.AddToStack(target, top);
-            target.InStackStyle();
+            CardStack.OneAddToOne(target, top);
+
             //设置首次堆叠的样式，但是应该每次在ondrag或者onBeginDrag的时候就设置
             target.transform.SetAsLastSibling();
             top.transform.SetAsLastSibling();
 
-            EndDragMinus.RaiseEvent(top,this);
+            EndDragMinus.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
             EndDragAdd.RaiseEvent(top, this);
             return;
@@ -275,14 +283,15 @@ public class CardDragHandler : MonoBehaviour,
 
         // 第二种情况: 单到多（把单张加入到已有的 stack 顶部）
         if (target.cardData.mainId == top.cardData.mainId &&
-            (target.isInStack || target.isFront))
+            target.isFront && target.isInStack && !top.childCards.Contains(target))
         {
-            // 允许把单张放到已有堆栈（需要 CardStack.AddToStack 能处理 target 已经是 stack 的情况）
-            CardStack.AddToStack(target, top);
-            //target.InStackStyle();
+            Debug.Log("准备单到多");
+            // 允许把单张放到已有堆栈
+            CardStack.OneToStack(target, top);
 
-
+            EndDragMinus.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
+            EndDragAdd.RaiseEvent(top, this);
             return;
         }
         //第三种情况，多到单（把已有的stack加入到单张上面
