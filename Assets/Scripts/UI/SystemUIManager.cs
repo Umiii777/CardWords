@@ -483,22 +483,23 @@ public class SystemUIManager : MonoBehaviour
         InitUIManager();
         for (uint u = 0; u < Enum.GetNames(typeof(UIType)).Length; u++)
             InitUICallbacks((UIType)u);
+
+        //游戏启动时直接显示大厅
         uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
 
-#if UNITY_EDITOR
-        //PlayerPrefs.DeleteAll();
-        //PlayerEnergy.SetEnergy(0);
-        _= LoadUI(UIType.Settings, true);
-        //_= LoadUI(UIType.Energy);
-        //_= LoadUI(UIType.Victory,100);
-        //_= LoadUI(UIType.Defeat, 0.6f);
-        //_= LoadUI(UIType.Item, ItemType.Hint);
-        Debug.Log("Coin:" + PlayerCoin.GetCoin() + " Energy:" + PlayerEnergy.GetEnergy());
-        Debug.Log("Hint:" + PlayerItem.GetItem(ItemType.Hint) + " Shuffle:" + PlayerItem.GetItem(ItemType.Shuffle));
-#endif
+//#if UNITY_EDITOR
+        // UI加载示例：
+        //_= SystemUIManager.LoadUI(UIType.Defeat, 0.6f);           // 失败界面（游戏进度60%）
+        //_= SystemUIManager.LoadUI(UIType.Energy);                 // 体力补充界面
+        //_= SystemUIManager.LoadUI(UIType.Home);                   // 大厅界面
+        //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
+        //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
+        //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
+        //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
+//#endif
     }
 
-#region 各界面初始化方法
+    #region 各界面初始化方法
     private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
     private void InitEnergy()
     {
@@ -629,7 +630,7 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     /// <param name="args">将本应传入 SystemUIManager.LoadUI 的参数连成字符串，两两之间用逗号隔开（例："Defeat, 0.5f"）</param>
     /// <exception cref="ArgumentException"></exception>
-    public async void FireLoadingUI(string args) => await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
+    public async void FireLoadUI(string args) => await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
         ? LoadUI(type, loadUIArgs)
         : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM
             .Replace("@", nameof(type))
