@@ -15,11 +15,14 @@ public class PlayerAd
     }
 
     public static int GetWatchedAd() => WatchedAd;
-    public static void IncreaseWatchedAd() => WatchedAd++;
-    public static void ResetWatchedAd() => WatchedAd = 0;
+    public static void SetWatchedAd(int count) => WatchedAd = count;
+    public static void AddWatchedAdd(int count = 1) => WatchedAd += count;
     public static void ResetAd()
     {
         PlayerPrefs.DeleteKey(Key_WatchedAd);
         PlayerPrefs.Save();
     }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void ResetAdWhenQuitGame() => Application.quitting += ResetAd;
 }
