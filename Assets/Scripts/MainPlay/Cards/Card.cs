@@ -54,6 +54,7 @@ public class Card : MonoBehaviour
     {
         rectTransform = gameObject.GetComponent<RectTransform>();
         cardBaseStyle = gameObject.GetComponent<Image>();
+        cg = GetComponent<CanvasGroup>();
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
     public void SetCardVisual()

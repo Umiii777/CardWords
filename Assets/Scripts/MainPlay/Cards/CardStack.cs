@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 
 public class CardStack
@@ -13,9 +14,7 @@ public class CardStack
         Card top = parent.GetTop(); //获取被堆叠对象最顶部的对象
         top.isInStack = true;
         child.topParent = top;  //将新进的顶部对象设置为顶部对象
-        Debug.Log(top.cardData.cardContent);
         child.isInStack = true; //新近对象为Instack
-        Debug.Log(top.childCards.Count);
         if (top.childCards.Count == 0)
         {
             top.childCards.Add(top);  //只有顶部的卡会有一个List，储存所有的子对象
@@ -39,6 +38,24 @@ public class CardStack
         child.transform.SetParent(top.transform.parent, true);
         UpdateStackPositions(top);
     }
+    //多到单
+    public static void StackToOne(Card parent, Card child)
+    {
+        //先获得原来父类的childCards；先给目标top加上自己
+        Card top = parent.GetTop();
+        top.isInStack = true;
+        top.childCards.Add(top);
+
+        Card formerTop = child.GetTop();
+        top.childCards.AddRange(formerTop.childCards);
+        formerTop.childCards.Clear();
+        for (int i = 1; i < top.childCards.Count; i++)
+        {
+            top.childCards[i].topParent = top;
+            top.childCards[i].transform.SetParent(top.transform.parent, true);
+        }
+        UpdateStackPositions(top);
+    }
 
     //添加单张到整个stack，单对多
     //public static void OneAddToStack(Card parent,)
@@ -53,11 +70,13 @@ public class CardStack
         {
             RectTransform cRT = top.childCards[i].rectTransform;
             cRT.anchoredPosition = topRT.anchoredPosition + new Vector2(0, -offsetY * i);
+            //top.childCards[i].cg.blocksRaycasts = false;
         }
-        for (int i = 0; i < top.childCards.Count-1; i++)
+        for (int i = 0; i < top.childCards.Count - 1; i++)
         {
             top.childCards[i].InStackStyle();
         }
+
 
     }
 
@@ -68,7 +87,25 @@ public class CardStack
         for (int i = 0; i < top.childCards.Count; i++)
         {
             top.childCards[i].transform.SetAsLastSibling();
-            Debug.Log(top.childCards[0].cardData.cardContent);
+            Debug.Log("当前堆最上面的卡牌是" + top.childCards[0].cardData.cardContent);
+        }
+    }
+    public static void BeginDragStackSetCg(Card parent)
+    {
+        Card top = parent.GetTop();
+        for (int i = 1; i < top.childCards.Count; i++)
+        {
+            ;
+            top.childCards[i].cg.blocksRaycasts = false;
+        }
+    }
+    public static void EndDragStackSetCg(Card parent)
+    {
+        Card top = parent.GetTop();
+        for (int i = 1; i < top.childCards.Count; i++)
+        {
+            ;
+            top.childCards[i].cg.blocksRaycasts = true;
         }
     }
 }

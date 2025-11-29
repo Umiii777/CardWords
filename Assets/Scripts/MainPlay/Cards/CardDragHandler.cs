@@ -23,6 +23,7 @@ public class CardDragHandler : MonoBehaviour,
     public CardEventSO EndDragAdd;      //从deck来的牌只增加不减少
     public CardEventSO EndDragMinus;    //向上面走的时候只减少不增加，
 
+    public ObjectEventSO onSuccessDrag;
 
 
     private void Awake()
@@ -64,6 +65,7 @@ public class CardDragHandler : MonoBehaviour,
         {
             //如果拖拽的卡是堆，那么直接用stack的方法遍历整个设置lastsibiling
             CardStack.ChangeAllStackSibings(top);
+            CardStack.BeginDragStackSetCg(top);
         }
 
 
@@ -109,9 +111,10 @@ public class CardDragHandler : MonoBehaviour,
         if (top == null)
         {
             Debug.Log("top为空");
+
             return;
         }
-        cg.blocksRaycasts = true;
+
 
         Card best = FindBestOverlapCard();
         Row bestRow = FindBestOverlapRow();
@@ -121,15 +124,20 @@ public class CardDragHandler : MonoBehaviour,
             if (bestRow.isEmpty)
             {
                 PlaceOnRow(bestRow);
+                CardStack.EndDragStackSetCg(top);
                 return;
             }
 
         }
         // 2. 落到卡上（合并逻辑）
-        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront)
+        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront && best.cg.blocksRaycasts)
         {
+
             TryMerge(best);
+            cg.blocksRaycasts = true;
             return;
+
+
         }
         else if (best && best.cardData.isMainCard)
         {
@@ -141,6 +149,8 @@ public class CardDragHandler : MonoBehaviour,
         // 默认：回原位
         top.rectTransform.anchoredPosition = originalPos;
         CardStack.UpdateStackPositions(top);
+        CardStack.EndDragStackSetCg(top);
+        cg.blocksRaycasts = true;
     }
 
     // 修复：正确从 eventData 指向的被拖拽物体获取拖拽的 top（不要依赖本实例的 private top）
@@ -203,14 +213,23 @@ public class CardDragHandler : MonoBehaviour,
         else if (row.rowType == RowType.normal && row.isEmpty)
         {
             top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
-            CardStack.UpdateStackPositions(top);
 
-            //注意：从空row上转移的时候，应该只有一个top操作，已经获得到了row，直接用row赋值
-            EndDragMinus.RaiseEvent(top, this);
-            top.slotCount = row.rowNum;
-            EndDragAdd.RaiseEvent(top, this);
+            if (top.isInStack)
+            {
+                CardStack.UpdateStackPositions(top);
+                MoveStackCallRow(top, row);
+                return;                                   //整体call的事件
+            }
+            else
+            {
+                //注意：从空row上转移的时候，应该只有一个top操作，已经获得到了row，直接用row赋值
+                EndDragMinus.RaiseEvent(top, this);
+                top.slotCount = row.rowNum;
+                EndDragAdd.RaiseEvent(top, this);
+                return;
 
-            return;
+            }
+
         }
         // 主卡可以放到mainRow
         else if (row.rowType == RowType.main && top.cardData.isMainCard)
@@ -267,10 +286,10 @@ public class CardDragHandler : MonoBehaviour,
 
         // 第一种情况: 单到单（目标是单张且正面）
         if (target.cardData.mainId == top.cardData.mainId &&
-            target.isFront && !target.isInStack)
+            target.isFront && !target.isInStack && !top.isInStack)
         {
+            Debug.Log("准备单到单");
             CardStack.OneAddToOne(target, top);
-
             //设置首次堆叠的样式，但是应该每次在ondrag或者onBeginDrag的时候就设置
             target.transform.SetAsLastSibling();
             top.transform.SetAsLastSibling();
@@ -295,6 +314,14 @@ public class CardDragHandler : MonoBehaviour,
             return;
         }
         //第三种情况，多到单（把已有的stack加入到单张上面
+        if (target.cardData.mainId == top.cardData.mainId && target.isFront &&
+         !target.isInStack && !top.childCards.Contains(target))
+        {
+            Debug.Log("准备多到单");
+            CardStack.StackToOne(target, top);
+            MoveStackCallCard(top.GetTop(), target);
+
+        }
 
         //第四种情况，多到多（把已有的
 
@@ -304,8 +331,29 @@ public class CardDragHandler : MonoBehaviour,
         CardStack.UpdateStackPositions(top);
         return;
     }
+    //移动stack的时候，触发Rowmanager监听的方法
+    public void MoveStackCallRow(Card top, Row row)
+    {
+        foreach (var card in top.childCards)
+        {
+            EndDragMinus.RaiseEvent(card, this);
+            card.slotCount = row.rowNum;
+            EndDragAdd.RaiseEvent(card, this);
+        }
 
-    //成功拖动时，改变card的slotCount
+    }
+    public void MoveStackCallCard(Card top, Card target)
+    {
+        for (int i = top.childCards.Count-1; i >= 0; i--)
+        {
+            Card callCard = top.childCards[i];
+            EndDragMinus.RaiseEvent(callCard, this);
+            callCard.slotCount = target.slotCount;
+            EndDragAdd.RaiseEvent(callCard, this);
+        }
+    }
+
+
 
     //消除卡牌的行为
     public void OnCardEliminate(List<Card> eliminateCards)
