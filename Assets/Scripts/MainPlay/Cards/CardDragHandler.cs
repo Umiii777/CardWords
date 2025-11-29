@@ -125,6 +125,7 @@ public class CardDragHandler : MonoBehaviour,
             {
                 PlaceOnRow(bestRow);
                 CardStack.EndDragStackSetCg(top);
+                cg.blocksRaycasts = true;
                 return;
             }
 
@@ -134,6 +135,7 @@ public class CardDragHandler : MonoBehaviour,
         {
 
             TryMerge(best);
+            CardStack.EndDragStackSetCg(top);
             cg.blocksRaycasts = true;
             return;
 
@@ -199,7 +201,7 @@ public class CardDragHandler : MonoBehaviour,
         Debug.Log("当前卡片的堆叠区域是" + maxArea);
         return maxArea > 0.5 ? best : null; //和maxArea比较的值就是吸附的参数
     }
-
+    #region 放在普通row上
     private void PlaceOnRow(Row row)    //放到普通row上，有下面到下面，也有下面到上面main
     {
         //普通卡放不到mainRow
@@ -240,9 +242,10 @@ public class CardDragHandler : MonoBehaviour,
             //变更拖拽上去的卡状态
             top.isOnMainRow = true;
             top.isOnRow = false;
-
+            top.currentMainRow = row;
             //变更row状态
             row.isEmpty = false;    //主卡槽直接置空，TODO清空主卡槽的逻辑传递给消除完的mainRow事件
+            
             //变更所有卡状态
             CardStack.UpdateStackPositions(top);
 
@@ -255,7 +258,8 @@ public class CardDragHandler : MonoBehaviour,
 
         CardStack.UpdateStackPositions(top);
     }
-
+    #endregion
+    #region 放在mainCard上面
     private void PlaceOnMainCard(Card target)   //合成到主卡上，从下面到上面
     {
         if (!target.isOnMainRow)
@@ -263,14 +267,27 @@ public class CardDragHandler : MonoBehaviour,
             top.rectTransform.anchoredPosition = originalPos;
             return;
         }
+        //当主卡在槽位上
         else
         {
-            if (top.cardData.mainId == target.cardData.mainId)
+            //且相同id，且top不是inStack
+            if (top.cardData.mainId == target.cardData.mainId && !top.isInStack)
             {
                 //触发card自身的被合成东西+表现
                 top.gameObject.SetActive(false);
-                target.SetMainCardVisualOnCombine();
+                target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
+            }
+            //相同id，且top在stack中
+            else if (top.cardData.mainId == target.cardData.mainId && top.isInStack)
+            {
+                //先调用row的移除整个stack的事件
+                RemoveStackOnMainRow(top.GetTop());
+                foreach (var card in top.GetTop().childCards)
+                {
+                    card.gameObject.SetActive(false);
+                }
+                target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
             }
             else
             {
@@ -279,7 +296,8 @@ public class CardDragHandler : MonoBehaviour,
             }
         }
     }
-
+    #endregion
+    #region 合成
     private void TryMerge(Card target)
     {
         Debug.Log($"Trying merge: {top.cardData.cardContent}  vs  {target.cardData.cardContent}");
@@ -301,7 +319,7 @@ public class CardDragHandler : MonoBehaviour,
         }
 
         // 第二种情况: 单到多（把单张加入到已有的 stack 顶部）
-        if (target.cardData.mainId == top.cardData.mainId &&
+        if (target.cardData.mainId == top.cardData.mainId && !top.isInStack &&
             target.isFront && target.isInStack && !top.childCards.Contains(target))
         {
             Debug.Log("准备单到多");
@@ -314,16 +332,23 @@ public class CardDragHandler : MonoBehaviour,
             return;
         }
         //第三种情况，多到单（把已有的stack加入到单张上面
-        if (target.cardData.mainId == top.cardData.mainId && target.isFront &&
+        if (target.cardData.mainId == top.cardData.mainId && target.isFront && top.isInStack &&
          !target.isInStack && !top.childCards.Contains(target))
         {
             Debug.Log("准备多到单");
             CardStack.StackToOne(target, top);
             MoveStackCallCard(top.GetTop(), target);
-
+            return;
         }
-
         //第四种情况，多到多（把已有的
+        if (target.cardData.mainId == top.cardData.mainId && target.isFront && target.isInStack &&
+        target.isInStack && !top.childCards.Contains(target))
+        {
+            Debug.Log("准备多到多");
+            CardStack.StackToStack(target, top);
+            MoveStackCallCard(top.GetTop(), target);
+            return;
+        }
 
 
         // 默认：不匹配，回退
@@ -331,6 +356,8 @@ public class CardDragHandler : MonoBehaviour,
         CardStack.UpdateStackPositions(top);
         return;
     }
+    #endregion
+    #region 移动
     //移动stack的时候，触发Rowmanager监听的方法
     public void MoveStackCallRow(Card top, Row row)
     {
@@ -340,11 +367,17 @@ public class CardDragHandler : MonoBehaviour,
             card.slotCount = row.rowNum;
             EndDragAdd.RaiseEvent(card, this);
         }
-
+    }
+    public void RemoveStackOnMainRow(Card top)
+    {
+        foreach (var card in top.childCards)
+        {
+            EndDragMinus.RaiseEvent(card, this);
+        }
     }
     public void MoveStackCallCard(Card top, Card target)
     {
-        for (int i = top.childCards.Count-1; i >= 0; i--)
+        for (int i = top.childCards.Count - 1; i >= 0; i--)
         {
             Card callCard = top.childCards[i];
             EndDragMinus.RaiseEvent(callCard, this);
@@ -352,7 +385,7 @@ public class CardDragHandler : MonoBehaviour,
             EndDragAdd.RaiseEvent(callCard, this);
         }
     }
-
+    #endregion
 
 
     //消除卡牌的行为

@@ -58,6 +58,25 @@ public class CardStack
     }
 
     //添加单张到整个stack，单对多
+    public static void StackToStack(Card parent, Card child)
+    {
+        Card parentTop = parent.GetTop();
+        Debug.Log("父堆的数量" + parentTop.childCards.Count);
+        Card childTop = child.GetTop();
+        Debug.Log("子堆的数量" + childTop.childCards.Count);
+        parentTop.childCards.AddRange(childTop.childCards);
+
+        childTop.childCards.Clear();
+
+        for (int i = 1; i < parentTop.childCards.Count; i++)
+        {
+            parentTop.childCards[i].topParent = parentTop;
+            parentTop.childCards[i].transform.SetParent(parentTop.transform.parent, true);
+        }
+        UpdateStackPositions(parentTop);
+
+
+    }
     //public static void OneAddToStack(Card parent,)
 
     // 移动整个 stack

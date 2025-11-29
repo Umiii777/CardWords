@@ -20,28 +20,16 @@ public class StepManager : MonoBehaviour
         tmPro.text = currentSteps.ToString();
     }
 
-    public void StepMinusOne()
+    public void StepsChange(int offsetStep)
     {
-        if (currentSteps <= 0)
-        {
-            Debug.Log("步骤用完，关卡失败");
-            //调用关卡失败的事件
-            StepsCheck();
-        }
-        else
-        {
-            currentSteps -= 1;
-            tmPro.text = currentSteps.ToString();
-        }
+        currentSteps = offsetStep + currentSteps;
+        tmPro.text = currentSteps.ToString();
 
-    }
-    public void StepsCheck()
-    {
-        //调用关卡失败的事件
-        return;
+        //当变化为0的时候，call关卡失败（其他弹窗）
 
     }
 
+    
     public void TestSetSteps()
     {
         maxSteps = 999;

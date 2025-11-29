@@ -34,6 +34,7 @@ public class Card : MonoBehaviour
     public int stackIndex = 0;
     public bool isInStack = false;
     public List<Card> childCards = new List<Card>();
+    public Row currentMainRow = null;
 
     public int cardNums = 1;//代表这个牌未堆叠的时候，只有一张，用于传递给Row
 
@@ -138,15 +139,16 @@ public class Card : MonoBehaviour
         CardManager.Instance.allCards.Remove(this);
     }
     #endregion
+
     #region MainCard方法
-    public void SetMainCardVisualOnCombine()
+    public void SetMainCardVisualOnCombine(int cardsNum)
     {
-        cardData.currentLength++;
-        tmLength.text = cardData.currentLength.ToString() + "/" + cardData.mainTotalLength.ToString();
-        MainCardCheckLength();
+        cardData.currentLength = cardData.currentLength + cardsNum;
+        MainCardUpdate();
     }
-    public void MainCardCheckLength()
+    public void MainCardUpdate()
     {
+        tmLength.text = cardData.currentLength.ToString() + "/" + cardData.mainTotalLength.ToString();
         if (cardData.currentLength == cardData.mainTotalLength)
         {
             //执行maincard的消除逻辑和表现
@@ -157,7 +159,8 @@ public class Card : MonoBehaviour
     //消除表现
     public void CompleteMainCard()
     {
-
+        currentMainRow.isEmpty = true;
+        gameObject.SetActive(false);
     }
     #endregion
 
