@@ -1,0 +1,662 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+/// <summary>
+/// 游戏中的界面类型
+/// </summary>
+public enum UIType
+{
+    /// <summary>
+    /// 关卡失败界面
+    /// <br/><br/>
+    /// 生成时须再传一个表示玩家游戏完成度的 float 值，最小为0，最大为1
+    /// </summary>
+    Defeat,
+    /// <summary>
+    /// 体力补充界面
+    /// <br/><br/>
+    /// 生成时不传其他参数
+    /// </summary>
+    Energy,
+    /// <summary>
+    /// 大厅界面
+    /// <br/><br/>
+    /// 生成时不传其他参数
+    /// </summary>
+    Home,
+    /// <summary>
+    /// 道具获取界面
+    /// <br/><br/>
+    /// 生成时须再传一个表示道具类型的 ItemType 枚举
+    /// </summary>
+    Item,
+    /// <summary>
+    /// 设置界面
+    /// <br/><br/>
+    /// 生成时须再传一个表示玩家当前是否处于关卡内的 bool 值
+    /// </summary>
+    Settings,
+    /// <summary>
+    /// 商店界面
+    /// <br/><br/>
+    /// 生成时不传其他参数
+    /// </summary>
+    Shop,
+    /// <summary>
+    /// 关卡胜利界面
+    /// <br/><br/>
+    /// 生成时可再传一个表示奖励金币数量的 int 值，若不传则使用 VictoryUIController.numCoinsToReceive 的值
+    /// </summary>
+    Victory
+}
+
+/// <summary>
+/// 加入新界面时须向该类添加 InitXXX 方法，并补充 InitUICallbacks 和 LoadUI 方法的switch分支
+/// </summary>
+public class SystemUIManager : MonoBehaviour
+{
+#region 异常消息内容常量
+    private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为 #，不在枚举 $ 之中";
+    private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。实际参数可能不符合方法要求！";
+    private const string EXCEPTION_MANAGER_UNINITIALIZED = "SystemUIManager.Instance 还未初始化，无法调用 @";
+#endregion
+#region 弹出提示内容常量
+    private const string TIPS_ASKING_ENERGY = "体力不足，请补充体力或等待回复";
+    private const string TIPS_COIN_LACK = "金币不足";
+    private const string TIPS_SUCCESSFUL_REDEEM = "兑换成功！";
+    private const string TIPS_SUCCESSFUL_RECEIVING = "领取成功！";
+    private const string TIPS_ENERGY_ADDED = "体力 + @";
+    private const string TIPS_ENERGY_IS_FULL = "兑换失败，体力已满";
+#endregion
+
+    public static SystemUIManager Instance;
+    /// <summary>
+    /// 关卡加载委托
+    /// <br/><br/>
+    /// 第一个参数为要加载的关卡编号，第二个参数为额外信息
+    /// </summary>
+    public static Func<int, object, Task> loadingLevel;
+
+#region public 游戏内所有道具的信息和图标
+    public string[] itemInfos;
+    public Sprite[] itemIcons;
+    private Dictionary<ItemType, ValueTuple<string, Sprite>> dictItemInfoIcons;
+#endregion
+
+#region 各界面预制体
+    [SerializeField]
+    private DefeatUIController defeatUIPrefab;
+    [SerializeField]
+    private EnergyUIController energyUIPrefab;
+    [SerializeField]
+    private HomeUIController homeUIPrefab;
+    [SerializeField]
+    private ItemUIController itemUIPrefab;
+    [SerializeField]
+    private SettingsUIController settingsUIPrefab;
+    [SerializeField]
+    private ShopUIController shopUIPrefab;
+    [SerializeField]
+    private VictoryUIController victoryUIPrefab;
+#endregion
+
+    [SerializeField]
+    private RectTransform tipsPrefab;
+
+    private object[] uiInstances;
+    /// <summary>
+    /// Keys: 所有生成时不传其他参数的 UIType 枚举值
+    /// <br/><br/>
+    /// Values: { Item1: UIType 对应的预制体; Item2: UIType 对应的初始化方法（即 SystemUIManager.InitXXX）}
+    /// </summary>
+    private Dictionary<UIType, ValueTuple<MonoBehaviour, Action>> dictPrefabInitings;
+
+#region 静态方法
+    public static void InitUICallbacks(UIType type)
+    {
+        static GameObject uiGameObj(UIType type)
+        {
+            var uiObj = Instance.uiInstances[(uint)type] as MonoBehaviour;
+            return uiObj == null ? null : uiObj.gameObject;
+        }
+        static async Task clickingContinue(UIType type, bool hasAd = true, string popUpMessage = null)
+        {
+            if (uiGameObj(type) == null)
+                return;
+            await (hasAd
+                ? Task.Delay(3000) //假装播放3秒广告
+                : Task.CompletedTask
+            );
+            await Task.WhenAll(new Task[]
+            {
+                //TODO: 下面这行执行关卡加载
+                loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null),
+                popUpMessage is null ? Task.CompletedTask : PopUpTips(popUpMessage)
+            });
+            Destroy(uiGameObj(type));
+            Instance.uiInstances[(uint)type] = null;
+        }
+        switch (type)
+        {
+            case UIType.Defeat:
+                DefeatUIController.clickingHome = async () =>
+                {
+                    await LoadUI(UIType.Home);
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                DefeatUIController.clickingContinue = async () => await clickingContinue(type);
+                DefeatUIController.clickingReplay = async () =>
+                {
+                    if (uiGameObj(type) == null)
+                        return;
+                    if (PlayerEnergy.TrySpendEnergy(1))
+                    {
+                        //Instance.OnUpdateEnergy(); // 没必要调 OnUpdateEnergy
+                        //TODO: 下面这行执行关卡加载
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                        Destroy(uiGameObj(type));
+                        Instance.uiInstances[(uint)type] = null;
+                        return;
+                    }
+                    await LoadUI(UIType.Energy);
+                    await PopUpTips(TIPS_ASKING_ENERGY);
+                };
+                return;
+            case UIType.Energy:
+                static async Task addEnergy()
+                {
+                    Instance.OnUpdateEnergy();
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
+                }
+                EnergyUIController.clickingClose = () => { Destroy(uiGameObj(type)); Instance.uiInstances[(uint)type] = null; };
+                EnergyUIController.clickingBuy = async price =>
+                {
+                    if (PlayerEnergy.GetEnergy() >= PlayerEnergy.MaxEnergy)
+                    {
+                        await PopUpTips(TIPS_ENERGY_IS_FULL);
+                        return;
+                    }
+                    if (PlayerCoin.TrySpendCoin(price))
+                    {
+                        PlayerEnergy.AddEnergy(1);
+                        Instance.OnUpdateCoin();
+                        await addEnergy();
+                        return;
+                    }
+                    await PopUpTips(TIPS_COIN_LACK);
+                };
+                EnergyUIController.clickingWatchAd = async _=>
+                {
+                    await Task.Delay(3000); //假装播放3秒广告
+                    if (Instance.uiInstances[(uint)type] == null)
+                        return;
+                    if (PlayerEnergy.TryAddEnergy(1))
+                    {
+                        await addEnergy();
+                        return;
+                    }
+                    await PopUpTips(TIPS_ENERGY_IS_FULL);
+                };
+                EnergyUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(EnergyUIController), EnergyUIController.clickingWatchAd);
+                return;
+            case UIType.Home:
+                HomeUIController.clickingSettings = async () => await LoadUI(UIType.Settings, false);
+                HomeUIController.clickingAddEnergy = async () => await LoadUI(UIType.Energy);
+                HomeUIController.clickingShop = async () => await LoadUI(UIType.Shop);
+                HomeUIController.clickingStart = async () =>
+                {
+                    if (PlayerEnergy.TrySpendEnergy(HomeUIController.NumEnergyToPlay))
+                    {
+                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
+                        //TODO: 下面这行执行关卡加载
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                        Destroy(uiGameObj(type));
+                        Instance.uiInstances[(uint)type] = null;
+                        return;
+                    }
+                    await LoadUI(UIType.Energy);
+                    await PopUpTips(TIPS_ASKING_ENERGY);
+                };
+                return;
+            case UIType.Item: return;
+            case UIType.Settings:
+                SettingsUIController.clickingClose = () => { Destroy(uiGameObj(type)); Instance.uiInstances[(uint)type] = null; };
+                SettingsUIController.clickingConfirm = async () =>
+                {
+                    await LoadUI(UIType.Home);
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                SettingsUIController.clickingReplay = async () =>
+                {
+                    if (uiGameObj(type) == null)
+                        return;
+                    //TODO: 下面这行执行关卡加载
+                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                return;
+            case UIType.Shop:
+                ShopUIController.clickingSettings = async () => await LoadUI(UIType.Settings, false);
+                ShopUIController.clickingClose = () =>
+                {
+                    PlayerAd.ResetWatchedAd();
+                    //Instance.OnWatchAd(); // 没必要调 OnWatchAd
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                ShopUIController.clickingBuy = async (ItemType, count, price) =>
+                {
+                    if (PlayerCoin.TrySpendCoin(price))
+                    {
+                        PlayerItem.AddItem(ItemType, count);
+                        Instance.OnUpdateCoin();
+                        await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
+                        return;
+                    }
+                    await PopUpTips(TIPS_COIN_LACK);
+                };
+                ShopUIController.clickingWatchAd = async configs =>
+                {
+                    await Task.Delay(3000); //假装播放3秒广告
+                    PlayerAd.IncreaseWatchedAd();
+                    Instance.OnWatchAd();
+                    if (PlayerAd.GetWatchedAd() >= configs[1])
+                    {
+                        PlayerCoin.AddCoin(configs[0]);
+                        PlayerAd.ResetWatchedAd();
+                        Instance.OnWatchAd();
+                        Instance.OnUpdateCoin();
+                        await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                    }
+                };
+                ShopUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(ShopUIController), ShopUIController.clickingWatchAd);
+                return;
+            case UIType.Victory:
+                VictoryUIController.clickingHome = async () =>
+                {
+                    await LoadUI(UIType.Home);
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                VictoryUIController.clickingReceive = async () =>
+                {
+                    await clickingContinue(type, false, TIPS_SUCCESSFUL_RECEIVING);
+                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
+                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
+                };
+                VictoryUIController.clickingWatchAd = async _=> {
+                    await clickingContinue(type, true, TIPS_SUCCESSFUL_RECEIVING);
+                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
+                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
+                };
+                VictoryUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
+                return;
+            default:
+                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                    .Replace("@", nameof(type))
+                    .Replace("#", $"{type}")
+                    .Replace("$", nameof(UIType))
+                );
+        }
+    }
+
+    /// <summary>
+    /// 生成指定类型的界面
+    /// <br/><br/>
+    /// SystemUIManager 会自动初始化和管理生成的界面
+    /// </summary>
+    /// <param name="type">要生成的界面类型</param>
+    /// <param name="args">生成此界面时需要的数据。确定好第一个实参后，参考第一个实参的注释来传入</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static async Task LoadUI(UIType type, params object[] args)
+    {
+        if (Instance == null)
+            await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
+        if (args is { Length: > 0 })
+            switch (type)
+            {
+                case UIType.Defeat:
+                    if (float.TryParse(args[0].ToString(), out float progress))
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as DefeatUIController,
+                            Instance.defeatUIPrefab,
+                            () => Instance.InitDefeatUI(progress)
+                        );
+                    return;
+                case UIType.Item:
+                    if (Enum.IsDefined(typeof(ItemType), args[0]))
+                    {
+                        var itemUIs = Instance.uiInstances[(uint)type] as LinkedList<ItemUIController>;
+                        ItemUIController itemUI = Instance.CreateUI(
+                            itemUIs.Count > 0 ? itemUIs.First() : null,
+                            Instance.itemUIPrefab
+                        );
+                        Instance.InitItemUI(itemUI, (ItemType)args[0]);
+                        itemUIs.RemoveFirst();
+                        itemUIs.AddLast(itemUI);
+                    }
+                    return;
+                case UIType.Settings:
+                    if (bool.TryParse(args[0].ToString(), out bool isInLevel))
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as SettingsUIController,
+                            Instance.settingsUIPrefab,
+                            () => Instance.InitSettingsUI(isInLevel)
+                        );
+                    return;
+            }
+        switch (type)
+        {
+            case UIType.Victory:
+                int numCoinsToReceive = args is null or { Length: 0 }
+                    ? VictoryUIController.numCoinsToReceive
+                    : int.TryParse(args[0].ToString(), out int numCoins)
+                        ? numCoins
+                        : 0;
+                Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                    Instance.uiInstances[(uint)type] as VictoryUIController,
+                    Instance.victoryUIPrefab,
+                    () => Instance.InitVictoryUI(numCoinsToReceive)
+                );
+                return;
+            default:
+                if (Enum.IsDefined(typeof(UIType), type))
+                {
+                    Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                        Instance.uiInstances[(uint)type] as MonoBehaviour,
+                        Instance.dictPrefabInitings[type].Item1,
+                        Instance.dictPrefabInitings[type].Item2
+                    );
+                    return;
+                }
+                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                    .Replace("@", nameof(type))
+                    .Replace("#", $"{type}")
+                    .Replace("$", nameof(UIType))
+                );
+        }
+    }
+
+    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null)
+    {
+        const int movingDuration = 80, stayingDuration = 1000, fadingDelay = 25;
+        Transform parent = parentTransform == null
+            ? Instance.transform.GetChild(Instance.transform.childCount - 1)
+            : parentTransform;
+        RectTransform rt = Instantiate(Instance.tipsPrefab, parent);
+        CanvasGroup tipsBackground = rt.GetComponent<CanvasGroup>();
+        int targetPosY = (int)rt.localPosition.y + 250;
+
+        rt.GetChild(1).GetComponent<Text>().text = tipsMessage;
+        if (parentTransform == null)
+            while (rt.localPosition.y < targetPosY)
+            {
+                rt.localPosition += Vector3.up * 25;
+                await Task.Delay(movingDuration / 10);
+            }
+        else
+            await Task.Delay(movingDuration);
+        await Task.Delay(stayingDuration);
+        while (tipsBackground.alpha > 0f)
+        {
+            tipsBackground.alpha -= 0.1f;
+            await Task.Delay(fadingDelay);
+        }
+        Destroy(rt.gameObject);
+    }
+
+    /// <summary>
+    /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
+    /// <br/><br/>
+    /// 用于派生自 NonSingletonAdProcessor 的界面类型
+    /// </summary>
+    /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
+    /// <returns>须代入按钮回调的新委托</returns>
+    private static Func<Task> StartAdAndBlockClicking(AdProcessor uiInstance)
+    {
+        Func<Task> clicking = uiInstance.clickingWatchAd;
+        async Task startAdAndBlockClicking()
+        {
+            uiInstance.clickingWatchAd = null;
+            await Task.WhenAll(clicking.GetInvocationList()
+                .Cast<Func<Task>>()
+                .Select(async f => await f())
+            );
+            uiInstance.clickingWatchAd = clicking + startAdAndBlockClicking;
+        }
+        ;
+        return startAdAndBlockClicking;
+    }
+
+    /// <summary>
+    /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
+    /// <br/><br/>
+    /// 用于派生自 SingletonAdProcessor 的界面类型
+    /// </summary>
+    /// <typeparam name="T">看广告领东西按钮回调委托的返回值类型</typeparam>
+    /// <param name="typeOfUIController">要禁用按钮响应的界面类型</param>
+    /// <param name="clickingFunc">看广告领东西按钮的回调委托</param>
+    /// <param name="nameOfClickingFunc">看广告领东西按钮回调委托的字段名称</param>
+    /// <returns>须代入按钮回调的新委托</returns>
+    /// <exception cref="ArgumentException"></exception>
+    private static Func<T, Task> StartAdAndBlockClicking<T>(
+        Type typeOfUIController,
+        Func<T, Task> clickingFunc,
+        string nameOfClickingFunc = nameof(StaticAdProcessor<MonoBehaviour, object>.clickingWatchAd)
+    )
+    {
+        FieldInfo clickingField = typeOfUIController.GetField(
+            nameOfClickingFunc,
+            BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.Public
+        );
+        if (clickingField?.GetValue(null) is not Func<T, Task> clicking)
+            throw new ArgumentException(EXCEPITON_STATIC_FIELD_NOT_FOUND
+                .Replace("@", typeOfUIController.ToString())
+                .Replace("#", nameOfClickingFunc)
+                .Replace("$", $"Func<{typeof(T)}, Task>")
+            );
+
+        async Task startAdAndBlockClicking(T arg)
+        {
+            clickingField.SetValue(null, null);
+            await Task.WhenAll(clicking.GetInvocationList()
+                .Cast<Func<T, Task>>()
+                .Select(async f => await f(arg))
+            );
+            clickingField.SetValue(null, clicking + (async arg => await startAdAndBlockClicking(arg)));
+        }
+        return startAdAndBlockClicking;
+    }
+#endregion
+
+    void Awake()
+    {
+        InitUIManager();
+        for (uint u = 0; u < Enum.GetNames(typeof(UIType)).Length; u++)
+            InitUICallbacks((UIType)u);
+
+        //游戏启动时直接显示大厅
+        uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
+
+//#if UNITY_EDITOR
+        // UI加载示例：
+        //_= SystemUIManager.LoadUI(UIType.Defeat, 0.6f);           // 失败界面（游戏进度60%）
+        //_= SystemUIManager.LoadUI(UIType.Energy);                 // 体力补充界面
+        //_= SystemUIManager.LoadUI(UIType.Home);                   // 大厅界面
+        //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
+        //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
+        //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
+        //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
+//#endif
+    }
+
+    #region 各界面初始化方法
+    private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
+    private void InitEnergy()
+    {
+        EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        EnergyUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+        EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
+        PlayerEnergy.timing += () => EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
+    }
+    private void InitHomeUI()
+    {
+        HomeUIController.NumCoins = PlayerCoin.GetCoin();
+        HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        HomeUIController.MaxEnergy = PlayerEnergy.MaxEnergy;
+        HomeUIController.LevelName = "关卡" + PlayerProgress.GetCurrentLevel();
+        //TODO: （待实现）下面这行从 PlayerProgress 类获取进关卡扣除的体力值数据
+        //HomeUIController.NumEnergyToPlay = PlayerProgress.GetNumEnergyToPlay();
+    }
+    private void InitItemUI(ItemUIController itemUI, ItemType itemType)
+    {
+        ValueTuple<string, Sprite> itemInfoIcon = dictItemInfoIcons[itemType];
+        string[] infos = itemInfoIcon.Item1.Split('`');
+
+        itemUI.itemType = itemType;
+        itemUI.nameText.text = infos[0];
+        itemUI.price = int.Parse(infos[1]);
+        itemUI.descriptionText.text = infos[2];
+        itemUI.iconImage.sprite = itemInfoIcon.Item2;
+
+        ValueTuple<Action, Func<int, Task>, Func<Task>> clickings;
+        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out clickings))
+        {
+            clickings = (
+            () =>
+            {
+                (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
+                Destroy(itemUI.gameObject);
+            },
+            async price =>
+            {
+                if (PlayerCoin.TrySpendCoin(price))
+                {
+                    PlayerItem.AddItem(itemType, 1);
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
+                    return;
+                }
+                await PopUpTips(TIPS_COIN_LACK);
+            },
+            async () =>
+            {
+                await Task.Delay(3000); //假装播放3秒广告
+                PlayerItem.AddItem(itemType, 1);
+                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+            }
+            );
+            ItemUIController.dictCachedClickings.Add(itemType, clickings);
+        }
+        (itemUI.clickingClose, itemUI.clickingBuy, itemUI.clickingWatchAd) = clickings;
+        itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
+    }
+    private void InitSettingsUI(bool isInLevel)
+    {
+        SettingsUIController.isInLevel = isInLevel;
+        //TODO: （待实现）下面这行从 PlayerProgress 类获取进关卡扣除的体力值数据
+        //SettingsUIController.numEnergyToPlay = PlayerProgress.GetNumEnergyToPlay();
+    }
+    private void InitShopUI()
+    {
+        ShopUIController.NumCoins = PlayerCoin.GetCoin();
+        ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        ShopUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+    }
+    private void InitVictoryUI(int numRewardCoins) => VictoryUIController.numCoinsToReceive = numRewardCoins;
+#endregion
+
+#region 玩家资源更新响应
+    private void OnUpdateCoin()
+    {
+        HomeUIController.NumCoins = PlayerCoin.GetCoin();
+        ShopUIController.NumCoins = PlayerCoin.GetCoin();
+    }
+
+    private void OnUpdateEnergy()
+    {
+        EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
+    }
+
+    private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
+#endregion
+
+    private void InitUIManager()
+    {
+        Instance = this;
+        uiInstances = new object[Enum.GetNames(typeof(UIType)).Length];
+        uiInstances[(uint)UIType.Item] = new LinkedList<ItemUIController>();
+        dictItemInfoIcons = itemInfos.ToDictionary(
+            s => (ItemType)uint.Parse(s.Split('`', 2)[0]),
+            s => (
+                s.Split('`', 2)[1].Replace('，', ','),
+                itemIcons.First(i => i.name.Split('_', 2)[0] == s.Split('`', 2)[0])
+            )
+        );
+        dictPrefabInitings = new()
+        {
+            { UIType.Energy, new(energyUIPrefab, InitEnergy) },
+            { UIType.Home, new(homeUIPrefab, InitHomeUI) },
+            { UIType.Shop, new(shopUIPrefab, InitShopUI) }
+        };
+    }
+
+    private T CreateUI<T>(T ui, T uiPrefab, Action initing = null) where T : MonoBehaviour
+    {
+        if (ui != null)
+            Destroy(ui.gameObject);
+        T uiNew = Instantiate(uiPrefab, transform);
+        uiNew.name = uiNew.name[..^7]; // 去掉物体名字后面的"(Clone)"
+        initing?.Invoke();
+        return uiNew;
+    }
+
+    /// <summary>
+    /// SystemUIManager.LoadUI 的非静态版本。无法通过 await 等待
+    /// <br/><br/>
+    /// 是为了直接从 Unity Editor 的 Inspector 面板将界面加载方法绑定到按钮而准备的，
+    /// <br/><br/>
+    /// 因此返回类型只能是 void。代码中应避免调用该方法
+    /// </summary>
+    /// <param name="args">将本应传入 SystemUIManager.LoadUI 的参数连成字符串，两两之间用逗号隔开（例："Defeat, 0.5f"）</param>
+    /// <exception cref="ArgumentException"></exception>
+    public async void FireLoadUI(string args) => await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
+        ? LoadUI(type, loadUIArgs)
+        : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+            .Replace("@", nameof(type))
+            .Replace("#", $"{type}")
+            .Replace("$", nameof(UIType))
+        ))
+    );
+
+    private bool TryParseLoadUIArgs(string str, out UIType type, out object[] args)
+    {
+        type = (UIType)(-1);
+        args = null;
+        if (str is null or { Length: 0 })
+            return false;
+        IEnumerable<string> splitedArgs = str.Split(',').Select(s => s.Trim());
+        if (!Enum.TryParse(splitedArgs.ElementAt(0), true, out type))
+            return false;
+        args = splitedArgs.Skip(1).Cast<object>().Select(s =>
+            Enum.TryParse(s as string, true, out ItemType itemType)
+                ? itemType
+                : float.TryParse(s as string, out float floatNumber)
+                    ? floatNumber
+                    : bool.TryParse(s as string, out bool boolean)
+                        ? boolean
+                        : s
+        ).ToArray();
+        return true;
+    }
+}
