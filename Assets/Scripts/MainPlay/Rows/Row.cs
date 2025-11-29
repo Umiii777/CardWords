@@ -45,6 +45,7 @@ public class Row : MonoBehaviour
             Debug.LogError("他妈的row当前卡数量成负数了");
         }
         SetCardFront();
+        DebugRowOrder();
     }
     public void CheckIfMainRowEmpty()
     {
@@ -95,5 +96,12 @@ public class Row : MonoBehaviour
 
 
     //TODO:传入多个Card
-
+public void DebugRowOrder()
+{
+    Debug.Log("----- Row Order -----");
+    for (int i = 0; i < cardsOnRow.Count; i++)
+    {
+        Debug.Log(i + ": " + cardsOnRow[i].cardData.cardContent);
+    }
+}
 }

@@ -20,20 +20,13 @@ public class StepManager : MonoBehaviour
         tmPro.text = currentSteps.ToString();
     }
 
-    public void StepsChange(int offsetStep)
-    {
-        currentSteps = offsetStep + currentSteps;
-        tmPro.text = currentSteps.ToString();
-
-        //当变化为0的时候，call关卡失败（其他弹窗）
-
-    }
     public void StepMinusOne()
     {
         if (currentSteps <= 0)
         {
             Debug.Log("步骤用完，关卡失败");
             //调用关卡失败的事件
+            StepsCheck();
         }
         else
         {
@@ -44,12 +37,9 @@ public class StepManager : MonoBehaviour
     }
     public void StepsCheck()
     {
-        if (currentSteps <= 0)
-        {
-            Debug.Log("步骤用完，关卡失败");
-            //调用关卡失败的事件
+        //调用关卡失败的事件
+        return;
 
-        }
     }
 
     public void TestSetSteps()
