@@ -61,9 +61,10 @@ public class LevelManager : MonoBehaviour
     private void Awake()
     {
         cardLayoutManager = new CardLayoutManager();
-
+        PlayerPrefs.DeleteAll();
+        Debug.Log(PlayerProgress.GetCurrentLevel());
         PlayerProgress.SetCurrentLevel(101);
-        currentLevelNum = PlayerProgress.GetCurrentLevel();
+        //currentLevelNum = PlayerProgress.GetCurrentLevel();
         SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
 
     }
@@ -308,10 +309,18 @@ public class LevelManager : MonoBehaviour
     {
         currentLevelNum++;
         PlayerProgress.SetCurrentLevel(101);
-        
-        await SystemUIManager.LoadUI(UIType.Victory, true);
+
+        await SystemUIManager.LoadUI(UIType.Victory);
     }
     #endregion
+
+    #region 关卡失败
+    public async void OnLevelDefeat()
+    {
+        await SystemUIManager.LoadUI(UIType.Defeat, 0);
+    }
+    #endregion
+
     #region 清除关卡
     public void ClearLevel()
     {
@@ -331,5 +340,5 @@ public class LevelManager : MonoBehaviour
         CardManager.Instance.allRows.Clear();
 
     }
-#endregion
+    #endregion
 }

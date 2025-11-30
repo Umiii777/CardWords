@@ -180,7 +180,7 @@ public class Card : MonoBehaviour
 
     public void CardShake()
     {
-        rectTransform.DOShakeAnchorPos(0.4f, 50, 10, 90);
+        rectTransform.DOShakeAnchorPos(0.2f, 30, 5, 90);
     }
 
 }

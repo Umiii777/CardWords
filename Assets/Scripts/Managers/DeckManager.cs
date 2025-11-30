@@ -9,6 +9,8 @@ public class DeckManager : MonoBehaviour
     //组件引用
     public CardPool cardPool;
     public RectTransform canvas;
+    public DeckHandler deckHandler;
+
 
     public int currentLevelDeckTotalNum;  //当前关卡的牌库卡牌持有数量
 
@@ -48,6 +50,10 @@ public class DeckManager : MonoBehaviour
     public void DrawCard()
     {
         //当牌库已经被取出数据数量
+        if(currentDeckCount ==currentDeckCardDatas.Count-1)
+        {
+            deckHandler.DeckStyleReadyShuffle();
+        }
         if (currentDeckCount >= currentDeckCardDatas.Count)
         {
             Debug.Log("执行了ResetDeck");
@@ -78,6 +84,7 @@ public class DeckManager : MonoBehaviour
 
     public void ResetDeck()
     {
+        deckHandler.DeckStyleNormal();
         foreach (var card in currentDeckCardsHasSet)
         {
             card.gameObject.SetActive(false);
