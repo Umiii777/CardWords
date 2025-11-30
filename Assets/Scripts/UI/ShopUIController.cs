@@ -74,10 +74,8 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
         set
         {
             if (sharedWatchedAdTexts != null)
-            {
                 foreach (var t in sharedWatchedAdTexts)
                     t.text = value + "/" + t.text.Split('/')[1];
-            }
             numWatchedAd = value;
         }
     }

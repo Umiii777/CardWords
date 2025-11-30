@@ -247,7 +247,7 @@ public class SystemUIManager : MonoBehaviour
                 ShopUIController.clickingSettings = async () => await LoadUI(UIType.Settings, false);
                 ShopUIController.clickingClose = () =>
                 {
-                    PlayerAd.ResetWatchedAd();
+                    PlayerAd.SetWatchedAd(0);
                     //Instance.OnWatchAd(); // 没必要调 OnWatchAd
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
@@ -265,13 +265,16 @@ public class SystemUIManager : MonoBehaviour
                 };
                 ShopUIController.clickingWatchAd = async configs =>
                 {
-                    await Task.Delay(3000); //假装播放3秒广告
-                    PlayerAd.IncreaseWatchedAd();
-                    Instance.OnWatchAd();
-                    if (PlayerAd.GetWatchedAd() >= configs[1])
+                    if (PlayerAd.GetWatchedAd() < configs[1])
                     {
+                        await Task.Delay(3000); //假装播放3秒广告
+                        PlayerAd.AddWatchedAdd();
+                        Instance.OnWatchAd();
+                    }
+                    if (PlayerAd.GetWatchedAd() == configs[1])
+                    {
+                        PlayerAd.AddWatchedAdd(-configs[1]);
                         PlayerCoin.AddCoin(configs[0]);
-                        PlayerAd.ResetWatchedAd();
                         Instance.OnWatchAd();
                         Instance.OnUpdateCoin();
                         await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
@@ -341,7 +344,8 @@ public class SystemUIManager : MonoBehaviour
                             Instance.itemUIPrefab
                         );
                         Instance.InitItemUI(itemUI, (ItemType)args[0]);
-                        itemUIs.RemoveFirst();
+                        if (itemUIs.Count > 0)
+                            itemUIs.RemoveFirst();
                         itemUIs.AddLast(itemUI);
                     }
                     return;
@@ -386,7 +390,7 @@ public class SystemUIManager : MonoBehaviour
         }
     }
 
-    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null)
+    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null, bool isToMoveUp = true)
     {
         const int movingDuration = 80, stayingDuration = 1000, fadingDelay = 25;
         Transform parent = parentTransform == null
@@ -397,7 +401,7 @@ public class SystemUIManager : MonoBehaviour
         int targetPosY = (int)rt.localPosition.y + 250;
 
         rt.GetChild(1).GetComponent<Text>().text = tipsMessage;
-        if (parentTransform == null)
+        if (parentTransform == null || isToMoveUp)
             while (rt.localPosition.y < targetPosY)
             {
                 rt.localPosition += Vector3.up * 25;
@@ -417,7 +421,7 @@ public class SystemUIManager : MonoBehaviour
     /// <summary>
     /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
     /// <br/><br/>
-    /// 用于派生自 NonSingletonAdProcessor 的界面类型
+    /// 用于派生自 AdProcessor 的界面类型
     /// </summary>
     /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
@@ -431,16 +435,15 @@ public class SystemUIManager : MonoBehaviour
                 .Cast<Func<Task>>()
                 .Select(async f => await f())
             );
-            uiInstance.clickingWatchAd = clicking + startAdAndBlockClicking;
+            uiInstance.clickingWatchAd = startAdAndBlockClicking;
         }
-        ;
         return startAdAndBlockClicking;
     }
 
     /// <summary>
     /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
     /// <br/><br/>
-    /// 用于派生自 SingletonAdProcessor 的界面类型
+    /// 用于派生自 StaticAdProcessor 的界面类型
     /// </summary>
     /// <typeparam name="T">看广告领东西按钮回调委托的返回值类型</typeparam>
     /// <param name="typeOfUIController">要禁用按钮响应的界面类型</param>
@@ -472,7 +475,7 @@ public class SystemUIManager : MonoBehaviour
                 .Cast<Func<T, Task>>()
                 .Select(async f => await f(arg))
             );
-            clickingField.SetValue(null, clicking + (async arg => await startAdAndBlockClicking(arg)));
+            clickingField.SetValue(null, (Func<T,Task>)startAdAndBlockClicking);
         }
         return startAdAndBlockClicking;
     }
@@ -499,7 +502,7 @@ public class SystemUIManager : MonoBehaviour
 //#endif
     }
 
-    #region 各界面初始化方法
+#region 各界面初始化方法
     private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
     private void InitEnergy()
     {
@@ -527,36 +530,36 @@ public class SystemUIManager : MonoBehaviour
         itemUI.price = int.Parse(infos[1]);
         itemUI.descriptionText.text = infos[2];
         itemUI.iconImage.sprite = itemInfoIcon.Item2;
-
-        ValueTuple<Action, Func<int, Task>, Func<Task>> clickings;
-        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out clickings))
+        itemUI.clickingClose = () =>
         {
-            clickings = (
-            () =>
-            {
-                (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
-                Destroy(itemUI.gameObject);
-            },
+            (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
+            Destroy(itemUI.gameObject);
+        };
+
+        ValueTuple<Func<int, Task>, Func<Task>> cachedClickings;
+        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out cachedClickings))
+        {
+            cachedClickings = (
             async price =>
             {
                 if (PlayerCoin.TrySpendCoin(price))
                 {
                     PlayerItem.AddItem(itemType, 1);
-                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
                     return;
                 }
-                await PopUpTips(TIPS_COIN_LACK);
+                await PopUpTips(TIPS_COIN_LACK, Instance.transform);
             },
             async () =>
             {
                 await Task.Delay(3000); //假装播放3秒广告
                 PlayerItem.AddItem(itemType, 1);
-                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
             }
             );
-            ItemUIController.dictCachedClickings.Add(itemType, clickings);
+            ItemUIController.dictCachedClickings.Add(itemType, cachedClickings);
         }
-        (itemUI.clickingClose, itemUI.clickingBuy, itemUI.clickingWatchAd) = clickings;
+        (itemUI.clickingBuy, itemUI.clickingWatchAd) = cachedClickings;
         itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
     }
     private void InitSettingsUI(bool isInLevel)
@@ -570,6 +573,7 @@ public class SystemUIManager : MonoBehaviour
         ShopUIController.NumCoins = PlayerCoin.GetCoin();
         ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
         ShopUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+        ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
     }
     private void InitVictoryUI(int numRewardCoins) => VictoryUIController.numCoinsToReceive = numRewardCoins;
 #endregion

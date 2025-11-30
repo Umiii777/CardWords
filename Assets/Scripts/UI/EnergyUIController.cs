@@ -60,11 +60,11 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
     /// <br/><br/>
     /// 应将 Destroy(shopUI.gameObject) 加到最后
     /// </summary>
-    static public Action clickingClose;
+    public static Action clickingClose;
     /// <summary>
     /// 购买体力按钮回调
     /// </summary>
-    static public Func<int, Task> clickingBuy;
+    public static Func<int, Task> clickingBuy;
 #endregion
 
 #region 按钮回调方法
