@@ -309,7 +309,7 @@ public class LevelManager : MonoBehaviour
         currentLevelNum++;
         PlayerProgress.SetCurrentLevel(101);
         
-        await SystemUIManager.LoadUI(UIType.Victory, true);
+        await SystemUIManager.LoadUI(UIType.Victory);
     }
     #endregion
     #region 清除关卡

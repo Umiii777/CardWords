@@ -82,7 +82,7 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     public static Func<int, object, Task> loadingLevel;
 
-#region public 游戏内所有道具的信息和图标
+#region 游戏内所有道具的信息和图标
     public string[] itemInfos;
     public Sprite[] itemIcons;
     private Dictionary<ItemType, ValueTuple<string, Sprite>> dictItemInfoIcons;
@@ -124,23 +124,6 @@ public class SystemUIManager : MonoBehaviour
             var uiObj = Instance.uiInstances[(uint)type] as MonoBehaviour;
             return uiObj == null ? null : uiObj.gameObject;
         }
-        static async Task clickingContinue(UIType type, bool hasAd = true, string popUpMessage = null)
-        {
-            if (uiGameObj(type) == null)
-                return;
-            await (hasAd
-                ? Task.Delay(3000) //假装播放3秒广告
-                : Task.CompletedTask
-            );
-            await Task.WhenAll(new Task[]
-            {
-                //TODO: 下面这行执行关卡加载
-                loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null),
-                popUpMessage is null ? Task.CompletedTask : PopUpTips(popUpMessage)
-            });
-            Destroy(uiGameObj(type));
-            Instance.uiInstances[(uint)type] = null;
-        }
         switch (type)
         {
             case UIType.Defeat:
@@ -150,7 +133,15 @@ public class SystemUIManager : MonoBehaviour
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
-                DefeatUIController.clickingContinue = async () => await clickingContinue(type);
+                DefeatUIController.clickingContinue = async () =>
+                {
+                    if (uiGameObj(type) == null)
+                        return;
+                    await Task.Delay(3000); //假装播放3秒广告
+                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
                 DefeatUIController.clickingReplay = async () =>
                 {
                     if (uiGameObj(type) == null)
@@ -283,21 +274,27 @@ public class SystemUIManager : MonoBehaviour
                 ShopUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(ShopUIController), ShopUIController.clickingWatchAd);
                 return;
             case UIType.Victory:
-                VictoryUIController.clickingHome = async () =>
+                VictoryUIController.clickingReceive = async _=>
                 {
+                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
                     await LoadUI(UIType.Home);
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
-                };
-                VictoryUIController.clickingReceive = async () =>
-                {
-                    await clickingContinue(type, false, TIPS_SUCCESSFUL_RECEIVING);
-                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
                     //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
+                VictoryUIController.clickingReceive = StartAdAndBlockClicking(
+                    typeof(VictoryUIController),
+                    VictoryUIController.clickingReceive,
+                    nameof(VictoryUIController.clickingReceive)
+                );
                 VictoryUIController.clickingWatchAd = async _=> {
-                    await clickingContinue(type, true, TIPS_SUCCESSFUL_RECEIVING);
-                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
+                    await Task.Delay(3000); //假装播放3秒广告
+                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive * 10);
+                    await LoadUI(UIType.Home);
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
                     //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
                 VictoryUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
