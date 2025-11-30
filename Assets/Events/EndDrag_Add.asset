@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de5ef19d960fafc4b8e389fbf2b28fc7, type: 3}
   m_Name: EndDrag_Add
   m_EditorClassIdentifier: 
-  description: 
-  lastSender: 
+  description: "\u7ED9row\u4E0A\u9762\u6DFB\u52A0\u4E00\u5F20\u5F53\u524D\u632A\u52A8\u7684\u5361\u724C"
+  lastSender: Card (CardDragHandler)

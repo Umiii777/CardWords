@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -53,6 +54,9 @@ public class LevelManager : MonoBehaviour
 
     public int currentLevelNum;
 
+    // [Header("事件")]
+    // public ObjectEventSO completeLevel;
+
 
     private void Awake()
     {
@@ -61,7 +65,7 @@ public class LevelManager : MonoBehaviour
         PlayerProgress.SetCurrentLevel(101);
         currentLevelNum = PlayerProgress.GetCurrentLevel();
         SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
-        
+
     }
     private void Start()
     {
@@ -71,6 +75,9 @@ public class LevelManager : MonoBehaviour
 
     public void InitCurrentLevel(int currentLevelNUm)
     {
+        ClearLevel();
+
+
         //清空此前数据
         currentNormalCardDatas.Clear();
         currentMainCardDatas.Clear();
@@ -112,7 +119,7 @@ public class LevelManager : MonoBehaviour
     [ContextMenu("测试读取")]
     public void LoadLevel()
     {
-                //清空此前数据
+        //清空此前数据
         currentNormalCardDatas.Clear();
         currentMainCardDatas.Clear();
         currentTotalCardDatas.Clear();
@@ -148,11 +155,10 @@ public class LevelManager : MonoBehaviour
         //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
         SetLevelCardLayout(normalRows);
     }
-    //完成关卡，玩家数据加1
-    public void OnLevelComplete(int currentLevelID)
-    {
-        PlayerProgress.SetCurrentLevel(currentLevelID + 1);
-    }
+
+
+
+
     public void SetLevelLayout(int[] rows, int mainRow)
     {
         //规定行列的高
@@ -296,5 +302,34 @@ public class LevelManager : MonoBehaviour
     {
 
     }
+    #region 完成关卡
+    //完成关卡，玩家数据加1
+    public async void OnLevelComplete()
+    {
+        currentLevelNum++;
+        PlayerProgress.SetCurrentLevel(101);
+        
+        await SystemUIManager.LoadUI(UIType.Victory, true);
+    }
+    #endregion
+    #region 清除关卡
+    public void ClearLevel()
+    {
 
+        // 清卡牌
+        foreach (var card in CardManager.Instance.allCards)
+        {
+            cardPool.Release(card.gameObject);
+        }
+        CardManager.Instance.allCards.Clear();
+
+        // 清列
+        foreach (var row in CardManager.Instance.allRows)
+        {
+            rowPool.Release(row.gameObject);
+        }
+        CardManager.Instance.allRows.Clear();
+
+    }
+#endregion
 }

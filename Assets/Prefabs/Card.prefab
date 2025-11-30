@@ -109,9 +109,12 @@ MonoBehaviour:
   stackIndex: 0
   isInStack: 0
   childCards: []
+  currentMainRow: {fileID: 0}
   cardNums: 1
   slotCount: 0
   deckSuccessDrag: {fileID: 11400000, guid: 1cf403b968aebb14c82ee19aa90966b7, type: 2}
+  onCompleteCard: {fileID: 11400000, guid: 3793f10d8f455ec48a07e38504369687, type: 2}
+  onCompleteMainCard: {fileID: 11400000, guid: 6890f5a0029b3fb4283884d598479551, type: 2}
 --- !u!225 &2429184787772230549
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -138,6 +141,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EndDragAdd: {fileID: 11400000, guid: 35b7e9641fce70d4fad398fc7a1b44f2, type: 2}
   EndDragMinus: {fileID: 11400000, guid: 744b3d8419c4b7f4f9c33dbf8d081dff, type: 2}
+  onSuccessDrag: {fileID: 11400000, guid: 6e5af79c8ad6c1e4ca0ccaaeedee3853, type: 2}
+  onDragFromDeck: {fileID: 11400000, guid: 7f089111afa7017488e86d0152e3d5c4, type: 2}
 --- !u!1 &8679315250516797434
 GameObject:
   m_ObjectHideFlags: 0

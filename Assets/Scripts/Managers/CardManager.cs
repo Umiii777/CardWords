@@ -11,6 +11,8 @@ public class CardManager : MonoBehaviour
     public List<Card> allCards = new List<Card>();
     public List<Row> allRows = new List<Row>();
 
+    public ObjectEventSO CompleteLevel;
+
     private void Awake()
     {
         Instance = this;
@@ -27,6 +29,10 @@ public class CardManager : MonoBehaviour
     {
         if (allCards.Contains(card))
             allCards.Remove(card);
+        else if(allCards.Count==0)
+        {
+            OnCompleteLevel();
+        }
     }
 
     //Rows
@@ -39,9 +45,16 @@ public class CardManager : MonoBehaviour
     }
     public void UnregisterCard(Row row)
     {
-        if(allRows.Contains(row))
+        if (allRows.Contains(row))
         {
             allRows.Remove(row);
         }
+    }
+    
+    public void OnCompleteLevel()
+    {
+        //让levelManager监听胜利
+        Debug.Log("关卡胜利了");
+        CompleteLevel.RaiseEvent(this, this);
     }
 }

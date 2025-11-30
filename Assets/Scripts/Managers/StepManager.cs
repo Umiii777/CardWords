@@ -20,21 +20,28 @@ public class StepManager : MonoBehaviour
         tmPro.text = currentSteps.ToString();
     }
 
-    public void StepsChange(int offsetStep)
+    public void StepsChange(Object obj)
     {
-        currentSteps = offsetStep + currentSteps;
+        currentSteps--;
         tmPro.text = currentSteps.ToString();
 
-        //当变化为0的时候，call关卡失败（其他弹窗）
-
+        //当变化为0的时候，步数耗尽方法
+        if (currentSteps <= 0)
+        {
+            StepsRunningOut();
+        }
     }
 
-    
+
     public void TestSetSteps()
     {
         maxSteps = 999;
         currentSteps = maxSteps;
         tmPro.text = currentSteps.ToString();
     }
+    //步数耗尽的方法
+    public void StepsRunningOut()
+    {
 
+    }
 }
