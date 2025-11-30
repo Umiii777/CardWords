@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class RowManager : MonoBehaviour
 {
     public List<Row> rows = new List<Row>();
     public List<Row> mainRows = new List<Row>();
+
+    public CardEventSO onDragFromDeck;
+
 
     public void AddRow(Row rowFromLevelManager)
     {
@@ -24,7 +28,11 @@ public class RowManager : MonoBehaviour
     public void CardsOnRowChangeAdd(Card topCard)
     {
         //传入的card本身只有原来的sloutCount,如果是从deck传上来的，顺便改下deckCard的东西
-        topCard.isFromDeck = false;
+        if (topCard.isFromDeck)
+        {
+            topCard.isFromDeck = false;
+            onDragFromDeck.RaiseEvent(topCard, this);
+        }
 
 
         rows[topCard.slotCount].cardsOnRow.Add(topCard);

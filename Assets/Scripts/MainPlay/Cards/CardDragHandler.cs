@@ -24,7 +24,7 @@ public class CardDragHandler : MonoBehaviour,
     public CardEventSO EndDragMinus;    //向上面走的时候只减少不增加，
 
     public ObjectEventSO onSuccessDrag;
-
+    public CardEventSO onDragFromDeck;
 
     private void Awake()
     {
@@ -126,6 +126,7 @@ public class CardDragHandler : MonoBehaviour,
                 PlaceOnRow(bestRow);
                 CardStack.EndDragStackSetCg(top);
                 cg.blocksRaycasts = true;
+
                 return;
             }
 
@@ -137,6 +138,7 @@ public class CardDragHandler : MonoBehaviour,
             TryMerge(best);
             CardStack.EndDragStackSetCg(top);
             cg.blocksRaycasts = true;
+
             return;
 
 
@@ -145,11 +147,14 @@ public class CardDragHandler : MonoBehaviour,
         {
             Debug.Log("落在了主卡上");
             PlaceOnMainCard(best);
+
+            return;
         }
 
 
         // 默认：回原位
         top.rectTransform.anchoredPosition = originalPos;
+        top.CardShake();
         CardStack.UpdateStackPositions(top);
         CardStack.EndDragStackSetCg(top);
         cg.blocksRaycasts = true;
@@ -220,6 +225,8 @@ public class CardDragHandler : MonoBehaviour,
             {
                 CardStack.UpdateStackPositions(top);
                 MoveStackCallRow(top, row);
+
+                onSuccessDrag.RaiseEvent(top, this);
                 return;                                   //整体call的事件
             }
             else
@@ -228,6 +235,8 @@ public class CardDragHandler : MonoBehaviour,
                 EndDragMinus.RaiseEvent(top, this);
                 top.slotCount = row.rowNum;
                 EndDragAdd.RaiseEvent(top, this);
+
+                onSuccessDrag.RaiseEvent(top, this);
                 return;
 
             }
@@ -245,12 +254,13 @@ public class CardDragHandler : MonoBehaviour,
             top.currentMainRow = row;
             //变更row状态
             row.isEmpty = false;    //主卡槽直接置空，TODO清空主卡槽的逻辑传递给消除完的mainRow事件
-            
+
             //变更所有卡状态
             CardStack.UpdateStackPositions(top);
 
             EndDragMinus.RaiseEvent(top, this); //成功拖拽，拖上去，只增不减
-
+            onSuccessDrag.RaiseEvent(top, this);
+            OnSeccussDragFromDeck();
             return;
         }
 
@@ -264,7 +274,16 @@ public class CardDragHandler : MonoBehaviour,
     {
         if (!target.isOnMainRow)
         {
+            if (top.isInStack)
+            {
+                top.rectTransform.anchoredPosition = originalPos;
+                CardStack.UpdateStackPositions(top);
+                CardStack.EndDragStackSetCg(top);
+                
+                return;
+            }
             top.rectTransform.anchoredPosition = originalPos;
+            cg.blocksRaycasts = true;
             return;
         }
         //当主卡在槽位上
@@ -277,6 +296,9 @@ public class CardDragHandler : MonoBehaviour,
                 top.gameObject.SetActive(false);
                 target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
+
+                onSuccessDrag.RaiseEvent(top, this);
+                OnSeccussDragFromDeck();
             }
             //相同id，且top在stack中
             else if (top.cardData.mainId == target.cardData.mainId && top.isInStack)
@@ -288,10 +310,20 @@ public class CardDragHandler : MonoBehaviour,
                     card.gameObject.SetActive(false);
                 }
                 target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
+
+                onSuccessDrag.RaiseEvent(top, this);
             }
             else
             {
+                if (top.isInStack)
+                {
+                    top.rectTransform.anchoredPosition = originalPos;
+                    CardStack.UpdateStackPositions(top);
+                    CardStack.EndDragStackSetCg(top);
+                    return;
+                }
                 top.rectTransform.anchoredPosition = originalPos;
+                cg.blocksRaycasts = true;
                 return;
             }
         }
@@ -315,6 +347,8 @@ public class CardDragHandler : MonoBehaviour,
             EndDragMinus.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
             EndDragAdd.RaiseEvent(top, this);
+
+            onSuccessDrag.RaiseEvent(top, this);
             return;
         }
 
@@ -329,6 +363,8 @@ public class CardDragHandler : MonoBehaviour,
             EndDragMinus.RaiseEvent(top, this);
             top.slotCount = target.slotCount;
             EndDragAdd.RaiseEvent(top, this);
+
+            onSuccessDrag.RaiseEvent(top, this);
             return;
         }
         //第三种情况，多到单（把已有的stack加入到单张上面
@@ -338,6 +374,8 @@ public class CardDragHandler : MonoBehaviour,
             Debug.Log("准备多到单");
             CardStack.StackToOne(target, top);
             MoveStackCallCard(top.GetTop(), target);
+
+            onSuccessDrag.RaiseEvent(top, this);
             return;
         }
         //第四种情况，多到多（把已有的
@@ -347,6 +385,8 @@ public class CardDragHandler : MonoBehaviour,
             Debug.Log("准备多到多");
             CardStack.StackToStack(target, top);
             MoveStackCallCard(top.GetTop(), target);
+
+            onSuccessDrag.RaiseEvent(top, this);
             return;
         }
 
@@ -401,6 +441,14 @@ public class CardDragHandler : MonoBehaviour,
 
         Destroy(eliminateCard);
 
+    }
+
+    public void OnSeccussDragFromDeck() //card放在row里面处理了，这里处理的是mainCard和
+    {
+        if (top.isFromDeck)
+        {
+            onDragFromDeck.RaiseEvent(top, this);
+        }
     }
 
     #endregion

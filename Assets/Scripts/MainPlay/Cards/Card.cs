@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -47,7 +48,8 @@ public class Card : MonoBehaviour
     //触发的事件
     public CardDataEventSO deckSuccessDrag;
 
-
+    public CardEventSO onCompleteCard;
+    public CardEventSO onCompleteMainCard;
 
 
     //private BoxCollider2D collider;
@@ -91,7 +93,12 @@ public class Card : MonoBehaviour
         if (!isFront)
         {
             isFront = true;
-            SetCardVisual();
+            rectTransform.DOScaleX(0, 0.1f).onComplete = () =>
+            {
+                SetCardVisual();
+                rectTransform.DOScaleX(1, 0.1f);
+            };
+
         }
     }
 
@@ -161,12 +168,19 @@ public class Card : MonoBehaviour
     {
         currentMainRow.isEmpty = true;
         gameObject.SetActive(false);
+        onCompleteMainCard.RaiseEvent(this, this);
     }
     #endregion
 
     public void CompleteNormalCard()
     {
+        onCompleteCard.RaiseEvent(this, this);
         gameObject.SetActive(false);
+    }
+
+    public void CardShake()
+    {
+        rectTransform.DOShakeAnchorPos(0.4f, 50, 10, 90);
     }
 
 }

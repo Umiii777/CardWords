@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de5ef19d960fafc4b8e389fbf2b28fc7, type: 3}
-  m_Name: EndDrag_Miinus
+  m_Script: {fileID: 11500000, guid: 6394770e99fc3834fba6d76cf40d6c29, type: 3}
+  m_Name: OnStepDrawCard
   m_EditorClassIdentifier: 
-  description: "\u7ED9row\u4E0A\u9762\u51CF\u5C11\u62D6\u8D70\u7684\u5361\u724C"
-  lastSender: Card (CardDragHandler)
+  description: "\u4ECE\u724C\u5E93\u4E2D\u62BD\u4E00\u5F20\u724C\uFF0C\u901A\u77E5\u6B65\u6570\u51CF\u5C11"
+  lastSender: CardDeck (DeckHandler)
