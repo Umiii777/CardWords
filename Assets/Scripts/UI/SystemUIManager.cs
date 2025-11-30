@@ -344,7 +344,8 @@ public class SystemUIManager : MonoBehaviour
                             Instance.itemUIPrefab
                         );
                         Instance.InitItemUI(itemUI, (ItemType)args[0]);
-                        itemUIs.RemoveFirst();
+                        if (itemUIs.Count > 0)
+                            itemUIs.RemoveFirst();
                         itemUIs.AddLast(itemUI);
                     }
                     return;
@@ -389,7 +390,7 @@ public class SystemUIManager : MonoBehaviour
         }
     }
 
-    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null)
+    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null, bool isToMoveUp = true)
     {
         const int movingDuration = 80, stayingDuration = 1000, fadingDelay = 25;
         Transform parent = parentTransform == null
@@ -400,7 +401,7 @@ public class SystemUIManager : MonoBehaviour
         int targetPosY = (int)rt.localPosition.y + 250;
 
         rt.GetChild(1).GetComponent<Text>().text = tipsMessage;
-        if (parentTransform == null)
+        if (parentTransform == null || isToMoveUp)
             while (rt.localPosition.y < targetPosY)
             {
                 rt.localPosition += Vector3.up * 25;
@@ -529,36 +530,36 @@ public class SystemUIManager : MonoBehaviour
         itemUI.price = int.Parse(infos[1]);
         itemUI.descriptionText.text = infos[2];
         itemUI.iconImage.sprite = itemInfoIcon.Item2;
-
-        ValueTuple<Action, Func<int, Task>, Func<Task>> clickings;
-        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out clickings))
+        itemUI.clickingClose = () =>
         {
-            clickings = (
-            () =>
-            {
-                (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
-                Destroy(itemUI.gameObject);
-            },
+            (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
+            Destroy(itemUI.gameObject);
+        };
+
+        ValueTuple<Func<int, Task>, Func<Task>> cachedClickings;
+        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out cachedClickings))
+        {
+            cachedClickings = (
             async price =>
             {
                 if (PlayerCoin.TrySpendCoin(price))
                 {
                     PlayerItem.AddItem(itemType, 1);
-                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
                     return;
                 }
-                await PopUpTips(TIPS_COIN_LACK);
+                await PopUpTips(TIPS_COIN_LACK, Instance.transform);
             },
             async () =>
             {
                 await Task.Delay(3000); //假装播放3秒广告
                 PlayerItem.AddItem(itemType, 1);
-                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
+                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
             }
             );
-            ItemUIController.dictCachedClickings.Add(itemType, clickings);
+            ItemUIController.dictCachedClickings.Add(itemType, cachedClickings);
         }
-        (itemUI.clickingClose, itemUI.clickingBuy, itemUI.clickingWatchAd) = clickings;
+        (itemUI.clickingBuy, itemUI.clickingWatchAd) = cachedClickings;
         itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
     }
     private void InitSettingsUI(bool isInLevel)

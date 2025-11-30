@@ -10,9 +10,9 @@ using TMPro;
 /// </summary>
 public class ItemUIController : AdProcessor
 {
-    static public Dictionary<
+    public static Dictionary<
         ItemType,
-        ValueTuple<Action, Func<int, Task>, Func<Task>>
+        ValueTuple<Func<int, Task>, Func<Task>>
     > dictCachedClickings = new();
 
 #region 按钮回调委托
