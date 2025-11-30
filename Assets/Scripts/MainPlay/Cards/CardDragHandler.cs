@@ -1,288 +1,407 @@
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class CardDragHandler : MonoBehaviour,
-    IBeginDragHandler, IEndDragHandler, IDragHandler, IDropHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [Header("数值部分")]
-    public bool isDragging;
+    private Card card;
+    private Card top;
+
+    private Canvas canvas;
+    private CanvasGroup cg;
+
     private Vector2 offset;
     private Vector2 originalPos;
+    private Transform bestSlot = null;
+    private float bestArea = 0f;
 
-    private float stackOffset = 50;
+    //同时存在的时候先减再增加，传递给row的事件，让row帮助翻牌库的牌，同时检测是否为空
+    //对应事件由rowManager来订阅
+    public CardEventSO EndDragAdd;      //从deck来的牌只增加不减少
+    public CardEventSO EndDragMinus;    //向上面走的时候只减少不增加，
 
-    private CanvasGroup cg;
-    private Card currentCard;
-    private Card otherCard;
-    private CardData currentCardData;
+    public ObjectEventSO onSuccessDrag;
 
-    private RectTransform rectTransform; // 当前实际操作的 RectTransform（可能是 top 的）
-    private Canvas canvas;
-    private bool canDrag = true;
-
-    [Header("事件部分")]
-    public CardEventSO onSlotDrag;
-    public CardEventSO endSlotDrag;
-
-    public ObjectEventSO OnSuccessDrag;
-
-
-    private Transform dragLayer;
 
     private void Awake()
     {
+        card = GetComponent<Card>();
         cg = GetComponent<CanvasGroup>();
-        rectTransform = GetComponent<RectTransform>();
     }
-
+    #region Drag接口实现
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // 获取被点击的 card（trigger 所在的卡）
-
-
-
-        Card clicked = GetComponent<Card>();
-
-        onSlotDrag.RaiseEvent(clicked, this);
-
-        if (clicked == null) return;
-
-        // 如果在 stack 中，拖动应该转发到 top（堆顶）
-        Card top = clicked.topParent ?? clicked;
-
-        // 设置当前操作卡为 top（如果 top 不是被点击的 card，我们要把 top 作为 drag target）
-        currentCard = top;
-        rectTransform = currentCard.GetComponent<RectTransform>();
-        cg = currentCard.GetComponent<CanvasGroup>();
-
-        // dragLayer 来自 UIManager
-        dragLayer = UIManager.Instance.dragLayer;
-        canvas = currentCard.GetComponentInParent<Canvas>();
-
-        // 现在允许拖动（只要 top 存在并且卡是可拖的）
-        // 如果点击的不是 top（clicked != top），仍然允许 - 因为我们是把拖拽转发给 top
-        if (currentCard == null) return;
-
-        // 记录原位置（基于 top）
-        originalPos = rectTransform.anchoredPosition;
-
-        // 将 top 放到 dragLayer（全体堆放在同个父节点下）
-        if (!currentCard.isInStack)
+        if (!card.isFront)
         {
-            currentCard.transform.SetParent(dragLayer, true);
-            currentCard.transform.SetAsLastSibling();
+            // 翻面的卡不可拖拽
+            top = null;
+            return;
         }
-        // 屏幕坐标 -> local 坐标（基于当前 canvas）
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        if (card.isOnMainRow)
+        {
+            top = null;
+            return;
+        }
+
+        // 把拖拽转发到 top
+        top = card.GetTop();    //给topParent赋值
+
+        cg = top.GetComponent<CanvasGroup>();
+        canvas = top.GetComponentInParent<Canvas>();
+
+        originalPos = top.rectTransform.anchoredPosition;
+
+        if (!top.isInStack)
+        {
+            top.transform.SetParent(UIManager.Instance.dragLayer, true);
+            top.transform.SetAsLastSibling();
+
+
+        }
+        if (top.isInStack)
+        {
+            //如果拖拽的卡是堆，那么直接用stack的方法遍历整个设置lastsibiling
+            CardStack.ChangeAllStackSibings(top);
+            CardStack.BeginDragStackSetCg(top);
+        }
+
+
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
             canvas.worldCamera,
-            out var localMousePos))
-        {
-            offset = rectTransform.anchoredPosition - localMousePos;
-        }
-        else
-        {
-            offset = Vector2.zero;
-        }
+            out var localMouse);
 
-        isDragging = true;
+        offset = top.rectTransform.anchoredPosition - localMouse;
+
         cg.blocksRaycasts = false;
 
-        // 如果这个 top 有 childCards，确保子卡的 raycast 被关闭（避免子卡拦截事件）
-        foreach (var child in currentCard.childCards)
-        {
-            var childCg = child.GetComponent<CanvasGroup>();
-            if (childCg) childCg.blocksRaycasts = false;
-        }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging || currentCard == null) return;
+        if (top == null)
+        {
+            return;
+        }
 
         if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
             canvas.transform as RectTransform,
             eventData.position,
             canvas.worldCamera,
-            out var localMousePos))
+            out var localMouse))
         {
-            rectTransform.anchoredPosition = localMousePos + offset;
-
-            // 移动整个堆叠（基于 top）
-            MoveChildStack(currentCard);
+            //移动单张
+            top.rectTransform.anchoredPosition = localMouse + offset;
+            //整体移动
+            CardStack.UpdateStackPositions(top);
+        }
+        else
+        {
+            return;
         }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!isDragging || currentCard == null)
+        Debug.Log("执行了onEndDrag");
+        if (top == null)
         {
-            // 无效拖拽直接返回
+            Debug.Log("top为空");
+
             return;
         }
 
-        isDragging = false;
-        if (cg) cg.blocksRaycasts = true;
 
-        // 恢复子卡 raycast（如果需要的话）
-        foreach (var child in currentCard.childCards)
+        Card best = FindBestOverlapCard();
+        Row bestRow = FindBestOverlapRow();
+        // 1. 落到 Row 上
+        if (bestRow)
         {
-            var childCg = child.GetComponent<CanvasGroup>();
-            if (childCg) childCg.blocksRaycasts = true;
-        }
-
-        // 注意：eventData.pointerEnter 表示松手时鼠标下的 UI 元素
-        otherCard = eventData.pointerEnter?.GetComponent<Card>();
-        Row row = eventData.pointerEnter?.GetComponent<Row>();
-
-        // 下面使用 currentCard（top）来判断落点
-        currentCardData = currentCard.cardData;
-        endSlotDrag.RaiseEvent(otherCard, this);
-        // 如果落到主row
-        if (row && row.rowType == RowType.main)
-        {
-            if (currentCardData.isMainCard)
+            if (bestRow.isEmpty)
             {
-                rectTransform.anchoredPosition = row.GetComponent<RectTransform>().anchoredPosition;
-                currentCard.isOnMainRow = true;
-                MoveChildStack(currentCard);
-                OnSuccessDrag.RaiseEvent(this, this);
-                return;
-            }
-            else
-            {
-                rectTransform.anchoredPosition = originalPos;
-                MoveChildStack(currentCard);
-                return;
-            }
-        }
-
-        // 落到普通row
-        if (row && row.rowType == RowType.normal)
-        {
-            if (currentCardData.isMainCard)
-            {
-                rectTransform.anchoredPosition = originalPos;
-                MoveChildStack(currentCard);
-                return;
-            }
-            else
-            {
-                rectTransform.anchoredPosition = row.GetComponent<RectTransform>().anchoredPosition;
-                MoveChildStack(currentCard);
-                OnSuccessDrag.RaiseEvent(this, this);
-                return;
-            }
-        }
-
-        // 落在主卡上
-        if (otherCard && otherCard.cardData.isMainCard)
-        {
-            if (otherCard.isOnMainRow)
-            {
-                rectTransform.anchoredPosition = otherCard.GetComponent<RectTransform>().anchoredPosition;
-                MoveChildStack(currentCard);
-                OnSuccessDrag.RaiseEvent(this, this);
-                return;
-            }
-            else
-            {
-                rectTransform.anchoredPosition = originalPos;
-                MoveChildStack(currentCard);
-                return;
-            }
-        }
-
-        // 落在普通卡上（合并）
-        if (otherCard && !otherCard.cardData.isMainCard)
-        {
-
-            // 如果是同一个主题词，合并到 otherCard 的 top 中
-            if (currentCardData.mainId == otherCard.cardData.mainId && otherCard.isOnRow)
-            {
-                AddToStack(parentCard: otherCard, childCard: currentCard);
-                MoveChildStack(currentCard);
-                // 成功合并事件，如果原本位置下面有牌，则将底下的翻面事件
-               
-                    OnSuccessDrag.RaiseEvent(this, this);
+                PlaceOnRow(bestRow);
+                CardStack.EndDragStackSetCg(top);
+                cg.blocksRaycasts = true;
                 return;
             }
 
         }
+        // 2. 落到卡上（合并逻辑）
+        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront && best.cg.blocksRaycasts)
+        {
 
-        // 默认：回到原点
-        rectTransform.anchoredPosition = originalPos;
-        MoveChildStack(currentCard);
+            TryMerge(best);
+            CardStack.EndDragStackSetCg(top);
+            cg.blocksRaycasts = true;
+            return;
+
+
+        }
+        else if (best && best.cardData.isMainCard)
+        {
+            Debug.Log("落在了主卡上");
+            PlaceOnMainCard(best);
+        }
+
+
+        // 默认：回原位
+        top.rectTransform.anchoredPosition = originalPos;
+        CardStack.UpdateStackPositions(top);
+        CardStack.EndDragStackSetCg(top);
+        cg.blocksRaycasts = true;
     }
 
-    public void OnDrop(PointerEventData eventData)
+    // 修复：正确从 eventData 指向的被拖拽物体获取拖拽的 top（不要依赖本实例的 private top）
+
+    #endregion
+    #region 私有工具类
+
+    private Card FindBestOverlapCard()
     {
-        // 这个方法可以留空或用于其他逻辑
-        Card targetCard = GetComponent<Card>();
-        Card dragCard = eventData.pointerDrag?.GetComponent<Card>();
-        if (targetCard == null || dragCard == null)
+        float maxArea = 0;
+        Card best = null;
+        foreach (var c in CardManager.Instance.allCards)
         {
+            if (c == top) continue;
+
+            float area = CardOverlap.GetOverlapArea(
+                top.rectTransform, c.rectTransform);
+
+            if (area > maxArea)
+            {
+                maxArea = area;
+                best = c;
+            }
+        }
+        Debug.Log("当前Allcard有多少牌" + CardManager.Instance.allCards.Count);
+        Debug.Log("当前卡片的堆叠区域是" + maxArea);
+        return maxArea > 0.5 ? best : null; // 用 maxArea，而不是 bestArea
+    }
+    private Row FindBestOverlapRow()
+    {
+        Debug.Log("执行了findBestRow");
+        float maxArea = 0;
+        Row best = null;
+        Debug.Log("当前CardmanagerInstance的row总量为" + CardManager.Instance.allRows.Count);
+        foreach (var r in CardManager.Instance.allRows)
+        {
+            float area = CardOverlap.GetOverlapArea(
+                top.rectTransform, r.rectTransform);
+
+            if (area > maxArea)
+            {
+                maxArea = area;
+                best = r;
+            }
+        }
+        Debug.Log("当前卡片的堆叠区域是" + maxArea);
+        return maxArea > 0.5 ? best : null; //和maxArea比较的值就是吸附的参数
+    }
+    #region 放在普通row上
+    private void PlaceOnRow(Row row)    //放到普通row上，有下面到下面，也有下面到上面main
+    {
+        //普通卡放不到mainRow
+        if (row.rowType == RowType.main && !top.cardData.isMainCard)
+        {
+            top.rectTransform.anchoredPosition = originalPos;
+            CardStack.UpdateStackPositions(top);
             return;
         }
-        if (targetCard.cardData.mainId == dragCard.cardData.mainId)
+        //普通卡可以放到空row
+        else if (row.rowType == RowType.normal && row.isEmpty)
         {
-            targetCard.isInStack = true;
-            targetCard.SetCardVisual();
-            Debug.Log(targetCard.cardData.cardContent.ToString() + "上面落了一张牌" + targetCard.isInStack);
+            top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
+
+            if (top.isInStack)
+            {
+                CardStack.UpdateStackPositions(top);
+                MoveStackCallRow(top, row);
+                return;                                   //整体call的事件
+            }
+            else
+            {
+                //注意：从空row上转移的时候，应该只有一个top操作，已经获得到了row，直接用row赋值
+                EndDragMinus.RaiseEvent(top, this);
+                top.slotCount = row.rowNum;
+                EndDragAdd.RaiseEvent(top, this);
+                return;
+
+            }
+
+        }
+        // 主卡可以放到mainRow
+        else if (row.rowType == RowType.main && top.cardData.isMainCard)
+        {
+            Debug.Log("主卡拖到了mainRow上面");
+            top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
+
+            //变更拖拽上去的卡状态
+            top.isOnMainRow = true;
+            top.isOnRow = false;
+            top.currentMainRow = row;
+            //变更row状态
+            row.isEmpty = false;    //主卡槽直接置空，TODO清空主卡槽的逻辑传递给消除完的mainRow事件
+            
+            //变更所有卡状态
+            CardStack.UpdateStackPositions(top);
+
+            EndDragMinus.RaiseEvent(top, this); //成功拖拽，拖上去，只增不减
+
+            return;
+        }
+
+        top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
+
+        CardStack.UpdateStackPositions(top);
+    }
+    #endregion
+    #region 放在mainCard上面
+    private void PlaceOnMainCard(Card target)   //合成到主卡上，从下面到上面
+    {
+        if (!target.isOnMainRow)
+        {
+            top.rectTransform.anchoredPosition = originalPos;
+            return;
+        }
+        //当主卡在槽位上
+        else
+        {
+            //且相同id，且top不是inStack
+            if (top.cardData.mainId == target.cardData.mainId && !top.isInStack)
+            {
+                //触发card自身的被合成东西+表现
+                top.gameObject.SetActive(false);
+                target.SetMainCardVisualOnCombine(1);
+                EndDragMinus.RaiseEvent(top, this);
+            }
+            //相同id，且top在stack中
+            else if (top.cardData.mainId == target.cardData.mainId && top.isInStack)
+            {
+                //先调用row的移除整个stack的事件
+                RemoveStackOnMainRow(top.GetTop());
+                foreach (var card in top.GetTop().childCards)
+                {
+                    card.gameObject.SetActive(false);
+                }
+                target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
+            }
+            else
+            {
+                top.rectTransform.anchoredPosition = originalPos;
+                return;
+            }
         }
     }
-
-    private void AddToStack(Card parentCard, Card childCard)
+    #endregion
+    #region 合成
+    private void TryMerge(Card target)
     {
-        if (parentCard == null || childCard == null) return;
+        Debug.Log($"Trying merge: {top.cardData.cardContent}  vs  {target.cardData.cardContent}");
 
-        // 找到 parent 的真正 top
-        var top = parentCard.topParent ?? parentCard;
-
-        // 如果 child 自己也是 top（带有 child），需要把 child 整棵树并入 top（把 child 和 child.childCards 一起并入）
-        // 为简单起见，这里假设 childCard 本身不是带下级的 top（若是，需要做整体合并）
-        childCard.topParent = top;
-        childCard.isInStack = true;
-
-        // 将 child 加入 top 的 child 列表
-        top.childCards.Add(childCard);
-        childCard.stackIndex = top.childCards.Count; // 1-based index
-
-        // 把 child 的 transform 父对象设置为 top 的父对象（和 top 相同层级）
-        childCard.transform.SetParent(top.transform.parent, true);
-
-        // 更新 child 的 anchoredPosition（按 top 的位置 + offset）
-        RectTransform topRT = top.GetComponent<RectTransform>();
-        RectTransform childRT = childCard.GetComponent<RectTransform>();
-
-        childRT.anchoredPosition = topRT.anchoredPosition + new Vector2(0, -stackOffset * childCard.stackIndex);
-
-        // // 禁用 child 自身的拖拽拦截（使其点击时由 top 处理）
-        // var childDragHandler = childCard.GetComponent<CardDragHandler>();
-        // if (childDragHandler) childDragHandler.canDrag = false;
-    }
-
-    private void MoveChildStack(Card parent)
-    {
-        if (parent == null) return;
-
-        // 以 top 为基准移动整组
-        var top = parent.topParent ?? parent;
-        RectTransform topRT = top.GetComponent<RectTransform>();
-        if (topRT == null) return;
-
-        for (int i = 0; i < top.childCards.Count; i++)
+        // 第一种情况: 单到单（目标是单张且正面）
+        if (target.cardData.mainId == top.cardData.mainId &&
+            target.isFront && !target.isInStack && !top.isInStack)
         {
-            var child = top.childCards[i];
-            if (child == null) continue;
-            RectTransform cRT = child.GetComponent<RectTransform>();
-            if (cRT == null) continue;
+            Debug.Log("准备单到单");
+            CardStack.OneAddToOne(target, top);
+            //设置首次堆叠的样式，但是应该每次在ondrag或者onBeginDrag的时候就设置
+            target.transform.SetAsLastSibling();
+            top.transform.SetAsLastSibling();
 
-            cRT.anchoredPosition = topRT.anchoredPosition + new Vector2(0, -stackOffset * (i + 1));
+            EndDragMinus.RaiseEvent(top, this);
+            top.slotCount = target.slotCount;
+            EndDragAdd.RaiseEvent(top, this);
+            return;
+        }
+
+        // 第二种情况: 单到多（把单张加入到已有的 stack 顶部）
+        if (target.cardData.mainId == top.cardData.mainId && !top.isInStack &&
+            target.isFront && target.isInStack && !top.childCards.Contains(target))
+        {
+            Debug.Log("准备单到多");
+            // 允许把单张放到已有堆栈
+            CardStack.OneToStack(target, top);
+
+            EndDragMinus.RaiseEvent(top, this);
+            top.slotCount = target.slotCount;
+            EndDragAdd.RaiseEvent(top, this);
+            return;
+        }
+        //第三种情况，多到单（把已有的stack加入到单张上面
+        if (target.cardData.mainId == top.cardData.mainId && target.isFront && top.isInStack &&
+         !target.isInStack && !top.childCards.Contains(target))
+        {
+            Debug.Log("准备多到单");
+            CardStack.StackToOne(target, top);
+            MoveStackCallCard(top.GetTop(), target);
+            return;
+        }
+        //第四种情况，多到多（把已有的
+        if (target.cardData.mainId == top.cardData.mainId && target.isFront && target.isInStack &&
+        target.isInStack && !top.childCards.Contains(target))
+        {
+            Debug.Log("准备多到多");
+            CardStack.StackToStack(target, top);
+            MoveStackCallCard(top.GetTop(), target);
+            return;
+        }
+
+
+        // 默认：不匹配，回退
+        top.rectTransform.anchoredPosition = originalPos;
+        CardStack.UpdateStackPositions(top);
+        return;
+    }
+    #endregion
+    #region 移动
+    //移动stack的时候，触发Rowmanager监听的方法
+    public void MoveStackCallRow(Card top, Row row)
+    {
+        foreach (var card in top.childCards)
+        {
+            EndDragMinus.RaiseEvent(card, this);
+            card.slotCount = row.rowNum;
+            EndDragAdd.RaiseEvent(card, this);
         }
     }
+    public void RemoveStackOnMainRow(Card top)
+    {
+        foreach (var card in top.childCards)
+        {
+            EndDragMinus.RaiseEvent(card, this);
+        }
+    }
+    public void MoveStackCallCard(Card top, Card target)
+    {
+        for (int i = top.childCards.Count - 1; i >= 0; i--)
+        {
+            Card callCard = top.childCards[i];
+            EndDragMinus.RaiseEvent(callCard, this);
+            callCard.slotCount = target.slotCount;
+            EndDragAdd.RaiseEvent(callCard, this);
+        }
+    }
+    #endregion
+
+
+    //消除卡牌的行为
+    public void OnCardEliminate(List<Card> eliminateCards)
+    {
+        foreach (var item in eliminateCards)
+        {
+            Destroy(item.gameObject);
+        }
+    }
+    public void OnCardEliminate(Card eliminateCard)
+    {
+
+        Destroy(eliminateCard);
+
+    }
+
+    #endregion
 }
