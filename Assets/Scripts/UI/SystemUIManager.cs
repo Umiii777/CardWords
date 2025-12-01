@@ -62,7 +62,7 @@ public class SystemUIManager : MonoBehaviour
 {
 #region 异常消息内容常量
     private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为 #，不在枚举 $ 之中";
-    private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。实际参数可能不符合方法要求！";
+    private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。可能传入了错误的参数";
     private const string EXCEPTION_MANAGER_UNINITIALIZED = "SystemUIManager.Instance 还未初始化，无法调用 @";
 #endregion
 #region 弹出提示内容常量
@@ -133,15 +133,16 @@ public class SystemUIManager : MonoBehaviour
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
-                DefeatUIController.clickingContinue = async () =>
+                DefeatUIController.clickingWatchAd = async () =>
                 {
                     if (uiGameObj(type) == null)
                         return;
                     await Task.Delay(3000); //假装播放3秒广告
-                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                    StepManager.Instance.AddExtraSteps(); // 增加步数
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
+                DefeatUIController.clickingWatchAd = FireAndBan(typeof(DefeatUIController), DefeatUIController.clickingWatchAd);
                 DefeatUIController.clickingReplay = async () =>
                 {
                     if (uiGameObj(type) == null)
@@ -149,8 +150,7 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerEnergy.TrySpendEnergy(1))
                     {
                         //Instance.OnUpdateEnergy(); // 没必要调 OnUpdateEnergy
-                        //TODO: 下面这行执行关卡加载
-                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
                         Destroy(uiGameObj(type));
                         Instance.uiInstances[(uint)type] = null;
                         return;
@@ -194,7 +194,7 @@ public class SystemUIManager : MonoBehaviour
                     }
                     await PopUpTips(TIPS_ENERGY_IS_FULL);
                 };
-                EnergyUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(EnergyUIController), EnergyUIController.clickingWatchAd);
+                EnergyUIController.clickingWatchAd = FireAndBan(typeof(EnergyUIController), EnergyUIController.clickingWatchAd);
                 return;
             case UIType.Home:
                 HomeUIController.clickingSettings = async () => await LoadUI(UIType.Settings, false);
@@ -205,8 +205,7 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerEnergy.TrySpendEnergy(HomeUIController.NumEnergyToPlay))
                     {
                         //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
-                        //TODO: 下面这行执行关卡加载
-                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 加载玩家到达的最后一个关卡
                         Destroy(uiGameObj(type));
                         Instance.uiInstances[(uint)type] = null;
                         return;
@@ -228,8 +227,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     if (uiGameObj(type) == null)
                         return;
-                    //TODO: 下面这行执行关卡加载
-                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(0, null));
+                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
@@ -271,7 +269,7 @@ public class SystemUIManager : MonoBehaviour
                         await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     }
                 };
-                ShopUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(ShopUIController), ShopUIController.clickingWatchAd);
+                ShopUIController.clickingWatchAd = FireAndBan(typeof(ShopUIController), ShopUIController.clickingWatchAd);
                 return;
             case UIType.Victory:
                 VictoryUIController.clickingReceive = async _=>
@@ -283,7 +281,7 @@ public class SystemUIManager : MonoBehaviour
                     Instance.uiInstances[(uint)type] = null;
                     //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
-                VictoryUIController.clickingReceive = StartAdAndBlockClicking(
+                VictoryUIController.clickingReceive = FireAndBan(
                     typeof(VictoryUIController),
                     VictoryUIController.clickingReceive,
                     nameof(VictoryUIController.clickingReceive)
@@ -297,7 +295,7 @@ public class SystemUIManager : MonoBehaviour
                     Instance.uiInstances[(uint)type] = null;
                     //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
                 };
-                VictoryUIController.clickingWatchAd = StartAdAndBlockClicking(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
+                VictoryUIController.clickingWatchAd = FireAndBan(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
                 return;
             default:
                 throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
@@ -317,6 +315,7 @@ public class SystemUIManager : MonoBehaviour
     /// <param name="args">生成此界面时需要的数据。确定好第一个实参后，参考第一个实参的注释来传入</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public static async Task LoadUI(UIType type, params object[] args)
     {
         if (Instance == null)
@@ -422,33 +421,33 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
-    private static Func<Task> StartAdAndBlockClicking(AdProcessor uiInstance)
+    private static Func<Task> FireAndBan(AdProcessor uiInstance)
     {
         Func<Task> clicking = uiInstance.clickingWatchAd;
-        async Task startAdAndBlockClicking()
+        async Task fireAndBan()
         {
             uiInstance.clickingWatchAd = null;
             await Task.WhenAll(clicking.GetInvocationList()
                 .Cast<Func<Task>>()
                 .Select(async f => await f())
             );
-            uiInstance.clickingWatchAd = startAdAndBlockClicking;
+            uiInstance.clickingWatchAd = fireAndBan;
         }
-        return startAdAndBlockClicking;
+        return fireAndBan;
     }
 
     /// <summary>
-    /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
+    /// 开始执行按钮回调委托，同时禁用按钮响应，直到委托执行完毕
     /// <br/><br/>
     /// 用于派生自 StaticAdProcessor 的界面类型
     /// </summary>
-    /// <typeparam name="T">看广告领东西按钮回调委托的返回值类型</typeparam>
+    /// <typeparam name="T">回调委托的返回值类型</typeparam>
     /// <param name="typeOfUIController">要禁用按钮响应的界面类型</param>
-    /// <param name="clickingFunc">看广告领东西按钮的回调委托</param>
-    /// <param name="nameOfClickingFunc">看广告领东西按钮回调委托的字段名称</param>
+    /// <param name="clickingFunc">要执行的回调委托</param>
+    /// <param name="nameOfClickingFunc">要执行的回调委托的字段名称</param>
     /// <returns>须代入按钮回调的新委托</returns>
-    /// <exception cref="ArgumentException"></exception>
-    private static Func<T, Task> StartAdAndBlockClicking<T>(
+    /// <exception cref="InvalidOperationException"></exception>
+    private static Func<T, Task> FireAndBan<T>(
         Type typeOfUIController,
         Func<T, Task> clickingFunc,
         string nameOfClickingFunc = nameof(StaticAdProcessor<MonoBehaviour, object>.clickingWatchAd)
@@ -459,22 +458,22 @@ public class SystemUIManager : MonoBehaviour
             BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.Public
         );
         if (clickingField?.GetValue(null) is not Func<T, Task> clicking)
-            throw new ArgumentException(EXCEPITON_STATIC_FIELD_NOT_FOUND
+            throw new InvalidOperationException(EXCEPITON_STATIC_FIELD_NOT_FOUND
                 .Replace("@", typeOfUIController.ToString())
                 .Replace("#", nameOfClickingFunc)
                 .Replace("$", $"Func<{typeof(T)}, Task>")
             );
 
-        async Task startAdAndBlockClicking(T arg)
+        async Task fireAndBan(T arg)
         {
             clickingField.SetValue(null, null);
             await Task.WhenAll(clicking.GetInvocationList()
                 .Cast<Func<T, Task>>()
                 .Select(async f => await f(arg))
             );
-            clickingField.SetValue(null, (Func<T,Task>)startAdAndBlockClicking);
+            clickingField.SetValue(null, (Func<T,Task>)fireAndBan);
         }
-        return startAdAndBlockClicking;
+        return fireAndBan;
     }
 #endregion
 
@@ -514,8 +513,7 @@ public class SystemUIManager : MonoBehaviour
         HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
         HomeUIController.MaxEnergy = PlayerEnergy.MaxEnergy;
         HomeUIController.LevelName = "关卡" + PlayerProgress.GetCurrentLevel();
-        //TODO: （待实现）下面这行从 PlayerProgress 类获取进关卡扣除的体力值数据
-        //HomeUIController.NumEnergyToPlay = PlayerProgress.GetNumEnergyToPlay();
+        //HomeUIController.NumEnergyToPlay = PlayerProgress.GetNumEnergyToPlay(); //TODO: 从 PlayerProgress 类获取进关卡扣除的体力值数据
     }
     private void InitItemUI(ItemUIController itemUI, ItemType itemType)
     {
@@ -557,13 +555,12 @@ public class SystemUIManager : MonoBehaviour
             ItemUIController.dictCachedClickings.Add(itemType, cachedClickings);
         }
         (itemUI.clickingBuy, itemUI.clickingWatchAd) = cachedClickings;
-        itemUI.clickingWatchAd = StartAdAndBlockClicking(itemUI);
+        itemUI.clickingWatchAd = FireAndBan(itemUI);
     }
     private void InitSettingsUI(bool isInLevel)
     {
         SettingsUIController.isInLevel = isInLevel;
-        //TODO: （待实现）下面这行从 PlayerProgress 类获取进关卡扣除的体力值数据
-        //SettingsUIController.numEnergyToPlay = PlayerProgress.GetNumEnergyToPlay();
+        //SettingsUIController.numEnergyToPlay = PlayerProgress.GetNumEnergyToPlay(); //TODO: 从 PlayerProgress 类获取进关卡扣除的体力值数据
     }
     private void InitShopUI()
     {
@@ -610,6 +607,7 @@ public class SystemUIManager : MonoBehaviour
             { UIType.Home, new(homeUIPrefab, InitHomeUI) },
             { UIType.Shop, new(shopUIPrefab, InitShopUI) }
         };
+        loadingLevel = (level, _) => LevelManager.Instance.InitCurrentLevel(level);
     }
 
     private T CreateUI<T>(T ui, T uiPrefab, Action initing = null) where T : MonoBehaviour
