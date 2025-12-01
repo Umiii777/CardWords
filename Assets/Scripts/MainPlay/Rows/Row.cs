@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Row : MonoBehaviour
 {
@@ -8,6 +10,12 @@ public class Row : MonoBehaviour
     public bool isEmpty = false;
     public int cardCount = 0;
     public int rowNum = -1;
+
+    public TextMeshProUGUI unlockedText;
+    public Image unlockedIcon;
+
+
+
 
     // 当前行上的卡（按从 top 到子牌顺序或你需要的顺序）
     public List<Card> cardsOnRow = new List<Card>();
@@ -17,8 +25,20 @@ public class Row : MonoBehaviour
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
+
     }
 
+    private void OnClick()
+    {
+        if (rowType == RowType.unlocked)
+        {
+            OnChangeUnlockRowType();
+        }
+        else
+        {
+            return;
+        }
+    }
 
 
     public void OnChangeUnlockRowType()
@@ -96,12 +116,36 @@ public class Row : MonoBehaviour
 
 
     //TODO:传入多个Card
-public void DebugRowOrder()
-{
-    Debug.Log("----- Row Order -----");
-    for (int i = 0; i < cardsOnRow.Count; i++)
+    public void DebugRowOrder()
     {
-        Debug.Log(i + ": " + cardsOnRow[i].cardData.cardContent);
+        Debug.Log("----- Row Order -----");
+        for (int i = 0; i < cardsOnRow.Count; i++)
+        {
+            Debug.Log(i + ": " + cardsOnRow[i].cardData.cardContent);
+        }
     }
-}
+
+    public void OnChangeMainRowType()
+    {
+        if (rowType == RowType.unlocked)
+        {
+            rowType = RowType.main;
+            OnUpdateMainRowType(this);
+        }
+    }
+    public void OnUpdateMainRowType(Row currentMainrow)
+    {
+        unlockedIcon = transform.Find("Image_Unlock").GetComponent<Image>();
+        unlockedText = transform.Find("text_unlock").GetComponent<TextMeshProUGUI>();
+        if (currentMainrow.rowType == RowType.unlocked)
+        {
+            unlockedIcon.enabled = true;
+            unlockedText.enabled = true;
+        }
+        else if (currentMainrow.rowType == RowType.main)
+        {
+            unlockedIcon.enabled = false;
+            unlockedText.enabled = false;
+        }
+    }
 }

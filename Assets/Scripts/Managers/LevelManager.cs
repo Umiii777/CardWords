@@ -12,6 +12,7 @@ public class LevelManager : MonoBehaviour
     public float rowY = 240;
     public float mainRowY = 500;
     public float startX = 0f;
+    private int maxRowNum = 5;
     public RectTransform canvas;
     [Header("生成的卡牌位置相关")]
     private float cardColumnOffset = 50;
@@ -100,7 +101,7 @@ public class LevelManager : MonoBehaviour
         //表现层,可用列数，可用主槽位数，初始的卡牌排布
         int[] normalRows = currentLevelData.rows;
         int[] mainGroup = currentLevelData.mainGroup;
-        int mainRows = currentLevelData.column;
+        int mainRows = currentLevelData.column;  //是否应该从这里改变整体的unlockRowNum
 
         Debug.Log(normalRows.Count());
         Debug.Log(mainRows);
@@ -159,17 +160,17 @@ public class LevelManager : MonoBehaviour
 
 
 
-
+    #region 处理关卡排布
     public void SetLevelLayout(int[] rows, int mainRow)
     {
         //规定行列的高
         //数据层，获得rows的所有排列方式
         currentRowX = cardLayoutManager.SetRowLayoutX(rows.Count());
-        currentMainRowX = cardLayoutManager.SetMainRowLayoutX(mainRow);
+        currentMainRowX = cardLayoutManager.SetMainRowLayoutX(5);
         //处理row
         SetLevelRow(currentRowX, rows);
         //处理mainrow
-        SetLevelMainRow(currentMainRowX);
+        SetLevelMainRow(currentMainRowX,mainRow);
     }
     //生成关卡的普通列分布
     public void SetLevelRow(float[] rowx, int[] rows)
@@ -197,18 +198,39 @@ public class LevelManager : MonoBehaviour
         Debug.Log(rowManager.rows);
     }
     //生成关卡的主列分布
-    public void SetLevelMainRow(float[] mainRowx)
+    public void SetLevelMainRow(float[] mainRowx,int mainrow)
     {
         for (int i = 0; i < mainRowx.Count(); i++)
         {
-            GameObject mainRow = mainRowpool.Get();
-            Row currentMainRow = mainRow.GetComponent<Row>();
-            RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
-            currentMainRow.isEmpty = true;
-            rowManager.mainRows.Add(currentMainRow);
-            currentTransform.SetParent(canvas, false);
-            currentTransform.anchoredPosition = new Vector2(mainRowx[i] + startX, mainRowY);
-            currentTransform.SetParent(rowLayer, false);
+            if (i < mainrow)
+            {
+                GameObject mainRow = mainRowpool.Get();
+                Row currentMainRow = mainRow.GetComponent<Row>();
+                RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
+                currentMainRow.isEmpty = true;
+                currentMainRow.rowType = RowType.main;
+                currentMainRow.OnUpdateMainRowType(currentMainRow);
+
+                rowManager.mainRows.Add(currentMainRow);
+                currentTransform.SetParent(canvas, false);
+                currentTransform.anchoredPosition = new Vector2(mainRowx[i] + startX, mainRowY);
+                currentTransform.SetParent(rowLayer, false);
+            }
+            else
+            {
+                GameObject mainRow = mainRowpool.Get();
+                Row currentMainRow = mainRow.GetComponent<Row>();
+                RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
+                currentMainRow.isEmpty = true;
+                currentMainRow.rowType = RowType.unlocked;
+                currentMainRow.OnUpdateMainRowType(currentMainRow);
+                
+                rowManager.mainRows.Add(currentMainRow);
+                currentTransform.SetParent(canvas, false);
+                currentTransform.anchoredPosition = new Vector2(mainRowx[i] + startX, mainRowY);
+                currentTransform.SetParent(rowLayer, false);
+            }
+
         }
     }
     //读取关卡的卡牌排列
@@ -255,6 +277,8 @@ public class LevelManager : MonoBehaviour
         currentCardDeckDatas = currentTotalCardDatas.Skip(currentCardInitNum).ToList();
         cardDeck.InitCardDeck(currentCardDeckDatas);
     }
+    #endregion
+    #region 处理关卡卡牌数据
     //获得关卡卡牌的词汇数据
     public void SetLevelCardsData(LevelData currentLevelData)
     {
@@ -298,11 +322,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("当前关卡的第一个词组是" + currentTotalCardDatas[0].cardContent + currentTotalCardDatas[0].mainTotalLength);
     }
 
-
-    public void SetCardsLayout()
-    {
-
-    }
+    #endregion
     #region 完成关卡
     //完成关卡，玩家数据加1
     public async void OnLevelComplete()

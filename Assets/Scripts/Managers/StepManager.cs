@@ -18,10 +18,13 @@ public class StepManager : MonoBehaviour
 
     public ObjectEventSO onLevelDefeat;
 
+    public static StepManager Instance;
+
     private void Awake()
     {
         tmPro = GetComponent<TextMeshProUGUI>();
         tmTransform = GetComponent<RectTransform>();
+        Instance = this;
     }
 
     public void InitSetSteps(int currentLevelStep)
