@@ -71,8 +71,8 @@ public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
 #region 按钮回调方法
     public async void OnClickHome() => await (clickingHome is null ? Task.CompletedTask : clickingHome());
     public async void OnClickReplay() => await (clickingReplay is null ? Task.CompletedTask : clickingReplay());
-    public async void OnClickContinue() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
-#endregion
+    public async void OnClickContinue() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
+    #endregion
 
     void Start()
     {

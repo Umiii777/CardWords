@@ -69,7 +69,7 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public async void OnClickReceive() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
+    public async void OnClickReceive() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
     public async void OcClickBuy(string price) => await (clickingBuy is null ? Task.CompletedTask : clickingBuy(int.Parse(price)));
 #endregion
 

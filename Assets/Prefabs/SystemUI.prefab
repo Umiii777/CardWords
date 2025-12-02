@@ -126,5 +126,6 @@ MonoBehaviour:
   itemUIPrefab: {fileID: 4150647946035368849, guid: 6654d71a00a70cf44926252650a9b5c6, type: 3}
   settingsUIPrefab: {fileID: 4178944797675432691, guid: 11c758f9d7c0c4f49b5a5f5294a2ee29, type: 3}
   shopUIPrefab: {fileID: 4154039431515968401, guid: 7b0fc05274e748d4d9c1fb8fc0a9b49f, type: 3}
+  unlockSlotUIPrefab: {fileID: 1554065320632157442, guid: fc0076e7acc57e048b1f0c271bd66a4e, type: 3}
   victoryUIPrefab: {fileID: 8188723824494120873, guid: 722c9a4373805f44c8c4d77879ff5987, type: 3}
   tipsPrefab: {fileID: 3747723690821534621, guid: 42ba64297e50175449fbe25c619f73ec, type: 3}

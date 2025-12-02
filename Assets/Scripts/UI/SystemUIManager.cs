@@ -48,6 +48,12 @@ public enum UIType
     /// </summary>
     Shop,
     /// <summary>
+    /// 开启槽位界面
+    /// <br/><br/>
+    /// 生成时不传其他参数
+    /// </summary>
+    UnlockSlot,
+    /// <summary>
     /// 关卡胜利界面
     /// <br/><br/>
     /// 生成时可再传一个表示奖励金币数量的 int 值，若不传则使用 VictoryUIController.numCoinsToReceive 的值
@@ -61,7 +67,7 @@ public enum UIType
 public class SystemUIManager : MonoBehaviour
 {
 #region 异常消息内容常量
-    private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为 #，不在枚举 $ 之中";
+    private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为#，不在枚举 $ 之中";
     private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。可能传入了错误的参数";
     private const string EXCEPTION_MANAGER_UNINITIALIZED = "SystemUIManager.Instance 还未初始化，无法调用 @";
 #endregion
@@ -72,15 +78,27 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_SUCCESSFUL_RECEIVING = "领取成功！";
     private const string TIPS_ENERGY_ADDED = "体力 + @";
     private const string TIPS_ENERGY_IS_FULL = "兑换失败，体力已满";
+    private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
 #endregion
 
     public static SystemUIManager Instance;
+
+#region 静态委托
     /// <summary>
     /// 关卡加载委托
     /// <br/><br/>
     /// 第一个参数为要加载的关卡编号，第二个参数为额外信息
     /// </summary>
     public static Func<int, object, Task> loadingLevel;
+    /// <summary>
+    /// 增加步数委托
+    /// </summary>
+    public static Func<Task> addingSteps;
+    /// <summary>
+    /// 开启槽位委托
+    /// </summary>
+    public static Func<Task> unlockingSlot;
+#endregion
 
 #region 游戏内所有道具的信息和图标
     public string[] itemInfos;
@@ -101,6 +119,8 @@ public class SystemUIManager : MonoBehaviour
     private SettingsUIController settingsUIPrefab;
     [SerializeField]
     private ShopUIController shopUIPrefab;
+    [SerializeField]
+    private UnlockSlotUIController unlockSlotUIPrefab;
     [SerializeField]
     private VictoryUIController victoryUIPrefab;
 #endregion
@@ -133,12 +153,10 @@ public class SystemUIManager : MonoBehaviour
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
-                DefeatUIController.clickingWatchAd = async () =>
+                DefeatUIController.clickingWatchAd = async _=>
                 {
-                    if (uiGameObj(type) == null)
-                        return;
                     await Task.Delay(3000); //假装播放3秒广告
-                    StepManager.Instance.AddExtraSteps(); // 增加步数
+                    await (addingSteps is null ? Task.CompletedTask : addingSteps()); // 增加步数
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
@@ -160,7 +178,7 @@ public class SystemUIManager : MonoBehaviour
                 };
                 return;
             case UIType.Energy:
-                static async Task addEnergy()
+                static async Task onAddEnergy()
                 {
                     Instance.OnUpdateEnergy();
                     await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
@@ -177,7 +195,7 @@ public class SystemUIManager : MonoBehaviour
                     {
                         PlayerEnergy.AddEnergy(1);
                         Instance.OnUpdateCoin();
-                        await addEnergy();
+                        await onAddEnergy();
                         return;
                     }
                     await PopUpTips(TIPS_COIN_LACK);
@@ -189,7 +207,7 @@ public class SystemUIManager : MonoBehaviour
                         return;
                     if (PlayerEnergy.TryAddEnergy(1))
                     {
-                        await addEnergy();
+                        await onAddEnergy();
                         return;
                     }
                     await PopUpTips(TIPS_ENERGY_IS_FULL);
@@ -271,6 +289,22 @@ public class SystemUIManager : MonoBehaviour
                 };
                 ShopUIController.clickingWatchAd = FireAndBan(typeof(ShopUIController), ShopUIController.clickingWatchAd);
                 return;
+            case UIType.UnlockSlot:
+                UnlockSlotUIController.clickingClose = () =>
+                {
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                UnlockSlotUIController.clickingWatchAd = async _=>
+                {
+                    await Task.Delay(3000); //假装播放3秒广告
+                    await PopUpTips(TIPS_SUCCESSFL_UNLOCKING);
+                    await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot());
+                    Destroy(uiGameObj(type));
+                    Instance.uiInstances[(uint)type] = null;
+                };
+                UnlockSlotUIController.clickingWatchAd = FireAndBan(typeof(UnlockSlotUIController), UnlockSlotUIController.clickingWatchAd);
+                return;
             case UIType.Victory:
                 VictoryUIController.clickingReceive = async _=>
                 {
@@ -286,7 +320,8 @@ public class SystemUIManager : MonoBehaviour
                     VictoryUIController.clickingReceive,
                     nameof(VictoryUIController.clickingReceive)
                 );
-                VictoryUIController.clickingWatchAd = async _=> {
+                VictoryUIController.clickingWatchAd = async _=>
+                {
                     await Task.Delay(3000); //假装播放3秒广告
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive * 10);
@@ -471,7 +506,7 @@ public class SystemUIManager : MonoBehaviour
                 .Cast<Func<T, Task>>()
                 .Select(async f => await f(arg))
             );
-            clickingField.SetValue(null, (Func<T,Task>)fireAndBan);
+            clickingField.SetValue(null, (Func<T, Task>)fireAndBan);
         }
         return fireAndBan;
     }
@@ -480,8 +515,7 @@ public class SystemUIManager : MonoBehaviour
     void Awake()
     {
         InitUIManager();
-        for (uint u = 0; u < Enum.GetNames(typeof(UIType)).Length; u++)
-            InitUICallbacks((UIType)u);
+        Array.ForEach(Enum.GetValues(typeof(UIType)) as UIType[], t => InitUICallbacks(t));
 
         //游戏启动时直接显示大厅
         uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
@@ -494,6 +528,7 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
         //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
         //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
+        //_= SystemUIManager.LoadUI(UIType.UnlockSlot);             // 开启槽位界面
         //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
 //#endif
     }
@@ -592,7 +627,7 @@ public class SystemUIManager : MonoBehaviour
     private void InitUIManager()
     {
         Instance = this;
-        uiInstances = new object[Enum.GetNames(typeof(UIType)).Length];
+        uiInstances = new object[Enum.GetValues(typeof(UIType)).Length];
         uiInstances[(uint)UIType.Item] = new LinkedList<ItemUIController>();
         dictItemInfoIcons = itemInfos.ToDictionary(
             s => (ItemType)uint.Parse(s.Split('`', 2)[0]),
@@ -603,11 +638,13 @@ public class SystemUIManager : MonoBehaviour
         );
         dictPrefabInitings = new()
         {
-            { UIType.Energy, new(energyUIPrefab, InitEnergy) },
-            { UIType.Home, new(homeUIPrefab, InitHomeUI) },
-            { UIType.Shop, new(shopUIPrefab, InitShopUI) }
+            { UIType.Energy, (energyUIPrefab, InitEnergy) },
+            { UIType.Home, (homeUIPrefab, InitHomeUI) },
+            { UIType.Shop, (shopUIPrefab, InitShopUI) },
+            { UIType.UnlockSlot, (unlockSlotUIPrefab, null) }
         };
-        loadingLevel = (level, _) => LevelManager.Instance.InitCurrentLevel(level);
+        //TODO: loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
+        addingSteps = async () => StepManager.Instance.AddExtraSteps();
     }
 
     private T CreateUI<T>(T ui, T uiPrefab, Action initing = null) where T : MonoBehaviour
@@ -625,7 +662,7 @@ public class SystemUIManager : MonoBehaviour
     /// <br/><br/>
     /// 是为了直接从 Unity Editor 的 Inspector 面板将界面加载方法绑定到按钮而准备的，
     /// <br/><br/>
-    /// 因此返回类型只能是 void。代码中应避免调用该方法
+    /// 返回类型不得不定义为 void。代码中应避免调用该方法
     /// </summary>
     /// <param name="args">将本应传入 SystemUIManager.LoadUI 的参数连成字符串，两两之间用逗号隔开（例："Defeat, 0.5f"）</param>
     /// <exception cref="ArgumentException"></exception>

@@ -74,8 +74,7 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
         set
         {
             if (sharedWatchedAdTexts != null)
-                foreach (var t in sharedWatchedAdTexts)
-                    t.text = value + "/" + t.text.Split('/')[1];
+                Array.ForEach(sharedWatchedAdTexts, t => t.text = value + "/" + t.text.Split('/')[1]);
             numWatchedAd = value;
         }
     }
@@ -112,11 +111,11 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         await (clickingBuy is null ? Task.CompletedTask : clickingBuy((ItemType)c[0], c[1], c[2]));
     }
-    public async void OnClickReceive(string config) => await AdProcessor.ProcessAd(
-        clickingWatchAd,
-        null,
-        config.Split(',').Select(s => int.Parse(s.Trim())).ToArray()
-    );
+    public async void OnClickReceive(string config)
+    {
+        int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
+        await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(c));
+    }
 #endregion
 
     void Start()

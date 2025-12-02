@@ -31,7 +31,7 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
 
 #region 按钮回调方法
     public async void OnClickReceive() => await (clickingReceive is null ? Task.CompletedTask : clickingReceive(null));
-    public async void OnClickReceiveMore() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
+    public async void OnClickReceiveMore() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
 #endregion
 
     void Start()
