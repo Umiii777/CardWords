@@ -125,24 +125,25 @@ public class Row : MonoBehaviour
         }
     }
 
-    public void OnChangeMainRowType()
+//执行改变Rowtype——unlocked——main
+    public static void OnChangeMainRowType(Row row)
     {
-        if (rowType == RowType.unlocked)
+        if (row.rowType == RowType.unlocked)
         {
-            rowType = RowType.main;
-            OnUpdateMainRowType(this);
+            row.rowType = RowType.main;
+            row.OnUpdateMainRowType();
         }
     }
-    public void OnUpdateMainRowType(Row currentMainrow)
+    public void OnUpdateMainRowType()
     {
         unlockedIcon = transform.Find("Image_Unlock").GetComponent<Image>();
         unlockedText = transform.Find("text_unlock").GetComponent<TextMeshProUGUI>();
-        if (currentMainrow.rowType == RowType.unlocked)
+        if (rowType == RowType.unlocked)
         {
             unlockedIcon.enabled = true;
             unlockedText.enabled = true;
         }
-        else if (currentMainrow.rowType == RowType.main)
+        else if (rowType == RowType.main)
         {
             unlockedIcon.enabled = false;
             unlockedText.enabled = false;
