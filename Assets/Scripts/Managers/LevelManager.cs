@@ -55,18 +55,24 @@ public class LevelManager : MonoBehaviour
 
     public int currentLevelNum;
 
+    public static LevelManager Instance;
+
     // [Header("事件")]
     // public ObjectEventSO completeLevel;
 
 
     private void Awake()
     {
+        Instance = this;    
+
         cardLayoutManager = new CardLayoutManager();
         PlayerPrefs.DeleteAll();
         Debug.Log(PlayerProgress.GetCurrentLevel());
         PlayerProgress.SetCurrentLevel(101);
         //currentLevelNum = PlayerProgress.GetCurrentLevel();
         SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
+
+        
 
     }
     private void Start()
@@ -209,7 +215,7 @@ public class LevelManager : MonoBehaviour
                 RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
                 currentMainRow.isEmpty = true;
                 currentMainRow.rowType = RowType.main;
-                currentMainRow.OnUpdateMainRowType(currentMainRow);
+                currentMainRow.OnUpdateMainRowType();
 
                 rowManager.mainRows.Add(currentMainRow);
                 currentTransform.SetParent(canvas, false);
@@ -223,7 +229,7 @@ public class LevelManager : MonoBehaviour
                 RectTransform currentTransform = currentMainRow.GetComponent<RectTransform>();
                 currentMainRow.isEmpty = true;
                 currentMainRow.rowType = RowType.unlocked;
-                currentMainRow.OnUpdateMainRowType(currentMainRow);
+                currentMainRow.OnUpdateMainRowType();
                 
                 rowManager.mainRows.Add(currentMainRow);
                 currentTransform.SetParent(canvas, false);

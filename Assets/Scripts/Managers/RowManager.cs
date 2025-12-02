@@ -10,7 +10,19 @@ public class RowManager : MonoBehaviour
 
     public CardEventSO onDragFromDeck;
 
+    private Card firstHintCard;
+    private Card secondHintCard;
 
+    public static RowManager Instance;
+
+    public void Awake()
+    {
+        Instance = this;
+    }
+    
+
+
+    
     public void AddRow(Row rowFromLevelManager)
     {
         rows.Add(rowFromLevelManager);
@@ -47,4 +59,20 @@ public class RowManager : MonoBehaviour
         rows[topCard.slotCount].cardsOnRow.Remove(topCard);
         rows[topCard.slotCount].CheckIfRowEmpty();
     }
+
+    // public void HintTry()
+    // {
+    //     for (int i = 0; i < rows.Count; i++)
+    //     {
+    //         if (rows[i].cardsOnRow.Count > 1)
+    //         {
+    //             firstHintCard = rows[i].cardsOnRow[rows[i].cardsOnRow.Count - 1];
+    //         }
+    //         else
+    //         {
+    //             i++;
+    //         }
+
+    //     }
+    // }
 }
