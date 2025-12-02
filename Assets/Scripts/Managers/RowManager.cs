@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,10 +21,10 @@ public class RowManager : MonoBehaviour
     {
         Instance = this;
     }
-    
 
 
-    
+
+
     public void AddRow(Row rowFromLevelManager)
     {
         rows.Add(rowFromLevelManager);
@@ -60,19 +62,61 @@ public class RowManager : MonoBehaviour
         rows[topCard.slotCount].CheckIfRowEmpty();
     }
 
-    // public void HintTry()
-    // {
-    //     for (int i = 0; i < rows.Count; i++)
-    //     {
-    //         if (rows[i].cardsOnRow.Count > 1)
-    //         {
-    //             firstHintCard = rows[i].cardsOnRow[rows[i].cardsOnRow.Count - 1];
-    //         }
-    //         else
-    //         {
-    //             i++;
-    //         }
 
-    //     }
-    // }
+    //
+
+    [ContextMenu("提示测试")]
+    public async Task HintTry()
+    {
+        Debug.Log("开始测试");
+        Debug.Log(mainRows.Count);
+        //await SystemUIManager.PopUpTips("开始测试");
+        for (int i = 0; i < rows.Count; i++)
+        {
+            if (rows[i].cardsOnRow.Count >= 1)
+            {
+                firstHintCard = rows[i].cardsOnRow[rows[i].cardsOnRow.Count - 1];
+                for (int j = 0; j < rows.Count; j++)
+                {
+                    if (j != i)
+                    {
+                        if (rows[j].cardsOnRow.Count >= 1)
+                        {
+                            secondHintCard = rows[j].cardsOnRow[rows[j].cardsOnRow.Count - 1];
+                            if (firstHintCard.cardData.mainId == secondHintCard.cardData.mainId && !secondHintCard.cardData.isMainCard)
+                            {
+                                //await SystemUIManager.PopUpTips("找到了相同的卡牌");
+                                Debug.Log("找到了相同的卡牌");
+                                return;
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+                List<Card> currentMaincards = CardManager.Instance.GetCurrentLevelCardOnFront();
+
+                foreach (var maincard in currentMaincards)
+                {
+                    Debug.Log("执行了找主卡的方法");
+                    if (firstHintCard.cardData.mainId == maincard.cardData.mainId)
+                    {
+                        //await SystemUIManager.PopUpTips("找到了相同的卡牌");
+                        Debug.Log("找到了相同的卡牌");
+                        return;
+                    }
+                }
+            }
+
+        }
+        //await SystemUIManager.PopUpTips("没找到可合成相同的卡牌");
+        Debug.Log("没找到可合成相同的卡牌");
+
+    }
 }

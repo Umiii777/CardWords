@@ -50,11 +50,23 @@ public class CardManager : MonoBehaviour
             allRows.Remove(row);
         }
     }
-    
+
     public void OnCompleteLevel()
     {
         //让levelManager监听胜利
         Debug.Log("关卡胜利了");
         CompleteLevel.RaiseEvent(this, this);
+    }
+    public List<Card> GetCurrentLevelCardOnFront()
+    {
+        List<Card> currentLevelCardsOnFront = new List<Card>();
+        foreach (var card in allCards)
+        {
+            if (card.isFront && card.isOnMainRow&&card.cardData.isMainCard)
+            {
+                currentLevelCardsOnFront.Add(card);
+            }
+        }
+        return currentLevelCardsOnFront;
     }
 }
