@@ -121,7 +121,7 @@ public class CardDragHandler : MonoBehaviour,
         // 1. 落到 Row 上
         if (bestRow)
         {
-            if (bestRow.isEmpty)
+            if (bestRow.isEmpty && bestRow.rowType != RowType.unlocked)
             {
                 PlaceOnRow(bestRow);
                 CardStack.EndDragStackSetCg(top);
@@ -219,6 +219,7 @@ public class CardDragHandler : MonoBehaviour,
         //普通卡可以放到空row
         else if (row.rowType == RowType.normal && row.isEmpty)
         {
+            Debug.Log("普通卡放到空row");
             top.rectTransform.anchoredPosition = row.rectTransform.anchoredPosition;
 
             if (top.isInStack)
@@ -279,7 +280,7 @@ public class CardDragHandler : MonoBehaviour,
                 top.rectTransform.anchoredPosition = originalPos;
                 CardStack.UpdateStackPositions(top);
                 CardStack.EndDragStackSetCg(top);
-                
+
                 return;
             }
             top.rectTransform.anchoredPosition = originalPos;

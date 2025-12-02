@@ -9,6 +9,8 @@ public class CardVisualManager : MonoBehaviour
     public Sprite spriteBack;
     public Sprite spriteFrontNormal;
     public Sprite spriteFrontMain;
+    public Sprite refreshDeck;
+    public Sprite normalDeck;
 
     private void Awake()
     {
