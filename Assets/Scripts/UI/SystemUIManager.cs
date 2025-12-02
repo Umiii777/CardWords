@@ -50,7 +50,7 @@ public enum UIType
     /// <summary>
     /// 开启槽位界面
     /// <br/><br/>
-    /// 生成时不传其他参数
+    /// 生成时须再传一个要开启的槽位所在的 Row 对象
     /// </summary>
     UnlockSlot,
     /// <summary>
@@ -97,7 +97,7 @@ public class SystemUIManager : MonoBehaviour
     /// <summary>
     /// 开启槽位委托
     /// </summary>
-    public static Func<Task> unlockingSlot;
+    public static Func<Row, Task> unlockingSlot;
 #endregion
 
 #region 游戏内所有道具的信息和图标
@@ -295,11 +295,11 @@ public class SystemUIManager : MonoBehaviour
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
-                UnlockSlotUIController.clickingWatchAd = async _=>
+                UnlockSlotUIController.clickingWatchAd = async row =>
                 {
                     await Task.Delay(3000); //假装播放3秒广告
                     await PopUpTips(TIPS_SUCCESSFL_UNLOCKING);
-                    await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot());
+                    await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot(row));
                     Destroy(uiGameObj(type));
                     Instance.uiInstances[(uint)type] = null;
                 };
@@ -386,6 +386,14 @@ public class SystemUIManager : MonoBehaviour
                             Instance.uiInstances[(uint)type] as SettingsUIController,
                             Instance.settingsUIPrefab,
                             () => Instance.InitSettingsUI(isInLevel)
+                        );
+                    return;
+                case UIType.UnlockSlot:
+                    if (args[0] is Row)
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as UnlockSlotUIController,
+                            Instance.unlockSlotUIPrefab,
+                            () => Instance.InitUnlckSlotUI(args[0] as Row)
                         );
                     return;
             }
@@ -528,7 +536,7 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
         //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
         //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
-        //_= SystemUIManager.LoadUI(UIType.UnlockSlot);             // 开启槽位界面
+        //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);       // 开启槽位界面
         //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
 //#endif
     }
@@ -604,6 +612,7 @@ public class SystemUIManager : MonoBehaviour
         ShopUIController.maxEnergy = PlayerEnergy.MaxEnergy;
         ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
     }
+    private void InitUnlckSlotUI(Row row) => UnlockSlotUIController.currentRow = row;
     private void InitVictoryUI(int numRewardCoins) => VictoryUIController.numCoinsToReceive = numRewardCoins;
 #endregion
 
@@ -640,11 +649,11 @@ public class SystemUIManager : MonoBehaviour
         {
             { UIType.Energy, (energyUIPrefab, InitEnergy) },
             { UIType.Home, (homeUIPrefab, InitHomeUI) },
-            { UIType.Shop, (shopUIPrefab, InitShopUI) },
-            { UIType.UnlockSlot, (unlockSlotUIPrefab, null) }
+            { UIType.Shop, (shopUIPrefab, InitShopUI) }
         };
-        //TODO: loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
+        loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
         addingSteps = async () => StepManager.Instance.AddExtraSteps();
+        unlockingSlot = async row => Row.OnChangeMainRowType(row);
     }
 
     private T CreateUI<T>(T ui, T uiPrefab, Action initing = null) where T : MonoBehaviour
