@@ -17,7 +17,10 @@ public class GameItemManager : MonoBehaviour
 
     public void UseHint()
     {
-        currentHintNum--;
+        //RowManager.Instance.HintTry();
+    }
+    public void UseShuffle()
+    {
 
     }
 
