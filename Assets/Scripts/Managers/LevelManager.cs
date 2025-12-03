@@ -70,7 +70,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log(PlayerProgress.GetCurrentLevel());
         PlayerProgress.SetCurrentLevel(101);
         //currentLevelNum = PlayerProgress.GetCurrentLevel();
-        SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
+        //SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
 
         
 

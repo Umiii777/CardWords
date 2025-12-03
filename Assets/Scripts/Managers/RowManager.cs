@@ -87,6 +87,8 @@ public class RowManager : MonoBehaviour
                             {
                                 //await SystemUIManager.PopUpTips("找到了相同的卡牌");
                                 Debug.Log("找到了相同的卡牌");
+                                firstHintCard.CardHint();
+                                secondHintCard.CardHint();
                                 return;
                             }
                             else
@@ -108,6 +110,8 @@ public class RowManager : MonoBehaviour
                     if (firstHintCard.cardData.mainId == maincard.cardData.mainId)
                     {
                         //await SystemUIManager.PopUpTips("找到了相同的卡牌");
+                        firstHintCard.CardHint();
+                        maincard.CardHint();
                         Debug.Log("找到了相同的卡牌");
                         return;
                     }
@@ -115,7 +119,7 @@ public class RowManager : MonoBehaviour
             }
 
         }
-        //await SystemUIManager.PopUpTips("没找到可合成相同的卡牌");
+        await SystemUIManager.PopUpTips("请点击牌库获得新卡牌");
         Debug.Log("没找到可合成相同的卡牌");
 
     }

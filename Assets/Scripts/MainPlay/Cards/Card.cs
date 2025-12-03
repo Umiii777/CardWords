@@ -182,5 +182,9 @@ public class Card : MonoBehaviour
     {
         rectTransform.DOShakeAnchorPos(0.2f, 30, 5, 90);
     }
+    public void CardHint()
+    {
+        rectTransform.DOShakeAnchorPos(5f, 30, 5, 90);
+    }
 
 }
