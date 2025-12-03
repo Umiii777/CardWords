@@ -39,7 +39,7 @@ public class ItemUIController : AdProcessor
 
 #region 按钮回调方法
     public void OnClickClose() => clickingClose?.Invoke();
-    public async void OnClickReceive() => await ProcessAd(clickingWatchAd);
+    public async void OnClickReceive() => await (clickingBuy is null ? Task.CompletedTask : clickingWatchAd());
     public async void OcClickBuy() => await (clickingBuy is null ? Task.CompletedTask : clickingBuy(price));
 #endregion
 

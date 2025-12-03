@@ -390,7 +390,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 8188723824494120873}
         m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickHome
+        m_MethodName: OnClickReceive
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

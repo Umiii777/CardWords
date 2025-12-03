@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,6 +9,7 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
     /// </summary>
     public static Func<U, Task> clickingWatchAd;
 
+    /* TODO: 重新评估 SystemUIManager.FireAndBan 的设计及其与 ProcessAd 的取舍
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
         if (toWait is not null)
@@ -22,6 +22,7 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
             );
         afterWait?.Invoke();
     }
+    */
 }
 
 public abstract class AdProcessor : MonoBehaviour
@@ -31,6 +32,8 @@ public abstract class AdProcessor : MonoBehaviour
     /// </summary>
     public Func<Task> clickingWatchAd;
 
+    /*
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
         await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
+    */
 }

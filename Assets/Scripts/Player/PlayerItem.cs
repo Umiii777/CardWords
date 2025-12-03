@@ -42,7 +42,7 @@ public class PlayerItem
         }
     }
 
-    private static Prop[] props =
+    private static readonly Prop[] props =
     {
         new() { Get = () => Hint, Set = v => Hint = v },
         new() { Get = () => Shuffle, Set = v => Shuffle = v }

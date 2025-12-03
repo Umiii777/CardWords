@@ -9,7 +9,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态字段赋值以更新各个按钮和进度条的显示内容和及行为
 /// </summary>
-public class DefeatUIController : MonoBehaviour
+public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
 {
 #region 静态公开字段
     /// <summary>
@@ -26,12 +26,6 @@ public class DefeatUIController : MonoBehaviour
     /// 应将 Destroy(defeatUI.gameObject) 加到最后
     /// </summary>
     public static Func<Task> clickingHome;
-    /// <summary>
-    /// 继续游戏按钮回调
-    /// <br/><br/>
-    /// 应将 Destroy(defeatUI.gameObject) 加到最后
-    /// </summary>
-    public static Func<Task> clickingContinue;
     /// <summary>
     /// 重玩按钮回调
     /// <br/><br/>
@@ -77,8 +71,8 @@ public class DefeatUIController : MonoBehaviour
 #region 按钮回调方法
     public async void OnClickHome() => await (clickingHome is null ? Task.CompletedTask : clickingHome());
     public async void OnClickReplay() => await (clickingReplay is null ? Task.CompletedTask : clickingReplay());
-    public async void OnClickContinue() => await AdProcessor.ProcessAd(clickingContinue);
-#endregion
+    public async void OnClickContinue() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
+    #endregion
 
     void Start()
     {

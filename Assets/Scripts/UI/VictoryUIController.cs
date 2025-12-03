@@ -16,17 +16,11 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     /// </summary>
     public static int numCoinsToReceive = 10;
     /// <summary>
-    /// 返回主界面按钮回调
-    /// <br/><br/>
-    /// 应将 Destroy(victoryUI.gameObject) 加到最后
-    /// </summary>
-    public static Func<Task> clickingHome;
-    /// <summary>
     /// 领取奖励按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
-    public static Func<Task> clickingReceive;
+    public static Func<object, Task> clickingReceive;
 #endregion
 
     /// <summary>
@@ -36,9 +30,8 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     private TextMeshProUGUI coinCountText;
 
 #region 按钮回调方法
-    public async void OnClickHome() => await (clickingHome is null ? Task.CompletedTask : clickingHome());
-    public async void OnClickReceive() => await (clickingReceive is null ? Task.CompletedTask : clickingReceive());
-    public async Task OnClickReceiveMore() => await AdProcessor.ProcessAd(clickingWatchAd, null, 0);
+    public async void OnClickReceive() => await (clickingReceive is null ? Task.CompletedTask : clickingReceive(null));
+    public async void OnClickReceiveMore() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
 #endregion
 
     void Start()
