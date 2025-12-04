@@ -190,7 +190,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &266164018
+--- !u!1001 &293223291
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -281,10 +281,6 @@ PrefabInstance:
     - target: {fileID: 7959341532255118932, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
       propertyPath: m_Name
       value: SystemUI
-      objectReference: {fileID: 0}
-    - target: {fileID: 7959341532255118932, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -412,7 +408,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 656796223}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SystemUIManager, Assembly-CSharp
         m_MethodName: FireLoadUI
         m_Mode: 5
@@ -657,7 +653,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 656796223}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SystemUIManager, Assembly-CSharp
         m_MethodName: FireLoadUI
         m_Mode: 5
@@ -825,17 +821,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 891787479}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &656796223 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7547519825697140921, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
-  m_PrefabInstance: {fileID: 266164018}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a201edd37aba9548a0b1a852e284440, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &706296898
 GameObject:
   m_ObjectHideFlags: 0
@@ -1816,7 +1801,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 656796223}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: SystemUIManager, Assembly-CSharp
         m_MethodName: FireLoadUI
         m_Mode: 5
@@ -2788,4 +2773,4 @@ SceneRoots:
   - {fileID: 71035638}
   - {fileID: 891787479}
   - {fileID: 801774033}
-  - {fileID: 266164018}
+  - {fileID: 293223291}

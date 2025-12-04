@@ -122,11 +122,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 126850877240769197}
         m_TargetAssemblyTypeName: Row, Assembly-CSharp
-        m_MethodName: OnChangeMainRowType
-        m_Mode: 2
+        m_MethodName: OnClickUnlockedRow
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 126850877240769197}
-          m_ObjectArgumentAssemblyTypeName: Row, Assembly-CSharp
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

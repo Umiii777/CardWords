@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+     using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,7 +20,7 @@ public class Row : MonoBehaviour
 
     // 当前行上的卡（按从 top 到子牌顺序或你需要的顺序）
     public List<Card> cardsOnRow = new List<Card>();
-
+    
     public RectTransform rectTransform;
 
     private void Awake()
@@ -28,26 +29,19 @@ public class Row : MonoBehaviour
 
     }
 
-    private void OnClick()
+    public void OnClickUnlockedRow()
     {
-        if (rowType == RowType.unlocked)
-        {
-            OnChangeUnlockRowType();
-        }
-        else
-        {
-            return;
-        }
+        SystemUIManager.LoadUI(UIType.UnlockSlot, this);
     }
 
 
-    public void OnChangeUnlockRowType()
-    {
-        if (rowType == RowType.unlocked)
-        {
-            rowType = RowType.main;
-        }
-    }
+    // public void OnChangeUnlockRowType()
+    // {
+    //     if (rowType == RowType.unlocked)
+    //     {
+    //         rowType = RowType.main;
+    //     }
+    // }
     //每次在下方成功拖动的时候应该调用
     public void CheckIfRowEmpty()
     {
