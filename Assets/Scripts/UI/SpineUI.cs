@@ -1,31 +1,56 @@
 using System.Linq;
 using UnityEngine;
+using Spine;
 using Spine.Unity;
 
+//TODO: 类名改为 SpineController，挪到 Scripts/Tools
 public class SpineUI : MonoBehaviour
 {
-    [SerializeField]
-    private SkeletonGraphic spine;
-    [SerializeField]
-    private string[] spineAnimsSetteings;
+    private const int MAX_UI_TRACKS = 5;
 
-    void Start()
+    [SerializeField]
+    private SkeletonGraphic spineObject;
+    [SerializeField]
+    private string[] animConfigs;
+    private AnimationState animState;
+
+    void Awake()
     {
-        InitSpineAnims();
+        if (spineObject == null)
+            spineObject = GetComponent<SkeletonGraphic>();
+        animState = spineObject.AnimationState;
     }
 
-    private void InitSpineAnims()
+    void OnEnable()
     {
-        string[] s;
-        foreach (var settings in spineAnimsSetteings)
+        AddUIAnims();
+    }
+
+    void OnDisable()
+    {
+        ClearUIAnims();
+    }
+
+    private void AddUIAnims()
+    {
+        string[] c;
+        foreach (var config in animConfigs)
         {
-            s = settings.Split(',').Select(s => s.Trim()).ToArray();
-            spine.AnimationState.AddAnimation(
-                int.Parse(s[0]),
-                s[1],
-                bool.Parse(s[2]),
-                float.Parse(s[3])
+            c = config.Split(',').Select(s => s.Trim()).ToArray();
+            animState.AddAnimation(
+                int.Parse(c[0]),
+                c[1],
+                bool.Parse(c[2]),
+                float.Parse(c[3])
             );
         }
+    }
+
+    private void ClearUIAnims()
+    {
+        ExposedList<TrackEntry> animTracks = animState.Tracks;
+        foreach (var i in Enumerable.Range(0, Math.Min(animTracks.Count, MAX_UI_TRACKS)))
+            if (animTracks[i] is not null)
+                animState.SetEmptyAnimation(i, 0.1f);
     }
 }
