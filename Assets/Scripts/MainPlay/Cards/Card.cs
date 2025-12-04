@@ -186,5 +186,9 @@ public class Card : MonoBehaviour
     {
         rectTransform.DOShakeAnchorPos(5f, 30, 5, 90);
     }
-
+    public void SpineTry()
+    {
+        SpineController spineController = GetComponentInChildren<SpineController>();
+        spineController.enabled = true;
+    }
 }
