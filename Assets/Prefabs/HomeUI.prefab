@@ -1416,7 +1416,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3419364044362974628}
   - component: {fileID: 6824110446126579515}
-  - component: {fileID: 8956968496835212622}
+  - component: {fileID: 4954830102871259741}
   m_Layer: 5
   m_Name: HomeUI
   m_TagString: Untagged
@@ -1469,7 +1469,7 @@ MonoBehaviour:
   energyToPlayText: {fileID: 3887393296039572550}
   addEnergyButton: {fileID: 2750574968163771264}
   shopHint: {fileID: 671484076706175475}
---- !u!114 &8956968496835212622
+--- !u!114 &4954830102871259741
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1478,11 +1478,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4755391323926725552}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6250a2c04ba3a44aad77c942edfc3cf, type: 3}
+  m_Script: {fileID: 11500000, guid: a34f7bed741682a47b6005c1cc68df9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spine: {fileID: 2805341048224602324}
-  spineAnimsSetteings:
+  spineObject: {fileID: 2805341048224602324}
+  animConfigs:
   - 0, shan, true, 0
 --- !u!1 &4858004254890920395
 GameObject:

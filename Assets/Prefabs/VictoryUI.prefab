@@ -694,7 +694,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2422548839208846338}
   - component: {fileID: 8188723824494120873}
-  - component: {fileID: 6862993451268781729}
+  - component: {fileID: 1422874377927570510}
   m_Layer: 5
   m_Name: VictoryUI
   m_TagString: Untagged
@@ -739,7 +739,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinCountText: {fileID: 868905478753600440}
---- !u!114 &6862993451268781729
+--- !u!114 &1422874377927570510
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -748,11 +748,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 6189136093061783952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6250a2c04ba3a44aad77c942edfc3cf, type: 3}
+  m_Script: {fileID: 11500000, guid: a34f7bed741682a47b6005c1cc68df9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spine: {fileID: 9203651881856667542}
-  spineAnimsSetteings:
+  spineObject: {fileID: 9203651881856667542}
+  animConfigs:
   - 0, gongxi01, false, 0
   - 0, gongxi02, true, 2.6
 --- !u!1 &6871684688684055753

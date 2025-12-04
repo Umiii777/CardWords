@@ -67,7 +67,8 @@ public enum UIType
 public class SystemUIManager : MonoBehaviour
 {
 #region 异常消息内容常量
-    private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为#，不在枚举 $ 之中";
+    private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";
+    private const string EXCEPITON_ILLEGAL_ENUM_ARG = "参数 @ 的值为 #，不在枚举 $ 之中";
     private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。可能传入了错误的参数";
     private const string EXCEPTION_MANAGER_UNINITIALIZED = "SystemUIManager.Instance 还未初始化，无法调用 @";
 #endregion
@@ -147,7 +148,7 @@ public class SystemUIManager : MonoBehaviour
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public static async Task LoadUI<T>(UIType type, params T[] args)
+    public static async Task LoadUI(UIType type, params object[] args)
     {
         if (Instance == null)
             await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
@@ -155,11 +156,11 @@ public class SystemUIManager : MonoBehaviour
             switch (type)
             {
                 case UIType.Defeat:
-                    if (default(T) is float or int)
+                    if (args[0] is float or int)
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
-                            () => Instance.InitDefeatUI(args[0] as float)
+                            () => Instance.InitDefeatUI((float)args[0])
                         );
                     return;
                 case UIType.Item:
@@ -177,11 +178,11 @@ public class SystemUIManager : MonoBehaviour
                     }
                     return;
                 case UIType.Settings:
-                    if (default(T) is bool)
+                    if (args[0] is bool isInLevel)
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as SettingsUIController,
                             Instance.settingsUIPrefab,
-                            () => Instance.InitSettingsUI(args[0] as bool)
+                            () => Instance.InitSettingsUI(isInLevel)
                         );
                     return;
                 case UIType.UnlockSlot:
@@ -199,14 +200,19 @@ public class SystemUIManager : MonoBehaviour
                 Instance.uiInstances[(uint)type] = Instance.CreateUI(
                     Instance.uiInstances[(uint)type] as VictoryUIController,
                     Instance.victoryUIPrefab,
-                    defalt(T) is int
-                        ? () => Instance.InitVictoryUI(args[0] as int)
+                    args is not null and { Length: 1 } && args[0] is int numCoins
+                        ? () => Instance.InitVictoryUI(numCoins)
                         : () => Instance.InitVictoryUI()
                 );
                 return;
             default:
                 if (Enum.IsDefined(typeof(UIType), type))
                 {
+                    if (!Instance.dictPrefabInitings.ContainsKey(type))
+                        await Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_LOADUI_ARG
+                            .Replace("@", nameof(UIType))
+                            .Replace("#", $"{type}")
+                        ));
                     Instance.uiInstances[(uint)type] = Instance.CreateUI(
                         Instance.uiInstances[(uint)type] as MonoBehaviour,
                         Instance.dictPrefabInitings[type].Item1,
@@ -214,11 +220,12 @@ public class SystemUIManager : MonoBehaviour
                     );
                     return;
                 }
-                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                await Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
                     .Replace("@", nameof(type))
                     .Replace("#", $"{type}")
                     .Replace("$", nameof(UIType))
-                );
+                ));
+                return;
         }
     }
 
@@ -446,7 +453,7 @@ public class SystemUIManager : MonoBehaviour
                 VictoryUIController.clickingWatchAd = FireAndBan(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
                 return;
             default:
-                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
                     .Replace("@", nameof(type))
                     .Replace("#", $"{type}")
                     .Replace("$", nameof(UIType))
@@ -533,8 +540,8 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
         //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
         //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
-        //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);       // 开启槽位界面
-        //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
+        //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);        // 开启槽位界面
+        //_= SystemUIManager.LoadUI(UIType.Victory, 10);             // 胜利界面（可领取金币数：10）
 //#endif
     }
 
@@ -571,8 +578,7 @@ public class SystemUIManager : MonoBehaviour
             Destroy(itemUI.gameObject);
         };
 
-        ValueTuple<Func<int, Task>, Func<Task>> cachedClickings;
-        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out cachedClickings))
+        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out ValueTuple<Func<int, Task>, Func<Task>> cachedClickings))
         {
             cachedClickings = (
             async price =>
@@ -610,10 +616,10 @@ public class SystemUIManager : MonoBehaviour
         ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
     }
     private void InitUnlckSlotUI(Row row) => UnlockSlotUIController.currentRow = row;
-    private void InitVictoryUI(int numRewardCoins = -1)
+    private void InitVictoryUI(int? numRewardCoins = null)
     {
-        if (numRewardCoins > -1)
-            VictoryUIController.numCoinsToReceive = numRewardCoins;
+        if (numRewardCoins is int numCoins)
+            VictoryUIController.numCoinsToReceive = numCoins;
     }
 #endregion
 
@@ -623,14 +629,12 @@ public class SystemUIManager : MonoBehaviour
         HomeUIController.NumCoins = PlayerCoin.GetCoin();
         ShopUIController.NumCoins = PlayerCoin.GetCoin();
     }
-
     private void OnUpdateEnergy()
     {
         EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
         HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
         ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
     }
-
     private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
 #endregion
 
@@ -678,7 +682,7 @@ public class SystemUIManager : MonoBehaviour
     /// <exception cref="ArgumentException"></exception>
     public async void FireLoadUI(string args) => await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
         ? LoadUI(type, loadUIArgs)
-        : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+        : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
             .Replace("@", nameof(type))
             .Replace("#", $"{type}")
             .Replace("$", nameof(UIType))

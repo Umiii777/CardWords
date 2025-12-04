@@ -1,10 +1,10 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using Spine;
 using Spine.Unity;
 
-//TODO: 类名改为 SpineController，挪到 Scripts/Tools
-public class SpineUI : MonoBehaviour
+public class SpineController : MonoBehaviour
 {
     private const int MAX_UI_TRACKS = 5;
 
@@ -12,7 +12,7 @@ public class SpineUI : MonoBehaviour
     private SkeletonGraphic spineObject;
     [SerializeField]
     private string[] animConfigs;
-    private AnimationState animState;
+    private Spine.AnimationState animState;
 
     void Awake()
     {
@@ -50,7 +50,7 @@ public class SpineUI : MonoBehaviour
     {
         ExposedList<TrackEntry> animTracks = animState.Tracks;
         foreach (var i in Enumerable.Range(0, Math.Min(animTracks.Count, MAX_UI_TRACKS)))
-            if (animTracks[i] is not null)
+            if (animTracks.ElementAt(i) is not null)
                 animState.SetEmptyAnimation(i, 0.1f);
     }
 }
