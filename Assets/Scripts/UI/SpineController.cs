@@ -1,17 +1,18 @@
 using System;
 using System.Linq;
 using UnityEngine;
-using Spine;
 using Spine.Unity;
 
 public class SpineController : MonoBehaviour
 {
-    private const int MAX_UI_TRACKS = 5;
+    public Action endingAnims;
 
     [SerializeField]
     private SkeletonGraphic spineObject;
     [SerializeField]
     private string[] animConfigs;
+    [SerializeField]
+    private bool isPlayingStart;
     private Spine.AnimationState animState;
 
     void Awake()
@@ -19,20 +20,27 @@ public class SpineController : MonoBehaviour
         if (spineObject == null)
             spineObject = GetComponent<SkeletonGraphic>();
         animState = spineObject.AnimationState;
+        animState.Complete += track =>
+        {
+            if (!track.Loop)
+            {
+                animState.ClearTrack(track.TrackIndex);
+                if (animState.Tracks.All(t => t is null))
+                    endingAnims();
+            }
+        };
     }
 
-    void OnEnable()
+    void Start()
     {
-        AddUIAnims();
+        if (isPlayingStart)
+            PlayAnims();
     }
 
-    void OnDisable()
+    public void PlayAnims()
     {
-        ClearUIAnims();
-    }
+        spineObject.freeze = false;
 
-    private void AddUIAnims()
-    {
         string[] c;
         foreach (var config in animConfigs)
         {
@@ -46,11 +54,13 @@ public class SpineController : MonoBehaviour
         }
     }
 
-    private void ClearUIAnims()
+    public void ClearAnims(float duration = 0.1f, int maxTrackIndex = int.MaxValue, int minTrackIndex = 0)
     {
-        ExposedList<TrackEntry> animTracks = animState.Tracks;
-        foreach (var i in Enumerable.Range(0, Math.Min(animTracks.Count, MAX_UI_TRACKS)))
-            if (animTracks.ElementAt(i) is not null)
-                animState.SetEmptyAnimation(i, 0.1f);
+        animState.Tracks.ForEach(t =>
+        {
+            int trackIndex = t.TrackIndex;
+            if (trackIndex >= minTrackIndex && trackIndex <= maxTrackIndex)
+                animState.SetEmptyAnimation(trackIndex, duration);
+        });
     }
 }

@@ -100,7 +100,7 @@ public class HomeUIController : MonoBehaviour
 
 #region 进关卡扣除的体力值
     /// <summary>
-    /// 进入关卡时要扣除的体力值（请代入负数）
+    /// 进入关卡时要扣除的体力值
     /// </summary>
     public static int NumEnergyToPlay
     {
@@ -108,11 +108,11 @@ public class HomeUIController : MonoBehaviour
         set
         {
             if (sharedEnergyToPlayText != null)
-                sharedEnergyToPlayText.text = value.ToString();
+                sharedEnergyToPlayText.text = (-value).ToString();
             numEnergyToPlay = value;
         }
     }
-    private static int numEnergyToPlay = -1;
+    private static int numEnergyToPlay = 1;
     private static TextMeshProUGUI sharedEnergyToPlayText;
     [SerializeField]
     private TextMeshProUGUI energyToPlayText;

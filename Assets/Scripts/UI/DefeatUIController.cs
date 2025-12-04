@@ -17,9 +17,9 @@ public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
     /// </summary>
     public static float progress = 1f / 100;
     /// <summary>
-    /// 要显示在重玩按钮上的体力值（请代入负数）
+    /// 选择重玩时要扣除的体力值
     /// </summary>
-    public static int numEnergy = -1;
+    public static int numEnergy = 1;
     /// <summary>
     /// 返回主界面按钮回调
     /// <br/><br/>
@@ -76,7 +76,7 @@ public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
 
     void Start()
     {
-        energyCountText.text = numEnergy.ToString();
+        energyCountText.text = (-numEnergy).ToString();
         progressBarParentTransform = progressBarTransform.parent.GetComponent<RectTransform>();
         StartCoroutine(nameof(CoroutineUpdate));
     }
