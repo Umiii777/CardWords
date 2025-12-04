@@ -579,7 +579,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5226842978509945680}
   - component: {fileID: 6316583830975194959}
-  - component: {fileID: 7690020012676951261}
+  - component: {fileID: 2937573228085487425}
   m_Layer: 5
   m_Name: DefeatUI
   m_TagString: Untagged
@@ -627,7 +627,7 @@ MonoBehaviour:
   energyCountText: {fileID: 8176671868150771359}
   progressText: {fileID: 4837640079493953379}
   progressBarTransform: {fileID: 1564233406521000554}
---- !u!114 &7690020012676951261
+--- !u!114 &2937573228085487425
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -636,11 +636,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4380294509021059714}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6250a2c04ba3a44aad77c942edfc3cf, type: 3}
+  m_Script: {fileID: 11500000, guid: a34f7bed741682a47b6005c1cc68df9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spine: {fileID: 2108721485876235239}
-  spineAnimsSetteings:
+  spineObject: {fileID: 2108721485876235239}
+  animConfigs:
   - 0, shibai, true, 0
 --- !u!1 &4741033736816568514
 GameObject:

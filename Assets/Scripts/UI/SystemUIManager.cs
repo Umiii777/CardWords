@@ -67,7 +67,8 @@ public enum UIType
 public class SystemUIManager : MonoBehaviour
 {
 #region 异常消息内容常量
-    private const string EXCEPITON_ILLEGAL_ENUM = "参数 @ 的值为#，不在枚举 $ 之中";
+    private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";
+    private const string EXCEPITON_ILLEGAL_ENUM_ARG = "参数 @ 的值为 #，不在枚举 $ 之中";
     private const string EXCEPITON_STATIC_FIELD_NOT_FOUND = "类型 @ 中没有名为 \"#\" 且类型为 $ 的静态公开字段。可能传入了错误的参数";
     private const string EXCEPTION_MANAGER_UNINITIALIZED = "SystemUIManager.Instance 还未初始化，无法调用 @";
 #endregion
@@ -137,6 +138,125 @@ public class SystemUIManager : MonoBehaviour
     private Dictionary<UIType, ValueTuple<MonoBehaviour, Action>> dictPrefabInitings;
 
 #region 静态方法
+    /// <summary>
+    /// 生成指定类型的界面
+    /// <br/><br/>
+    /// SystemUIManager 会自动初始化和管理生成的界面
+    /// </summary>
+    /// <param name="type">要生成的界面类型</param>
+    /// <param name="args">生成此界面时需要的数据。确定好第一个实参后，参考第一个实参的注释来传入</param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    public static async Task LoadUI(UIType type, params object[] args)
+    {
+        if (Instance == null)
+            await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
+        if (args is { Length: 1 })
+            switch (type)
+            {
+                case UIType.Defeat:
+                    if (args[0] is float or int)
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as DefeatUIController,
+                            Instance.defeatUIPrefab,
+                            () => Instance.InitDefeatUI((float)args[0])
+                        );
+                    return;
+                case UIType.Item:
+                    if (Enum.IsDefined(typeof(ItemType), args[0]))
+                    {
+                        var itemUIs = Instance.uiInstances[(uint)type] as LinkedList<ItemUIController>;
+                        ItemUIController itemUI = Instance.CreateUI(
+                            itemUIs.Count > 0 ? itemUIs.First() : null,
+                            Instance.itemUIPrefab
+                        );
+                        Instance.InitItemUI(itemUI, (ItemType)args[0]);
+                        if (itemUIs.Count > 0)
+                            itemUIs.RemoveFirst();
+                        itemUIs.AddLast(itemUI);
+                    }
+                    return;
+                case UIType.Settings:
+                    if (args[0] is bool isInLevel)
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as SettingsUIController,
+                            Instance.settingsUIPrefab,
+                            () => Instance.InitSettingsUI(isInLevel)
+                        );
+                    return;
+                case UIType.UnlockSlot:
+                    if (args[0] is Row row)
+                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                            Instance.uiInstances[(uint)type] as UnlockSlotUIController,
+                            Instance.unlockSlotUIPrefab,
+                            () => Instance.InitUnlckSlotUI(row)
+                        );
+                    return;
+            }
+        switch (type)
+        {
+            case UIType.Victory:
+                Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                    Instance.uiInstances[(uint)type] as VictoryUIController,
+                    Instance.victoryUIPrefab,
+                    args is not null and { Length: 1 } && args[0] is int numCoins
+                        ? () => Instance.InitVictoryUI(numCoins)
+                        : () => Instance.InitVictoryUI()
+                );
+                return;
+            default:
+                if (Enum.IsDefined(typeof(UIType), type))
+                {
+                    if (!Instance.dictPrefabInitings.ContainsKey(type))
+                        await Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_LOADUI_ARG
+                            .Replace("@", nameof(UIType))
+                            .Replace("#", $"{type}")
+                        ));
+                    Instance.uiInstances[(uint)type] = Instance.CreateUI(
+                        Instance.uiInstances[(uint)type] as MonoBehaviour,
+                        Instance.dictPrefabInitings[type].Item1,
+                        Instance.dictPrefabInitings[type].Item2
+                    );
+                    return;
+                }
+                await Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
+                    .Replace("@", nameof(type))
+                    .Replace("#", $"{type}")
+                    .Replace("$", nameof(UIType))
+                ));
+                return;
+        }
+    }
+
+    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null, bool isToMoveUp = true)
+    {
+        const int movingDuration = 80, stayingDuration = 1000, fadingDelay = 25;
+        Transform parent = parentTransform == null
+            ? Instance.transform.GetChild(Instance.transform.childCount - 1)
+            : parentTransform;
+        RectTransform rt = Instantiate(Instance.tipsPrefab, parent);
+        CanvasGroup tipsBackground = rt.GetComponent<CanvasGroup>();
+        int targetPosY = (int)rt.localPosition.y + 250;
+
+        rt.GetChild(1).GetComponent<Text>().text = tipsMessage;
+        if (parentTransform == null || isToMoveUp)
+            while (rt.localPosition.y < targetPosY)
+            {
+                rt.localPosition += Vector3.up * 25;
+                await Task.Delay(movingDuration / 10);
+            }
+        else
+            await Task.Delay(movingDuration);
+        await Task.Delay(stayingDuration);
+        while (tipsBackground.alpha > 0f)
+        {
+            tipsBackground.alpha -= 0.1f;
+            await Task.Delay(fadingDelay);
+        }
+        Destroy(rt.gameObject);
+    }
+
     public static void InitUICallbacks(UIType type)
     {
         static GameObject uiGameObj(UIType type)
@@ -333,128 +453,12 @@ public class SystemUIManager : MonoBehaviour
                 VictoryUIController.clickingWatchAd = FireAndBan(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
                 return;
             default:
-                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
                     .Replace("@", nameof(type))
                     .Replace("#", $"{type}")
                     .Replace("$", nameof(UIType))
                 );
         }
-    }
-
-    /// <summary>
-    /// 生成指定类型的界面
-    /// <br/><br/>
-    /// SystemUIManager 会自动初始化和管理生成的界面
-    /// </summary>
-    /// <param name="type">要生成的界面类型</param>
-    /// <param name="args">生成此界面时需要的数据。确定好第一个实参后，参考第一个实参的注释来传入</param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    /// <exception cref="ArgumentException"></exception>
-    public static async Task LoadUI(UIType type, params object[] args)
-    {
-        if (Instance == null)
-            await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
-        if (args is { Length: > 0 })
-            switch (type)
-            {
-                case UIType.Defeat:
-                    if (float.TryParse(args[0].ToString(), out float progress))
-                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
-                            Instance.uiInstances[(uint)type] as DefeatUIController,
-                            Instance.defeatUIPrefab,
-                            () => Instance.InitDefeatUI(progress)
-                        );
-                    return;
-                case UIType.Item:
-                    if (Enum.IsDefined(typeof(ItemType), args[0]))
-                    {
-                        var itemUIs = Instance.uiInstances[(uint)type] as LinkedList<ItemUIController>;
-                        ItemUIController itemUI = Instance.CreateUI(
-                            itemUIs.Count > 0 ? itemUIs.First() : null,
-                            Instance.itemUIPrefab
-                        );
-                        Instance.InitItemUI(itemUI, (ItemType)args[0]);
-                        if (itemUIs.Count > 0)
-                            itemUIs.RemoveFirst();
-                        itemUIs.AddLast(itemUI);
-                    }
-                    return;
-                case UIType.Settings:
-                    if (bool.TryParse(args[0].ToString(), out bool isInLevel))
-                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
-                            Instance.uiInstances[(uint)type] as SettingsUIController,
-                            Instance.settingsUIPrefab,
-                            () => Instance.InitSettingsUI(isInLevel)
-                        );
-                    return;
-                case UIType.UnlockSlot:
-                    if (args[0] is Row)
-                        Instance.uiInstances[(uint)type] = Instance.CreateUI(
-                            Instance.uiInstances[(uint)type] as UnlockSlotUIController,
-                            Instance.unlockSlotUIPrefab,
-                            () => Instance.InitUnlckSlotUI(args[0] as Row)
-                        );
-                    return;
-            }
-        switch (type)
-        {
-            case UIType.Victory:
-                int numCoinsToReceive = args is null or { Length: 0 }
-                    ? VictoryUIController.numCoinsToReceive
-                    : int.TryParse(args[0].ToString(), out int numCoins)
-                        ? numCoins
-                        : 0;
-                Instance.uiInstances[(uint)type] = Instance.CreateUI(
-                    Instance.uiInstances[(uint)type] as VictoryUIController,
-                    Instance.victoryUIPrefab,
-                    () => Instance.InitVictoryUI(numCoinsToReceive)
-                );
-                return;
-            default:
-                if (Enum.IsDefined(typeof(UIType), type))
-                {
-                    Instance.uiInstances[(uint)type] = Instance.CreateUI(
-                        Instance.uiInstances[(uint)type] as MonoBehaviour,
-                        Instance.dictPrefabInitings[type].Item1,
-                        Instance.dictPrefabInitings[type].Item2
-                    );
-                    return;
-                }
-                throw new ArgumentException(EXCEPITON_ILLEGAL_ENUM
-                    .Replace("@", nameof(type))
-                    .Replace("#", $"{type}")
-                    .Replace("$", nameof(UIType))
-                );
-        }
-    }
-
-    public static async Task PopUpTips(string tipsMessage, Transform parentTransform = null, bool isToMoveUp = true)
-    {
-        const int movingDuration = 80, stayingDuration = 1000, fadingDelay = 25;
-        Transform parent = parentTransform == null
-            ? Instance.transform.GetChild(Instance.transform.childCount - 1)
-            : parentTransform;
-        RectTransform rt = Instantiate(Instance.tipsPrefab, parent);
-        CanvasGroup tipsBackground = rt.GetComponent<CanvasGroup>();
-        int targetPosY = (int)rt.localPosition.y + 250;
-
-        rt.GetChild(1).GetComponent<Text>().text = tipsMessage;
-        if (parentTransform == null || isToMoveUp)
-            while (rt.localPosition.y < targetPosY)
-            {
-                rt.localPosition += Vector3.up * 25;
-                await Task.Delay(movingDuration / 10);
-            }
-        else
-            await Task.Delay(movingDuration);
-        await Task.Delay(stayingDuration);
-        while (tipsBackground.alpha > 0f)
-        {
-            tipsBackground.alpha -= 0.1f;
-            await Task.Delay(fadingDelay);
-        }
-        Destroy(rt.gameObject);
     }
 
     /// <summary>
@@ -536,8 +540,8 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.Item, ItemType.Shuffle); // 道具界面（洗牌）
         //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
         //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
-        //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);       // 开启槽位界面
-        //_= SystemUIManager.LoadUI(UIType.Victory,10);             // 胜利界面（可领取金币数：10）
+        //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);        // 开启槽位界面
+        //_= SystemUIManager.LoadUI(UIType.Victory, 10);             // 胜利界面（可领取金币数：10）
 //#endif
     }
 
@@ -574,8 +578,7 @@ public class SystemUIManager : MonoBehaviour
             Destroy(itemUI.gameObject);
         };
 
-        ValueTuple<Func<int, Task>, Func<Task>> cachedClickings;
-        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out cachedClickings))
+        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out ValueTuple<Func<int, Task>, Func<Task>> cachedClickings))
         {
             cachedClickings = (
             async price =>
@@ -613,7 +616,11 @@ public class SystemUIManager : MonoBehaviour
         ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
     }
     private void InitUnlckSlotUI(Row row) => UnlockSlotUIController.currentRow = row;
-    private void InitVictoryUI(int numRewardCoins) => VictoryUIController.numCoinsToReceive = numRewardCoins;
+    private void InitVictoryUI(int? numRewardCoins = null)
+    {
+        if (numRewardCoins is int numCoins)
+            VictoryUIController.numCoinsToReceive = numCoins;
+    }
 #endregion
 
 #region 玩家资源更新响应
@@ -622,14 +629,12 @@ public class SystemUIManager : MonoBehaviour
         HomeUIController.NumCoins = PlayerCoin.GetCoin();
         ShopUIController.NumCoins = PlayerCoin.GetCoin();
     }
-
     private void OnUpdateEnergy()
     {
         EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
         HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
         ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
     }
-
     private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
 #endregion
 
@@ -677,7 +682,7 @@ public class SystemUIManager : MonoBehaviour
     /// <exception cref="ArgumentException"></exception>
     public async void FireLoadUI(string args) => await (TryParseLoadUIArgs(args, out UIType type, out object[] loadUIArgs)
         ? LoadUI(type, loadUIArgs)
-        : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM
+        : Task.FromException(new ArgumentException(EXCEPITON_ILLEGAL_ENUM_ARG
             .Replace("@", nameof(type))
             .Replace("#", $"{type}")
             .Replace("$", nameof(UIType))
