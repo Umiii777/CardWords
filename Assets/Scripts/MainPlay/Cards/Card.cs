@@ -15,6 +15,7 @@ public class Card : MonoBehaviour
     public TextMeshProUGUI tmContent;
     public TextMeshProUGUI tmLength;
     public Image cardBaseStyle;
+    public Image cardContentImage;
 
     //展示相关的变量
     public bool isFront;
@@ -69,22 +70,43 @@ public class Card : MonoBehaviour
             if (cardData.isMainCard)
             {
                 //TODO;再增加一个Sprite数组内容，用于放置MainCard专属的东西
+                cardContentImage.gameObject.SetActive(false);
                 tmContent.text = cardData.cardContent;
                 cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontMain;
                 tmLength.text = cardData.currentLength.ToString() + "/" + cardData.mainTotalLength.ToString();
             }
             else
             {
-                tmContent.text = cardData.cardContent;
-                cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
-                tmLength.text = "";
+                /*普通卡的样式应该包含：
+                1.emoji
+                2.图片
+                3.普通文字*/
+                var type = CardContentDetector.GetContentType(cardData.cardContent);
+                //普通文字
+                switch (type)
+                {
+                    case CardContentType.Text:
+                        ShowText(cardData.cardContent);
+                        break;
 
+                    case CardContentType.Emoji:
+                        ShowEmoji(cardData.cardContent);
+                        break;
+
+                    case CardContentType.Image:
+                        ShowImage(cardData.cardContent);
+                        break;
+                }
+
+                //TODO：识别emoji和图片，emoji和图片的与普通文字的差异应该只有cardContent不同，
+                //普通文字的卡牌只有text，直接就是文本内容给textmeshpro，但是emoji和图片不使用textmeshpro
             }
         }
         else
         {
             //TODO:切换到卡背面
             tmContent.alpha = 0f;
+            cardContentImage.gameObject.SetActive(false);
             cardBaseStyle.sprite = CardVisualManager.Instance.spriteBack;
         }
     }
@@ -101,7 +123,41 @@ public class Card : MonoBehaviour
 
         }
     }
+    //普通文本卡
+    public void ShowText(string text)
+    {
+        //tmContent.gameObject.SetActive(true);
+        cardContentImage.gameObject.SetActive(false);
 
+
+        tmContent.text = cardData.cardContent;
+        cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
+        tmLength.text = "";
+    }
+    //普通emoji卡
+    public void ShowEmoji(string emoji)
+    {
+        Debug.Log("展示了一个emoji");
+        cardContentImage.gameObject.SetActive(true);
+
+        tmContent.text = "";
+        cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
+        tmLength.text = "";
+        Sprite sprite = EmojiManager.Instance.GetEmojiSprite(emoji);
+        cardContentImage.sprite = sprite;
+
+    }
+    //普通图片卡
+    public void ShowImage(string imageKey)
+    {
+        cardContentImage.gameObject.SetActive(true);
+        tmContent.text = "";
+        cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
+        tmLength.text = "";
+
+        Sprite sprite = EmojiManager.Instance.GetEmojiSprite(imageKey);
+        cardContentImage.sprite = sprite;
+    }
 
 
     public void InStackStyle()
@@ -111,6 +167,9 @@ public class Card : MonoBehaviour
             tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
             tmContent.fontSize = textStackOffsetSize;
             isStackStyleApplied = true;
+
+            cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
+            cardContentImage.rectTransform.localScale = new Vector3(0.3f, 0.3f, 1);
         }
 
     }
@@ -178,6 +237,9 @@ public class Card : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+
+    #region 动画表现
+    //动画表现
     public void CardShake()
     {
         rectTransform.DOShakeAnchorPos(0.2f, 30, 5, 90);
@@ -191,4 +253,5 @@ public class Card : MonoBehaviour
         SpineController spineController = GetComponentInChildren<SpineController>();
         spineController.enabled = true;
     }
+    #endregion
 }
