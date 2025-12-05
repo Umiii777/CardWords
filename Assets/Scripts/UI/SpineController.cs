@@ -52,11 +52,12 @@ public class SpineController : MonoBehaviour
         foreach (var config in animConfigs)
         {
             c = config.Split(',').Select(s => s.Trim()).ToArray();
-            animState.SetAnimation(
+            animState.AddAnimation(
                 int.Parse(c[0]),
                 c[1],
-                bool.Parse(c[2])
-            ).Delay = float.Parse(c[3]);
+                bool.Parse(c[2]),
+                float.Parse(c[3])
+            );
         }
     }
 
