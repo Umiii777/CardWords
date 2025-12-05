@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
+using Spine;
 using Spine.Unity;
 
 public class SpineController : MonoBehaviour
@@ -13,6 +15,8 @@ public class SpineController : MonoBehaviour
     private string[] animConfigs;
     [SerializeField]
     private bool isPlayingStart;
+    [SerializeField]
+    private UnityEvent onAnimsEnd;
     private Spine.AnimationState animState;
 
     void Awake()
@@ -26,7 +30,10 @@ public class SpineController : MonoBehaviour
             {
                 animState.ClearTrack(track.TrackIndex);
                 if (animState.Tracks.All(t => t is null))
-                    endingAnims();
+                {
+                    endingAnims?.Invoke();
+                    onAnimsEnd.Invoke();
+                }
             }
         };
     }
@@ -45,22 +52,19 @@ public class SpineController : MonoBehaviour
         foreach (var config in animConfigs)
         {
             c = config.Split(',').Select(s => s.Trim()).ToArray();
-            animState.AddAnimation(
+            animState.SetAnimation(
                 int.Parse(c[0]),
                 c[1],
-                bool.Parse(c[2]),
-                float.Parse(c[3])
-            );
+                bool.Parse(c[2])
+            ).Delay = float.Parse(c[3]);
         }
     }
 
-    public void ClearAnims(float duration = 0.1f, int maxTrackIndex = int.MaxValue, int minTrackIndex = 0)
+    public void ClearAnims(float duration = 0f, uint maxTrackIndex = int.MaxValue, uint minTrackIndex = 0)
     {
-        animState.Tracks.ForEach(t =>
-        {
-            int trackIndex = t.TrackIndex;
-            if (trackIndex >= minTrackIndex && trackIndex <= maxTrackIndex)
-                animState.SetEmptyAnimation(trackIndex, duration);
-        });
+        ExposedList<TrackEntry> animTracks = animState.Tracks;
+        foreach (var i in Enumerable.Range((int)minTrackIndex, Math.Min(animTracks.Count, (int)maxTrackIndex)))
+            if (animTracks.ElementAt(i) is not null)
+                animState.SetEmptyAnimation(i, duration);
     }
 }

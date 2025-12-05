@@ -156,7 +156,7 @@ public class SystemUIManager : MonoBehaviour
             switch (type)
             {
                 case UIType.Defeat:
-                    if (args[0] is float or int)
+                    if (args[0] is float or int or double)
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
