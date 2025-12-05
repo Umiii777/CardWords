@@ -755,6 +755,7 @@ MonoBehaviour:
   animConfigs:
   - 0, gongxi01, false, 0
   - 0, gongxi02, true, 2.6
+  isPlayingStart: 1
 --- !u!1 &6871684688684055753
 GameObject:
   m_ObjectHideFlags: 0

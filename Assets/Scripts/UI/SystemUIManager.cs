@@ -156,7 +156,7 @@ public class SystemUIManager : MonoBehaviour
             switch (type)
             {
                 case UIType.Defeat:
-                    if (args[0] is float or int)
+                    if (args[0] is float or int or double)
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
@@ -541,7 +541,7 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.Settings, false);        // 设置界面（关卡外）
         //_= SystemUIManager.LoadUI(UIType.Shop);                   // 商店界面
         //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);        // 开启槽位界面
-        //_= SystemUIManager.LoadUI(UIType.Victory, 10);             // 胜利界面（可领取金币数：10）
+        //_= SystemUIManager.LoadUI(UIType.Victory, 10);            // 胜利界面（可领取金币数：10）
 //#endif
     }
 

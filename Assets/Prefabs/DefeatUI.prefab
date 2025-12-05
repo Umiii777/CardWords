@@ -642,6 +642,7 @@ MonoBehaviour:
   spineObject: {fileID: 2108721485876235239}
   animConfigs:
   - 0, shibai, true, 0
+  isPlayingStart: 1
 --- !u!1 &4741033736816568514
 GameObject:
   m_ObjectHideFlags: 0

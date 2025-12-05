@@ -1484,6 +1484,7 @@ MonoBehaviour:
   spineObject: {fileID: 2805341048224602324}
   animConfigs:
   - 0, shan, true, 0
+  isPlayingStart: 1
 --- !u!1 &4858004254890920395
 GameObject:
   m_ObjectHideFlags: 0
