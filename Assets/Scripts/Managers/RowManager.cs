@@ -87,8 +87,10 @@ public class RowManager : MonoBehaviour
                             {
                                 //await SystemUIManager.PopUpTips("找到了相同的卡牌");
                                 Debug.Log("找到了相同的卡牌");
-                                firstHintCard.CardHint();
-                                secondHintCard.CardHint();
+                                // firstHintCard.CardHint();
+                                // secondHintCard.CardHint();
+                                firstHintCard.SpineTry();
+                                secondHintCard.SpineTry();
                                 return;
                             }
                             else
@@ -110,8 +112,10 @@ public class RowManager : MonoBehaviour
                     if (firstHintCard.cardData.mainId == maincard.cardData.mainId)
                     {
                         //await SystemUIManager.PopUpTips("找到了相同的卡牌");
-                        firstHintCard.CardHint();
-                        maincard.CardHint();
+                        // firstHintCard.CardHint();
+                        // maincard.CardHint();
+                        firstHintCard.SpineTry();
+                        maincard.SpineTry();
                         Debug.Log("找到了相同的卡牌");
                         return;
                     }

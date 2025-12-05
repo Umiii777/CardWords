@@ -1,0 +1,55 @@
+
+fangzhi.png
+size: 297, 219
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+fang
+  rotate: true
+  xy: 2, 2
+  size: 215, 267
+  orig: 217, 269
+  offset: 1, 1
+  index: -1
+yuan01
+  rotate: false
+  xy: 271, 193
+  size: 24, 24
+  orig: 26, 26
+  offset: 1, 1
+  index: -1
+yuan06
+  rotate: false
+  xy: 271, 193
+  size: 24, 24
+  orig: 26, 26
+  offset: 1, 1
+  index: -1
+yuan02
+  rotate: false
+  xy: 271, 163
+  size: 12, 12
+  orig: 14, 14
+  offset: 1, 1
+  index: -1
+yuan03
+  rotate: false
+  xy: 271, 163
+  size: 12, 12
+  orig: 14, 14
+  offset: 1, 1
+  index: -1
+yuan04
+  rotate: false
+  xy: 271, 177
+  size: 14, 14
+  orig: 16, 16
+  offset: 1, 1
+  index: -1
+yuan05
+  rotate: false
+  xy: 271, 177
+  size: 14, 14
+  orig: 16, 16
+  offset: 1, 1
+  index: -1
