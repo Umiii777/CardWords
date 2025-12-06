@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 /// <summary>
 /// 游戏中的界面类型
@@ -128,6 +129,20 @@ public class SystemUIManager : MonoBehaviour
 
     [SerializeField]
     private RectTransform tipsPrefab;
+
+#region HUD相关
+    private const string HUD_TAG = "HUD";
+
+    /// <summary>
+    /// 关卡内显示金币数量的预制体名称
+    /// </summary>
+    [SerializeField]
+    private string coinsHUDName;
+    /// <summary>
+    /// 关卡内内显示金币数量的文本
+    /// </summary>
+    private TextMeshProUGUI[] coinsHUDTexts;
+#endregion
 
     private object[] uiInstances;
     /// <summary>
@@ -264,21 +279,20 @@ public class SystemUIManager : MonoBehaviour
             var uiObj = Instance.uiInstances[(uint)type] as MonoBehaviour;
             return uiObj == null ? null : uiObj.gameObject;
         }
+        static void destroyUI(UIType type)
+        {
+            Destroy(uiGameObj(type));
+            Instance.uiInstances[(uint)type] = null;
+        }
         switch (type)
         {
             case UIType.Defeat:
-                DefeatUIController.clickingHome = async () =>
-                {
-                    await LoadUI(UIType.Home);
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
-                };
+                DefeatUIController.clickingHome = async () => { await LoadUI(UIType.Home); destroyUI(type); };
                 DefeatUIController.clickingWatchAd = async _=>
                 {
                     await Task.Delay(3000); //假装播放3秒广告
                     await (addingSteps is null ? Task.CompletedTask : addingSteps()); // 增加步数
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
+                    destroyUI(type);
                 };
                 DefeatUIController.clickingWatchAd = FireAndBan(typeof(DefeatUIController), DefeatUIController.clickingWatchAd);
                 DefeatUIController.clickingReplay = async () =>
@@ -289,8 +303,7 @@ public class SystemUIManager : MonoBehaviour
                     {
                         //Instance.OnUpdateEnergy(); // 没必要调 OnUpdateEnergy
                         await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
-                        Destroy(uiGameObj(type));
-                        Instance.uiInstances[(uint)type] = null;
+                        destroyUI(type);
                         return;
                     }
                     await LoadUI(UIType.Energy);
@@ -303,7 +316,7 @@ public class SystemUIManager : MonoBehaviour
                     Instance.OnUpdateEnergy();
                     await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
                 }
-                EnergyUIController.clickingClose = () => { Destroy(uiGameObj(type)); Instance.uiInstances[(uint)type] = null; };
+                EnergyUIController.clickingClose = () => destroyUI(type);
                 EnergyUIController.clickingBuy = async price =>
                 {
                     if (PlayerEnergy.GetEnergy() >= PlayerEnergy.MaxEnergy)
@@ -344,8 +357,7 @@ public class SystemUIManager : MonoBehaviour
                     {
                         //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
                         await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 加载玩家到达的最后一个关卡
-                        Destroy(uiGameObj(type));
-                        Instance.uiInstances[(uint)type] = null;
+                        destroyUI(type);
                         return;
                     }
                     await LoadUI(UIType.Energy);
@@ -354,20 +366,14 @@ public class SystemUIManager : MonoBehaviour
                 return;
             case UIType.Item: return;
             case UIType.Settings:
-                SettingsUIController.clickingClose = () => { Destroy(uiGameObj(type)); Instance.uiInstances[(uint)type] = null; };
-                SettingsUIController.clickingConfirm = async () =>
-                {
-                    await LoadUI(UIType.Home);
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
-                };
+                SettingsUIController.clickingClose = () => destroyUI(type);
+                SettingsUIController.clickingConfirm = async () => { await LoadUI(UIType.Home); destroyUI(type); };
                 SettingsUIController.clickingReplay = async () =>
                 {
                     if (uiGameObj(type) == null)
                         return;
                     await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
+                    destroyUI(type);
                 };
                 return;
             case UIType.Shop:
@@ -376,8 +382,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     PlayerAd.SetWatchedAd(0);
                     //Instance.OnWatchAd(); // 没必要调 OnWatchAd
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
+                    destroyUI(type);
                 };
                 ShopUIController.clickingBuy = async (ItemType, count, price) =>
                 {
@@ -410,30 +415,24 @@ public class SystemUIManager : MonoBehaviour
                 ShopUIController.clickingWatchAd = FireAndBan(typeof(ShopUIController), ShopUIController.clickingWatchAd);
                 return;
             case UIType.UnlockSlot:
-                UnlockSlotUIController.clickingClose = () =>
-                {
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
-                };
+                UnlockSlotUIController.clickingClose = () => destroyUI(type);
                 UnlockSlotUIController.clickingWatchAd = async row =>
                 {
                     await Task.Delay(3000); //假装播放3秒广告
                     await PopUpTips(TIPS_SUCCESSFL_UNLOCKING);
                     await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot(row));
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
+                    destroyUI(type);
                 };
                 UnlockSlotUIController.clickingWatchAd = FireAndBan(typeof(UnlockSlotUIController), UnlockSlotUIController.clickingWatchAd);
                 return;
             case UIType.Victory:
                 VictoryUIController.clickingReceive = async _=>
                 {
-                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
+                    Instance.OnUpdateCoin(true);
+                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
-                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
+                    destroyUI(type);
                 };
                 VictoryUIController.clickingReceive = FireAndBan(
                     typeof(VictoryUIController),
@@ -443,12 +442,11 @@ public class SystemUIManager : MonoBehaviour
                 VictoryUIController.clickingWatchAd = async _=>
                 {
                     await Task.Delay(3000); //假装播放3秒广告
-                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive * 10);
+                    Instance.OnUpdateCoin(true);
+                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
-                    Destroy(uiGameObj(type));
-                    Instance.uiInstances[(uint)type] = null;
-                    //Instance.OnUpdateCoin(); // 没必要调 OnUpdateCoin
+                    destroyUI(type);
                 };
                 VictoryUIController.clickingWatchAd = FireAndBan(typeof(VictoryUIController), VictoryUIController.clickingWatchAd);
                 return;
@@ -545,6 +543,23 @@ public class SystemUIManager : MonoBehaviour
 //#endif
     }
 
+    void Start()
+    {
+        InitHUDs();
+    }
+
+    private void InitHUDs()
+    {
+        GameObject[] huds = GameObject.FindGameObjectsWithTag(HUD_TAG);
+
+        coinsHUDTexts = huds
+            .Where(o => o.name == coinsHUDName)
+            .Select(o => o.GetComponentInChildren<TextMeshProUGUI>())
+            .ToArray();
+
+        Array.ForEach(coinsHUDTexts, t => t.text = PlayerCoin.GetCoin().ToString());
+    }
+
 #region 各界面初始化方法
     private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
     private void InitEnergy()
@@ -624,16 +639,21 @@ public class SystemUIManager : MonoBehaviour
 #endregion
 
 #region 玩家资源更新响应
-    private void OnUpdateCoin()
+    private void OnUpdateCoin(bool isForHUDOnly = false)
     {
-        HomeUIController.NumCoins = PlayerCoin.GetCoin();
-        ShopUIController.NumCoins = PlayerCoin.GetCoin();
+        int numCoins = PlayerCoin.GetCoin();
+        Array.ForEach(coinsHUDTexts, t => t.text = numCoins.ToString());
+        if (isForHUDOnly)
+            return;
+        HomeUIController.NumCoins = numCoins;
+        ShopUIController.NumCoins = numCoins;
     }
     private void OnUpdateEnergy()
     {
-        EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
-        HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
-        ShopUIController.NumEnergy = PlayerEnergy.GetEnergy();
+        int numEnergy = PlayerEnergy.GetEnergy();
+        EnergyUIController.NumEnergy = numEnergy;
+        HomeUIController.NumEnergy = numEnergy;
+        ShopUIController.NumEnergy = numEnergy;
     }
     private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
 #endregion
