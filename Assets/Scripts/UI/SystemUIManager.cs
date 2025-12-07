@@ -67,6 +67,8 @@ public enum UIType
 /// </summary>
 public class SystemUIManager : MonoBehaviour
 {
+    private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
+
 #region 异常消息内容常量
     private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";
     private const string EXCEPITON_ILLEGAL_ENUM_ARG = "参数 @ 的值为 #，不在枚举 $ 之中";
@@ -81,6 +83,7 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_ENERGY_ADDED = "体力 + @";
     private const string TIPS_ENERGY_IS_FULL = "兑换失败，体力已满";
     private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
+    private const string TIPS_WAIT_FOR_MORE_LEVELS = "更多关卡，敬请期待！";
 #endregion
 
     public static SystemUIManager Instance;
@@ -353,10 +356,18 @@ public class SystemUIManager : MonoBehaviour
                 HomeUIController.clickingShop = async () => await LoadUI(UIType.Shop);
                 HomeUIController.clickingStart = async () =>
                 {
+                    if (loadingLevel is null)
+                        return;
+                    int level = PlayerProgress.GetCurrentLevel();
+                    if (level > MAX_LEVEL)
+                    {
+                        await PopUpTips(TIPS_WAIT_FOR_MORE_LEVELS);
+                        return;
+                    }
                     if (PlayerEnergy.TrySpendEnergy(HomeUIController.NumEnergyToPlay))
                     {
                         //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
-                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 加载玩家到达的最后一个关卡
+                        await loadingLevel(level, default); // 加载玩家到达的最后一个关卡
                         destroyUI(type);
                         return;
                     }
@@ -459,6 +470,7 @@ public class SystemUIManager : MonoBehaviour
         }
     }
 
+    //TODO: 删除两个 FireAndBan 方法，改为为各UI类添加 bool 字段用于判断是否正在处理广告
     /// <summary>
     /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
     /// <br/><br/>
@@ -466,7 +478,7 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
-    private static Func<Task> FireAndBan(AdProcessor uiInstance)
+    private static Func<Task> FireAndBan<T>(AdProcessor<T> uiInstance) where T : MonoBehaviour
     {
         Func<Task> clicking = uiInstance.clickingWatchAd;
         async Task fireAndBan()
@@ -574,7 +586,7 @@ public class SystemUIManager : MonoBehaviour
         HomeUIController.NumCoins = PlayerCoin.GetCoin();
         HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
         HomeUIController.MaxEnergy = PlayerEnergy.MaxEnergy;
-        HomeUIController.LevelName = "关卡" + PlayerProgress.GetCurrentLevel();
+        HomeUIController.LevelName = "关卡" + (PlayerProgress.GetCurrentLevel() - 100); //TODO: 修正关卡编号（101 → 1, 102 → 2, ...）
         //HomeUIController.NumEnergyToPlay = PlayerProgress.GetNumEnergyToPlay(); //TODO: 从 PlayerProgress 类获取进关卡扣除的体力值数据
     }
     private void InitItemUI(ItemUIController itemUI, ItemType itemType)

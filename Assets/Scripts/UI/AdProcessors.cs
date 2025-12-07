@@ -9,6 +9,8 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
     /// </summary>
     public static Func<U, Task> clickingWatchAd;
 
+    protected static bool isWatchingAd;
+
     /* TODO: 重新评估 SystemUIManager.FireAndBan 的设计及其与 ProcessAd 的取舍
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
@@ -23,9 +25,25 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
         afterWait?.Invoke();
     }
     */
+
+    public static void ProcessClicking(Action clickingAction)
+    {
+        if (!isWatchingAd)
+            clickingAction?.Invoke();
+    }
+    public static async Task ProcessClicking(Func<Task> clickingFunc)
+    {
+        if (!isWatchingAd)
+            await (clickingFunc is null ? Task.CompletedTask : clickingFunc());
+    }
+    public static async Task ProcessClicking<T>(Func<T, Task> clickingFunc, T clickingArg)
+    {
+        if (!isWatchingAd)
+            await (clickingFunc is null ? Task.CompletedTask : clickingFunc(clickingArg));
+    }
 }
 
-public abstract class AdProcessor : MonoBehaviour
+public abstract class AdProcessor<Tag> : MonoBehaviour where Tag : MonoBehaviour
 {
     /// <summary>
     /// 看广告领东西按钮回调
@@ -36,4 +54,8 @@ public abstract class AdProcessor : MonoBehaviour
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
         await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
     */
+
+    protected static void ProcessClicking(Action clickingAction) => StaticAdProcessor<Tag, object>.ProcessClicking(clickingAction);
+    protected static async Task ProcessClicking(Func<Task> clickingFunc) => await StaticAdProcessor<Tag, object>.ProcessClicking(clickingFunc);
+    protected static async Task ProcessClicking<T>(Func<T, Task> clickingFunc, T clickingArg) => await StaticAdProcessor<Tag, object>.ProcessClicking(clickingFunc, clickingArg);
 }
