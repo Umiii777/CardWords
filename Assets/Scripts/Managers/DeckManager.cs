@@ -58,11 +58,13 @@ public class DeckManager : MonoBehaviour
         {
             Debug.Log("执行了ResetDeck");
             ResetDeck();
+            AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
         }
         else
         {
             GameObject cardObj = cardPool.Get();
             SetACardFromDeck(cardObj);
+            AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.DrawCard);
             //currentCardRect.SetParent(dragla)
         }
     }

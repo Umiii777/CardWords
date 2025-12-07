@@ -334,7 +334,7 @@ public class LevelManager : MonoBehaviour
     public async void OnLevelComplete()
     {
         currentLevelNum++;
-        PlayerProgress.SetCurrentLevel(101);
+        PlayerProgress.SetCurrentLevel(currentLevelNum);
 
         await SystemUIManager.LoadUI(UIType.Victory);
     }
@@ -351,18 +351,35 @@ public class LevelManager : MonoBehaviour
     public void ClearLevel()
     {
 
-        // 清卡牌
-        foreach (var card in CardManager.Instance.allCards)
+
+        // // 清卡牌
+        // foreach (var card in CardManager.Instance.allCards)
+        // {
+        //     cardPool.Release(card.gameObject);
+        // }
+        // CardManager.Instance.allCards.Clear();
+
+        // // 清列
+        // foreach (var row in CardManager.Instance.allRows)
+        // {
+        //     rowPool.Release(row.gameObject);
+        // }
+        // CardManager.Instance.allRows.Clear();
+        List<Card> cards = CardManager.Instance.allCards;
+        for (int i = 0; i < cards.Count; i++)
         {
-            cardPool.Release(card.gameObject);
+            cardPool.Release(cards[i].gameObject);
         }
+        cards.Clear();
         CardManager.Instance.allCards.Clear();
 
-        // 清列
-        foreach (var row in CardManager.Instance.allRows)
+
+        List<Row> rows = CardManager.Instance.allRows;
+        for (int i = 0; i < rows.Count; i++)
         {
-            rowPool.Release(row.gameObject);
+            rowPool.Release(rows[i].gameObject);
         }
+        rows.Clear();
         CardManager.Instance.allRows.Clear();
 
     }
