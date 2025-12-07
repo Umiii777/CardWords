@@ -8,7 +8,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态字段赋值以更新各个按钮的显示内容及行为
 /// </summary>
-public class VictoryUIController : StaticAdProcessor<VictoryUIController, object>
+public class VictoryUIController : StaticAdProcessor<VictoryUIController, object>, IAudioTrigger
 {
 #region 静态公开字段
     /// <summary>
@@ -54,4 +54,6 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     {
         coinCountText.text = numCoinsToReceive.ToString();
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

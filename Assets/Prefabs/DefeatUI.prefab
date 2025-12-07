@@ -125,6 +125,18 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 6316583830975194959}
         m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
+        m_MethodName: PlayClickingAudio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ClickButton
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6316583830975194959}
+        m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
         m_MethodName: OnClickReplay
         m_Mode: 1
         m_Arguments:
@@ -643,6 +655,9 @@ MonoBehaviour:
   animConfigs:
   - 0, shibai, true, 0
   isPlayingStart: 1
+  onAnimsEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4741033736816568514
 GameObject:
   m_ObjectHideFlags: 0
@@ -1279,6 +1294,18 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 6316583830975194959}
         m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
+        m_MethodName: PlayClickingAudio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ClickButton
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 6316583830975194959}
+        m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
         m_MethodName: OnClickContinue
         m_Mode: 1
         m_Arguments:
@@ -1409,6 +1436,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 6316583830975194959}
+        m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
+        m_MethodName: PlayClickingAudio
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ClickButton
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 6316583830975194959}
         m_TargetAssemblyTypeName: DefeatUIController, Assembly-CSharp
         m_MethodName: OnClickHome

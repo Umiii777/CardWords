@@ -50,7 +50,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlayUISFX(UISFXtype uiType)
     {
-        sfxSource.PlayOneShot(library.sfxList[(int)uiType]);
+        sfxSource.PlayOneShot(library.sfxUIlist[(int)uiType]);
     }
     public void PlayBGM(BGMType bGMType)
     {
