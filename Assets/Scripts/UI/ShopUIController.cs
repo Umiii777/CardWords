@@ -104,17 +104,22 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
 #endregion
 
 #region 按钮回调方法
-    public async void OnClickSettings() => await (clickingSettings is null ? Task.CompletedTask : clickingSettings());
-    public void OnClickClose() => clickingClose?.Invoke();
+    public void OnClickClose() => ProcessClicking(clickingClose);
+    public async void OnClickSettings() => await ProcessClicking(clickingSettings);
     public async void OcClickBuy(string config)
     {
-        int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
-        await (clickingBuy is null ? Task.CompletedTask : clickingBuy((ItemType)c[0], c[1], c[2]));
+        if (!isWatchingAd)
+        {
+            int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
+            await (clickingBuy is null ? Task.CompletedTask : clickingBuy((ItemType)c[0], c[1], c[2]));
+        }
     }
     public async void OnClickReceive(string config)
     {
+        isWatchingAd = true;
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
         await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(c));
+        isWatchingAd = false;
     }
 #endregion
 

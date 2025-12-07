@@ -30,8 +30,24 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     private TextMeshProUGUI coinCountText;
 
 #region 按钮回调方法
-    public async void OnClickReceive() => await (clickingReceive is null ? Task.CompletedTask : clickingReceive(null));
-    public async void OnClickReceiveMore() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
+    public async void OnClickReceive()
+    {
+        if (!isWatchingAd)
+        {
+            isWatchingAd = true;
+            await (clickingReceive is null ? Task.CompletedTask : clickingReceive(default));
+            isWatchingAd = false;
+        }
+    }
+    public async void OnClickReceiveMore()
+    {
+        if (!isWatchingAd)
+        {
+            isWatchingAd = true;
+            await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
+            isWatchingAd = false;
+        }
+    }
 #endregion
 
     void Start()

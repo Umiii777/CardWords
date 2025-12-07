@@ -8,7 +8,7 @@ using TMPro;
 /// <summary>
 /// 道具获取界面控制器
 /// </summary>
-public class ItemUIController : AdProcessor
+public class ItemUIController : AdProcessor<ItemUIController>
 {
     public static Dictionary<
         ItemType,
@@ -38,9 +38,9 @@ public class ItemUIController : AdProcessor
     private TextMeshProUGUI priceText;
 
 #region 按钮回调方法
-    public void OnClickClose() => clickingClose?.Invoke();
-    public async void OnClickReceive() => await (clickingBuy is null ? Task.CompletedTask : clickingWatchAd());
-    public async void OcClickBuy() => await (clickingBuy is null ? Task.CompletedTask : clickingBuy(price));
+    public void OnClickClose() => ProcessClicking(clickingClose);
+    public async void OnClickReceive() => await ProcessClicking(clickingWatchAd);
+    public async void OcClickBuy() => await ProcessClicking(clickingBuy, price);
 #endregion
 
     void Start()

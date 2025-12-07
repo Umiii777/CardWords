@@ -10,7 +10,12 @@ public class UnlockSlotUIController : StaticAdProcessor<UnlockSlotUIController, 
 #endregion
 
 #region 按钮回调方法
-    public void OnClickClose() => clickingClose?.Invoke();
-    public async void OnClickUnlock() => await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(currentRow));
+    public void OnClickClose() => ProcessClicking(clickingClose);
+    public async void OnClickUnlock()
+    {
+        isWatchingAd = true;
+        await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(currentRow));
+        isWatchingAd = false;
+    }
 #endregion
 }
