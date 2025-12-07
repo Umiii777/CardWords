@@ -89,8 +89,8 @@ public class RowManager : MonoBehaviour
                                 Debug.Log("找到了相同的卡牌");
                                 // firstHintCard.CardHint();
                                 // secondHintCard.CardHint();
-                                firstHintCard.SpineTry();
-                                secondHintCard.SpineTry();
+                                firstHintCard.HintAnimPlay();
+                                secondHintCard.HintAnimPlay();
                                 return;
                             }
                             else
@@ -114,8 +114,8 @@ public class RowManager : MonoBehaviour
                         //await SystemUIManager.PopUpTips("找到了相同的卡牌");
                         // firstHintCard.CardHint();
                         // maincard.CardHint();
-                        firstHintCard.SpineTry();
-                        maincard.SpineTry();
+                        firstHintCard.HintAnimPlay();
+                        maincard.HintAnimPlay();
                         Debug.Log("找到了相同的卡牌");
                         return;
                     }

@@ -136,6 +136,7 @@ public class CardDragHandler : MonoBehaviour,
         {
 
             TryMerge(best);
+            card.EndDragAnimPlay();
             CardStack.EndDragStackSetCg(top);
             cg.blocksRaycasts = true;
 
@@ -294,7 +295,10 @@ public class CardDragHandler : MonoBehaviour,
             if (top.cardData.mainId == target.cardData.mainId && !top.isInStack)
             {
                 //触发card自身的被合成东西+表现
+                card.onFinishAnim.endingAnims = () =>
                 top.gameObject.SetActive(false);
+                card.CardSetAnimPlay();
+                
                 target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
 
@@ -308,7 +312,9 @@ public class CardDragHandler : MonoBehaviour,
                 RemoveStackOnMainRow(top.GetTop());
                 foreach (var card in top.GetTop().childCards)
                 {
+                    card.onFinishAnim.endingAnims = () =>
                     card.gameObject.SetActive(false);
+                    card.CardSetAnimPlay();
                 }
                 target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
 

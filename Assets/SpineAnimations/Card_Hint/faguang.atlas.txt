@@ -1,0 +1,13 @@
+
+faguang.png
+size: 235,287
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+faguang
+  rotate: false
+  xy: 2, 2
+  size: 231, 283
+  orig: 233, 285
+  offset: 1, 1
+  index: -1
