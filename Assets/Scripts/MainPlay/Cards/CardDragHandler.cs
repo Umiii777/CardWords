@@ -136,7 +136,7 @@ public class CardDragHandler : MonoBehaviour,
         {
 
             TryMerge(best);
-            card.EndDragAnimPlay();
+            
             CardStack.EndDragStackSetCg(top);
             cg.blocksRaycasts = true;
 
@@ -257,6 +257,7 @@ public class CardDragHandler : MonoBehaviour,
             //变更row状态
             row.isEmpty = false;    //主卡槽直接置空，TODO清空主卡槽的逻辑传递给消除完的mainRow事件
 
+            top.EndDragAnimPlay();
             //变更所有卡状态
             CardStack.UpdateStackPositions(top);
 
@@ -295,6 +296,7 @@ public class CardDragHandler : MonoBehaviour,
             if (top.cardData.mainId == target.cardData.mainId && !top.isInStack)
             {
                 //触发card自身的被合成东西+表现
+                card.CardSetAllInvisible();
                 card.onFinishAnim.endingAnims = () =>
                 top.gameObject.SetActive(false);
                 card.CardSetAnimPlay();
@@ -312,6 +314,7 @@ public class CardDragHandler : MonoBehaviour,
                 RemoveStackOnMainRow(top.GetTop());
                 foreach (var card in top.GetTop().childCards)
                 {
+                    card.CardSetAllInvisible();
                     card.onFinishAnim.endingAnims = () =>
                     card.gameObject.SetActive(false);
                     card.CardSetAnimPlay();
@@ -350,6 +353,7 @@ public class CardDragHandler : MonoBehaviour,
             //设置首次堆叠的样式，但是应该每次在ondrag或者onBeginDrag的时候就设置
             target.transform.SetAsLastSibling();
             top.transform.SetAsLastSibling();
+
 
             EndDragMinus.RaiseEvent(top, this);
             top.slotCount = target.slotCount;

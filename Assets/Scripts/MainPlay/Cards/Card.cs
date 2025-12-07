@@ -57,6 +57,8 @@ public class Card : MonoBehaviour
     public SpineController onFinishAnim;
     public SpineController OnEndDragAnim;
 
+    private Image[] allImages;
+    private TextMeshProUGUI[] allTexts;
 
     //private BoxCollider2D collider;
     private void Awake()
@@ -64,6 +66,8 @@ public class Card : MonoBehaviour
         rectTransform = gameObject.GetComponent<RectTransform>();
         //cardBaseStyle = gameObject.GetComponent<Image>();
         cg = GetComponent<CanvasGroup>();
+        allImages = GetComponentsInChildren<Image>();
+        allTexts = GetComponentsInChildren<TextMeshProUGUI>();
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
     public void SetCardVisual()
@@ -244,6 +248,18 @@ public class Card : MonoBehaviour
 
 
     #region 动画表现
+    public void CardSetAllInvisible()
+    {
+        foreach (var image in allImages)
+        {
+            image.enabled = false;
+        }
+        foreach(var text in allTexts)
+        {
+            text.enabled = false;
+        }
+    }
+
     //动画表现
     public void CardShake()
     {
