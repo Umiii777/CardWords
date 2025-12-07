@@ -714,17 +714,17 @@ public class SystemUIManager : MonoBehaviour
     {
         foreach (var i in Enumerable.Range(0, inLevelItemButtons.Length))
         {
-            Func<Task>[] usingItems = new Func<Task>[]
+            Action[] usingItems = new Action[]
             {
-                RowManager.Instance.HintTry,
-                null //TODO: 第二个元素改为 RowManager.Instance.ShuffleTry
+                async () => await RowManager.Instance.HintTry(),
+                DeckManager.Instance.ShuffleDeck
             };
             inLevelItemButtons[i].onClick.AddListener(async () =>
             {
                 ItemType type = (ItemType)i + 1;
                 if (PlayerItem.TrySpendItem(type, 1))
                 {
-                    await usingItems[i]();
+                    usingItems[i]();
                     return;
                 }
                 await LoadUI(UIType.Item, type);
