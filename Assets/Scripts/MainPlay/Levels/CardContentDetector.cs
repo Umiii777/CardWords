@@ -57,7 +57,6 @@ public static class CardContentDetector
     public static bool IsImageKey(string input)
     {
         // 示例：你可以自定义规则
-        return input.StartsWith("icon_") ||     // img_fire / img_sword
-               (input.StartsWith("[") && input.EndsWith("]")); // [fire]
+        return input.StartsWith("icon_");
     }
 }

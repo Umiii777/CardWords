@@ -50,7 +50,7 @@ public class DeckManager : MonoBehaviour
     public void DrawCard()
     {
         //当牌库已经被取出数据数量
-        if(currentDeckCount ==currentDeckCardDatas.Count-1)
+        if (currentDeckCount == currentDeckCardDatas.Count - 1)
         {
             deckHandler.DeckStyleReadyShuffle();
         }
@@ -100,6 +100,7 @@ public class DeckManager : MonoBehaviour
         currentDeckCardDatas.Remove(cardFromDeck.cardData);
         currentDeckCardsHasSet.Remove(cardFromDeck);
         hasRemovedNum++;
+        currentDeckCount--;
     }
 
 

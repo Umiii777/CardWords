@@ -155,7 +155,7 @@ public class Card : MonoBehaviour
         cardBaseStyle.sprite = CardVisualManager.Instance.spriteFrontNormal;
         tmLength.text = "";
 
-        Sprite sprite = EmojiManager.Instance.GetEmojiSprite(imageKey);
+        Sprite sprite = CardImageManager.Instance.GetSprite(imageKey);
         cardContentImage.sprite = sprite;
     }
 

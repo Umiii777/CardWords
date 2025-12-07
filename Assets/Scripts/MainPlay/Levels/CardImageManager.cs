@@ -19,7 +19,7 @@ public class CardImageManager : MonoBehaviour
         if (imageCache.ContainsKey(key))
             return imageCache[key];
 
-        Sprite spr = Resources.Load<Sprite>("Icons/" + key);
+        Sprite spr = Resources.Load<Sprite>("images/" + key);
 
         if (spr == null)
         {
