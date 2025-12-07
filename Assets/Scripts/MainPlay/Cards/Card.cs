@@ -52,12 +52,17 @@ public class Card : MonoBehaviour
     public CardEventSO onCompleteCard;
     public CardEventSO onCompleteMainCard;
 
+    [Header("动画相关")]
+    public SpineController hintAnim;
+    public SpineController onFinishAnim;
+    public SpineController OnEndDragAnim;
+
 
     //private BoxCollider2D collider;
     private void Awake()
     {
         rectTransform = gameObject.GetComponent<RectTransform>();
-        cardBaseStyle = gameObject.GetComponent<Image>();
+        //cardBaseStyle = gameObject.GetComponent<Image>();
         cg = GetComponent<CanvasGroup>();
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
@@ -248,10 +253,20 @@ public class Card : MonoBehaviour
     {
         rectTransform.DOShakeAnchorPos(5f, 30, 5, 90);
     }
-    public void SpineTry()
+    public void HintAnimPlay()
     {
-        SpineController spineController = GetComponentInChildren<SpineController>();
-        spineController.enabled = true;
+        hintAnim.PlayAnims();
+    }
+
+    public void CardSetAnimPlay()
+    {
+        onFinishAnim.PlayAnims();
+    }
+    
+    public void EndDragAnimPlay()
+    {
+        OnEndDragAnim.PlayAnims();
     }
     #endregion
+    
 }

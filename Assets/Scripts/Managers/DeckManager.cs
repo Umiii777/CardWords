@@ -104,6 +104,10 @@ public class DeckManager : MonoBehaviour
         hasRemovedNum++;
         currentDeckCount--;
     }
+    public void ShuffleDeck()
+    {
+        
+    }
 
 
 }

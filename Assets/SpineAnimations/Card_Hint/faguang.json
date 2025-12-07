@@ -1,0 +1,62 @@
+{
+    "skeleton": {
+        "hash": "IBa3YRw7tWrSo9VmuQcRq5FIvqk=",
+        "spine": "3.8",
+        "x": -116.5,
+        "y": -142.5,
+        "width": 233,
+        "height": 285,
+        "images": "K:/项目/纸牌-公司/动画，图标/动画，图标/发光提示边",
+        "audio": ""
+    },
+    "bones": [
+        {
+            "name": "root"
+        },
+        {
+            "name": "bone",
+            "parent": "root"
+        }
+    ],
+    "slots": [
+        {
+            "name": "faguang",
+            "bone": "bone",
+            "attachment": "faguang"
+        }
+    ],
+    "skins": [
+        {
+            "name": "default",
+            "attachments": {
+                "faguang": {
+                    "faguang": {
+                        "width": 233,
+                        "height": 285
+                    }
+                }
+            }
+        }
+    ],
+    "animations": {
+        "faguang": {
+            "slots": {
+                "faguang": {
+                    "color": [
+                        {
+                            "color": "ffffff00"
+                        },
+                        {
+                            "time": 1,
+                            "color": "ffffffff"
+                        },
+                        {
+                            "time": 2,
+                            "color": "ffffff00"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
