@@ -106,7 +106,13 @@ public class DeckManager : MonoBehaviour
     }
     public void ShuffleDeck()
     {
+        Debug.Log("开始打乱牌库");
+        ResetDeck();
+        deckHandler.ShuffleAnim();
+        AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
+        currentDeckCardDatas.Shuffle();
         
+
     }
 
 

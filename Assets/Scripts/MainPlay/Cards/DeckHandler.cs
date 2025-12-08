@@ -62,4 +62,8 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
         tmPro.text = "";
 
     }
+    public void ShuffleAnim()
+    {
+        rectTransform.DOShakeAnchorPos(1f, 5f, 10, 90f, false, true, ShakeRandomnessMode.Harmonic);
+    }
 }

@@ -121,6 +121,7 @@ public class LevelManager : MonoBehaviour
 
         //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
         SetLevelCardLayout(normalRows);
+        AudioManager.Instance.PlayBGM(AudioManager.BGMType.PlayTheme);
 
     }
     //加载关卡配置，TODO：初始化对象池
