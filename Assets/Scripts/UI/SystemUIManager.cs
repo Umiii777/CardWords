@@ -92,6 +92,10 @@ public class SystemUIManager : MonoBehaviour
 
 #region 静态委托
     /// <summary>
+    /// 进入大厅委托
+    /// </summary>
+    public static Action initingHome;
+    /// <summary>
     /// 关卡加载委托
     /// <br/><br/>
     /// 第一个参数为要加载的关卡编号，第二个参数为额外信息
@@ -274,12 +278,13 @@ public class SystemUIManager : MonoBehaviour
         else
             await Task.Delay(movingDuration);
         await Task.Delay(stayingDuration);
-        while (tipsBackground.alpha > 0f)
+        while (tipsBackground != null && tipsBackground.alpha > 0f)
         {
             tipsBackground.alpha -= 0.1f;
             await Task.Delay(fadingDelay);
         }
-        Destroy(rt.gameObject);
+        if (tipsBackground != null)
+            Destroy(rt.gameObject);
     }
 
     public static void InitUICallbacks(UIType type)
@@ -326,6 +331,13 @@ public class SystemUIManager : MonoBehaviour
                     Instance.OnUpdateEnergy();
                     await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
                 }
+                PlayerEnergy.timing = () =>
+                {
+                    int secondsToRecover = PlayerEnergy.SecondsToRecover;
+                    if (secondsToRecover == 0)
+                        Instance.OnUpdateEnergy();
+                    EnergyUIController.SecondsToRecover = secondsToRecover;
+                };
                 EnergyUIController.clickingClose = () => destroyUI(type);
                 EnergyUIController.clickingBuy = async price =>
                 {
@@ -547,14 +559,12 @@ public class SystemUIManager : MonoBehaviour
     {
         InitUIManager();
         Array.ForEach(Enum.GetValues(typeof(UIType)) as UIType[], t => InitUICallbacks(t));
-
-        //游戏启动时直接显示大厅
-        uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
     }
 
     void Start()
     {
-        InitInLevelUIs();
+        //启动时直接显示大厅
+        uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
 
 //#if UNITY_EDITOR
         // UI加载示例：
@@ -571,15 +581,15 @@ public class SystemUIManager : MonoBehaviour
 
 #region 各界面初始化方法
     private void InitDefeatUI(float progress) => DefeatUIController.progress = progress;
-    private void InitEnergy()
+    private void InitEnergyUI()
     {
         EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
         EnergyUIController.maxEnergy = PlayerEnergy.MaxEnergy;
-        EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
-        PlayerEnergy.timing += () => EnergyUIController.SecondsToRecover = PlayerEnergy.secondsToRecover;
+        EnergyUIController.SecondsToRecover = PlayerEnergy.SecondsToRecover;
     }
     private void InitHomeUI()
     {
+        initingHome?.Invoke();
         HomeUIController.NumCoins = PlayerCoin.GetCoin();
         HomeUIController.NumEnergy = PlayerEnergy.GetEnergy();
         HomeUIController.MaxEnergy = PlayerEnergy.MaxEnergy;
@@ -684,13 +694,20 @@ public class SystemUIManager : MonoBehaviour
         );
         dictPrefabInitings = new()
         {
-            { UIType.Energy, (energyUIPrefab, InitEnergy) },
+            { UIType.Energy, (energyUIPrefab, InitEnergyUI) },
             { UIType.Home, (homeUIPrefab, InitHomeUI) },
             { UIType.Shop, (shopUIPrefab, InitShopUI) }
         };
-        loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
+
+    #region 初始化各静态委托
+        BGMType[] homeBGMTypes = new BGMType[] { BGMType.MainPage1, BGMType.MainPage2 };
+        initingHome = () => AudioManager.Instance.PlayBGM(
+            homeBGMTypes[DateTimeOffset.UtcNow.ToUnixTimeSeconds() % homeBGMTypes.Length]
+        );
+        loadingLevel = async (level, _) => { InitInLevelUIs(); LevelManager.Instance.InitCurrentLevel(level); };
         addingSteps = async () => StepManager.Instance.AddExtraSteps();
         unlockingSlot = async row => Row.OnChangeMainRowType(row);
+    #endregion
     }
 
     private void InitInLevelUIs()
@@ -703,10 +720,16 @@ public class SystemUIManager : MonoBehaviour
             .ToArray();
         Array.ForEach(inLevelCoinsTexts, t => t.text = PlayerCoin.GetCoin().ToString());
 
-        inLevelItemButtons = inLevelUIs
+        Button[] inLevelButtons = inLevelUIs
             .Select(o => { o.TryGetComponent(out Button b); return b; })
             .Where(b => b != null)
             .ToArray();
+        Array.ForEach(inLevelButtons, b => b.onClick.AddListener(() => AudioManager.Instance.PlayUISFX(UISFXtype.ClickButton)));
+
+        inLevelItemButtons = inLevelButtons
+            .Where(b => Enum.GetNames(typeof(ItemType))
+                .Any(n => n.Equals(b.name, StringComparison.OrdinalIgnoreCase))
+            ).ToArray();
         InitItemButtons();
     }
 
