@@ -1,6 +1,5 @@
 using System;
-using System.Threading;
-using UnityEditor;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerEnergy
@@ -12,10 +11,9 @@ public class PlayerEnergy
 #endregion
 
 #region 体力自动回复计时
-    public static int secondsToRecover = SECONDS_TO_RECOVER - 1;
-    public static Thread timer;
+    public static int SecondsToRecover { get; private set; } = SECONDS_TO_RECOVER - 1;
     public static Action timing;
-    private static SynchronizationContext unityContext;
+    public static Coroutine timerCoroutine;
 #endregion
 
     public static int MaxEnergy
@@ -72,29 +70,28 @@ public class PlayerEnergy
         PlayerPrefs.Save();
     }
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void StartTimer()
     {
-        unityContext = SynchronizationContext.Current;
-        timer = new Thread(() =>
+        static IEnumerator timer()
         {
+            WaitForSecondsRealtime waitOneSec = new(1f);
             while (true)
             {
-                Thread.Sleep(1000);
-                secondsToRecover = (secondsToRecover - 1 + SECONDS_TO_RECOVER) % SECONDS_TO_RECOVER;
-                unityContext.Post(_=>
+                if (Energy < MaxEnergy)
                 {
-                    if (secondsToRecover == 0)
+                    Debug.Log(SecondsToRecover);
+                    yield return waitOneSec;
+                    SecondsToRecover = (SecondsToRecover - 1 + SECONDS_TO_RECOVER) % SECONDS_TO_RECOVER;
+                    if (SecondsToRecover == 0)
                         AddEnergy(1);
                     timing?.Invoke();
-                }, null);
+                }
+                else
+                    yield return null;
             }
-        });
-        timer.IsBackground = true;
-        timer.Start();
-
-#if UNITY_EDITOR
-        EditorApplication.quitting += timer.Abort;
-#endif
+        }
+        timerCoroutine = SystemUIManager.Instance.StartCoroutine(timer());
+        Application.quitting += () => SystemUIManager.Instance.StopCoroutine(timerCoroutine);
     }
 }
