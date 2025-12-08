@@ -8,7 +8,7 @@ using TMPro;
 /// <summary>
 /// 道具获取界面控制器
 /// </summary>
-public class ItemUIController : AdProcessor<ItemUIController>
+public class ItemUIController : AdProcessor<ItemUIController>, IAudioTrigger
 {
     public static Dictionary<
         ItemType,
@@ -47,4 +47,6 @@ public class ItemUIController : AdProcessor<ItemUIController>
     {
         priceText.text = price.ToString();
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

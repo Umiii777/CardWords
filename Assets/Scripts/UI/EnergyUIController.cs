@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using TMPro;
 
-public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
+public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>, IAudioTrigger
 {
 #region 当前体力值
     /// <summary>
@@ -91,4 +91,6 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>
         NumEnergy = numEnergy;
         SecondsToRecover = secondsToRecover;
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

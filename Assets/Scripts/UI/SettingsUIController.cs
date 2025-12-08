@@ -6,7 +6,7 @@ using TMPro;
 /// <summary>
 /// 设置界面控制器
 /// </summary>
-class  SettingsUIController : MonoBehaviour
+class  SettingsUIController : MonoBehaviour, IAudioTrigger
 {
 #region 进关卡时扣除的体力值
     public static int numEnergyToPlay = 1;
@@ -49,4 +49,6 @@ class  SettingsUIController : MonoBehaviour
         inLevelUI.SetActive(isInLevel);
         outLevelUI.SetActive(!isInLevel);
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

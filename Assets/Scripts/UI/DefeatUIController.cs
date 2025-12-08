@@ -9,7 +9,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态字段赋值以更新各个按钮和进度条的显示内容和及行为
 /// </summary>
-public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
+public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>, IAudioTrigger
 {
 #region 静态公开字段
     /// <summary>
@@ -119,4 +119,6 @@ public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>
             progressBarTransform.sizeDelta.y
         );
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

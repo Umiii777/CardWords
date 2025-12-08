@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-public class UnlockSlotUIController : StaticAdProcessor<UnlockSlotUIController, Row>
+public class UnlockSlotUIController : StaticAdProcessor<UnlockSlotUIController, Row>, IAudioTrigger
 {
     public static Row currentRow;
 
@@ -18,4 +18,6 @@ public class UnlockSlotUIController : StaticAdProcessor<UnlockSlotUIController, 
         isWatchingAd = false;
     }
 #endregion
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

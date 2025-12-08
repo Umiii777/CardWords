@@ -9,7 +9,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态属性或字段赋值以更新各个组件的显示内容及行为
 /// </summary>
-public class HomeUIController : MonoBehaviour
+public class HomeUIController : MonoBehaviour, IAudioTrigger
 {
 #region 玩家金币数量
     /// <summary>
@@ -206,4 +206,6 @@ public class HomeUIController : MonoBehaviour
         NumEnergyToPlay = numEnergyToPlay;
         IsShopHintShown = isShopHintShown;
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

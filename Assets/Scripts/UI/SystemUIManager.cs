@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using static AudioManager;
 
 /// <summary>
 /// 游戏中的界面类型
@@ -84,6 +85,7 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_ENERGY_IS_FULL = "兑换失败，体力已满";
     private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
     private const string TIPS_WAIT_FOR_MORE_LEVELS = "更多关卡，敬请期待！";
+    private const string TIPS_ASKING_ITEM = "道具数量不足，请兑换";
 #endregion
 
     public static SystemUIManager Instance;
@@ -133,18 +135,22 @@ public class SystemUIManager : MonoBehaviour
     [SerializeField]
     private RectTransform tipsPrefab;
 
-#region HUD相关
-    private const string HUD_TAG = "HUD";
+#region 关卡内UI相关
+    private const string IN_LEVEL_UI_TAG = "InLevelUI";
 
     /// <summary>
     /// 关卡内显示金币数量的预制体名称
     /// </summary>
     [SerializeField]
-    private string coinsHUDName;
+    private string inLevelCoinsName;
     /// <summary>
     /// 关卡内内显示金币数量的文本
     /// </summary>
-    private TextMeshProUGUI[] coinsHUDTexts;
+    private TextMeshProUGUI[] inLevelCoinsTexts;
+    /// <summary>
+    /// 使用道具按钮
+    /// </summary>
+    private Button[] inLevelItemButtons;
 #endregion
 
     private object[] uiInstances;
@@ -170,6 +176,7 @@ public class SystemUIManager : MonoBehaviour
     {
         if (Instance == null)
             await Task.FromException(new InvalidOperationException(EXCEPTION_MANAGER_UNINITIALIZED.Replace("@", nameof(LoadUI))));
+        static void playLoadingAudio(UISFXtype audioType) => AudioManager.Instance.PlayUISFX(audioType);
         if (args is { Length: 1 })
             switch (type)
             {
@@ -178,7 +185,7 @@ public class SystemUIManager : MonoBehaviour
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
-                            () => Instance.InitDefeatUI((float)args[0])
+                            () => { Instance.InitDefeatUI((float)args[0]); playLoadingAudio(UISFXtype.Defeat); }
                         );
                     return;
                 case UIType.Item:
@@ -219,8 +226,8 @@ public class SystemUIManager : MonoBehaviour
                     Instance.uiInstances[(uint)type] as VictoryUIController,
                     Instance.victoryUIPrefab,
                     args is not null and { Length: 1 } && args[0] is int numCoins
-                        ? () => Instance.InitVictoryUI(numCoins)
-                        : () => Instance.InitVictoryUI()
+                        ? () => { Instance.InitVictoryUI(numCoins); playLoadingAudio(UISFXtype.LevelComplete); }
+                        : () => { Instance.InitVictoryUI(); playLoadingAudio(UISFXtype.LevelComplete); }
                 );
                 return;
             default:
@@ -293,7 +300,7 @@ public class SystemUIManager : MonoBehaviour
                 DefeatUIController.clickingHome = async () => { await LoadUI(UIType.Home); destroyUI(type); };
                 DefeatUIController.clickingWatchAd = async _=>
                 {
-                    await Task.Delay(3000); //假装播放3秒广告
+                    await Task.Delay(1000); //假装播放1秒广告
                     await (addingSteps is null ? Task.CompletedTask : addingSteps()); // 增加步数
                     destroyUI(type);
                 };
@@ -330,7 +337,7 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerCoin.TrySpendCoin(price))
                     {
                         PlayerEnergy.AddEnergy(1);
-                        Instance.OnUpdateCoin();
+                        Instance.OnUpdateCoin(-price);
                         await onAddEnergy();
                         return;
                     }
@@ -338,7 +345,7 @@ public class SystemUIManager : MonoBehaviour
                 };
                 EnergyUIController.clickingWatchAd = async _=>
                 {
-                    await Task.Delay(3000); //假装播放3秒广告
+                    await Task.Delay(1000); //假装播放1秒广告
                     if (Instance.uiInstances[(uint)type] == null)
                         return;
                     if (PlayerEnergy.TryAddEnergy(1))
@@ -400,7 +407,7 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerCoin.TrySpendCoin(price))
                     {
                         PlayerItem.AddItem(ItemType, count);
-                        Instance.OnUpdateCoin();
+                        Instance.OnUpdateCoin(-price);
                         await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
                         return;
                     }
@@ -410,7 +417,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     if (PlayerAd.GetWatchedAd() < configs[1])
                     {
-                        await Task.Delay(3000); //假装播放3秒广告
+                        await Task.Delay(1000); //假装播放1秒广告
                         PlayerAd.AddWatchedAdd();
                         Instance.OnWatchAd();
                     }
@@ -419,7 +426,7 @@ public class SystemUIManager : MonoBehaviour
                         PlayerAd.AddWatchedAdd(-configs[1]);
                         PlayerCoin.AddCoin(configs[0]);
                         Instance.OnWatchAd();
-                        Instance.OnUpdateCoin();
+                        Instance.OnUpdateCoin(configs[0]);
                         await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     }
                 };
@@ -429,7 +436,7 @@ public class SystemUIManager : MonoBehaviour
                 UnlockSlotUIController.clickingClose = () => destroyUI(type);
                 UnlockSlotUIController.clickingWatchAd = async row =>
                 {
-                    await Task.Delay(3000); //假装播放3秒广告
+                    await Task.Delay(1000); //假装播放1秒广告
                     await PopUpTips(TIPS_SUCCESSFL_UNLOCKING);
                     await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot(row));
                     destroyUI(type);
@@ -439,8 +446,9 @@ public class SystemUIManager : MonoBehaviour
             case UIType.Victory:
                 VictoryUIController.clickingReceive = async _=>
                 {
-                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive);
-                    Instance.OnUpdateCoin(true);
+                    int numCoins = VictoryUIController.numCoinsToReceive;
+                    PlayerCoin.AddCoin(numCoins);
+                    Instance.OnUpdateCoin(numCoins, true);
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
                     destroyUI(type);
@@ -452,9 +460,10 @@ public class SystemUIManager : MonoBehaviour
                 );
                 VictoryUIController.clickingWatchAd = async _=>
                 {
-                    await Task.Delay(3000); //假装播放3秒广告
-                    PlayerCoin.AddCoin(VictoryUIController.numCoinsToReceive * 10);
-                    Instance.OnUpdateCoin(true);
+                    int numCoins = VictoryUIController.numCoinsToReceive * 10;
+                    await Task.Delay(1000); //假装播放1秒广告
+                    PlayerCoin.AddCoin(numCoins);
+                    Instance.OnUpdateCoin(numCoins, true);
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
                     destroyUI(type);
@@ -541,6 +550,11 @@ public class SystemUIManager : MonoBehaviour
 
         //游戏启动时直接显示大厅
         uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
+    }
+
+    void Start()
+    {
+        InitInLevelUIs();
 
 //#if UNITY_EDITOR
         // UI加载示例：
@@ -553,23 +567,6 @@ public class SystemUIManager : MonoBehaviour
         //_= SystemUIManager.LoadUI(UIType.UnlockSlot, row);        // 开启槽位界面
         //_= SystemUIManager.LoadUI(UIType.Victory, 10);            // 胜利界面（可领取金币数：10）
 //#endif
-    }
-
-    void Start()
-    {
-        InitHUDs();
-    }
-
-    private void InitHUDs()
-    {
-        GameObject[] huds = GameObject.FindGameObjectsWithTag(HUD_TAG);
-
-        coinsHUDTexts = huds
-            .Where(o => o.name == coinsHUDName)
-            .Select(o => o.GetComponentInChildren<TextMeshProUGUI>())
-            .ToArray();
-
-        Array.ForEach(coinsHUDTexts, t => t.text = PlayerCoin.GetCoin().ToString());
     }
 
 #region 各界面初始化方法
@@ -620,7 +617,7 @@ public class SystemUIManager : MonoBehaviour
             },
             async () =>
             {
-                await Task.Delay(3000); //假装播放3秒广告
+                await Task.Delay(1000); //假装播放1秒广告
                 PlayerItem.AddItem(itemType, 1);
                 await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
             }
@@ -651,11 +648,14 @@ public class SystemUIManager : MonoBehaviour
 #endregion
 
 #region 玩家资源更新响应
-    private void OnUpdateCoin(bool isForHUDOnly = false)
+    private void OnUpdateCoin(int count, bool isInLevel = false)
     {
+        if (count > 0)
+            AudioManager.Instance.PlayUISFX(UISFXtype.GetCoins);
+
         int numCoins = PlayerCoin.GetCoin();
-        Array.ForEach(coinsHUDTexts, t => t.text = numCoins.ToString());
-        if (isForHUDOnly)
+        Array.ForEach(inLevelCoinsTexts, t => t.text = numCoins.ToString());
+        if (isInLevel)
             return;
         HomeUIController.NumCoins = numCoins;
         ShopUIController.NumCoins = numCoins;
@@ -691,6 +691,46 @@ public class SystemUIManager : MonoBehaviour
         loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
         addingSteps = async () => StepManager.Instance.AddExtraSteps();
         unlockingSlot = async row => Row.OnChangeMainRowType(row);
+    }
+
+    private void InitInLevelUIs()
+    {
+        GameObject[] inLevelUIs = GameObject.FindGameObjectsWithTag(IN_LEVEL_UI_TAG);
+
+        inLevelCoinsTexts = inLevelUIs
+            .Where(o => o.name == inLevelCoinsName)
+            .Select(o => o.GetComponentInChildren<TextMeshProUGUI>())
+            .ToArray();
+        Array.ForEach(inLevelCoinsTexts, t => t.text = PlayerCoin.GetCoin().ToString());
+
+        inLevelItemButtons = inLevelUIs
+            .Select(o => { o.TryGetComponent(out Button b); return b; })
+            .Where(b => b != null)
+            .ToArray();
+        InitItemButtons();
+    }
+
+    private void InitItemButtons()
+    {
+        foreach (var i in Enumerable.Range(0, inLevelItemButtons.Length))
+        {
+            Action[] usingItems = new Action[]
+            {
+                async () => await RowManager.Instance.HintTry(),
+                DeckManager.Instance.ShuffleDeck
+            };
+            inLevelItemButtons[i].onClick.AddListener(async () =>
+            {
+                ItemType type = (ItemType)i + 1;
+                if (PlayerItem.TrySpendItem(type, 1))
+                {
+                    usingItems[i]();
+                    return;
+                }
+                await LoadUI(UIType.Item, type);
+                await PopUpTips(TIPS_ASKING_ITEM);
+            });
+        }
     }
 
     private T CreateUI<T>(T ui, T uiPrefab, Action initing = null) where T : MonoBehaviour

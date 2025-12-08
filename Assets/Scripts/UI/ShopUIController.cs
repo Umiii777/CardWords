@@ -9,7 +9,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态属性或字段赋值以更新各个组件的显示内容及行为
 /// </summary>
-public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
+public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>, IAudioTrigger
 {
 #region 玩家金币数量
     /// <summary>
@@ -141,4 +141,6 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>
         NumEnergy = numEnergy;
         NumWatchedAd = numWatchedAd;
     }
+
+    public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }
