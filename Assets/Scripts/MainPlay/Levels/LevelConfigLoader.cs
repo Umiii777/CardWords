@@ -46,50 +46,82 @@ public class LevelConfigLoader : MonoBehaviour
     #region 读表方法组
     private void LoadLevelConfig()
     {
-        //定义文件查找路径，统一的json安置在StreamingAssetsPath这个路径下，打包的时候的特殊文件夹，不会被压缩
-        string path = Path.Combine(Application.streamingAssetsPath, levelConfigFileName);
-        if (File.Exists(path))
+
+
+        // //定义文件查找路径，统一的json安置在StreamingAssetsPath这个路径下，打包的时候的特殊文件夹，不会被压缩
+        // string path = Path.Combine(Application.streamingAssetsPath, levelConfigFileName);
+
+        // if (File.Exists(path))
+        // {
+        //     string json = File.ReadAllText(path);
+        //     levelConfig = JsonUtility.FromJson<LevelConfig>(json);//通过这个方法来获得json的内容赋值给levelConfig
+        //     Debug.Log(" 成功加载关卡配置，共有关卡：" + levelConfig.levels.Count);
+        //     Debug.Log(levelConfig.levels[1].steps);
+        // }
+        // else
+        // {
+        //     Debug.LogError($"Config file not found at : {path}");
+        // }
+        TextAsset jsonFile = Resources.Load<TextAsset>("configs/levels"); // 不用.json扩展名
+        if (jsonFile == null)
         {
-            string json = File.ReadAllText(path);
-            levelConfig = JsonUtility.FromJson<LevelConfig>(json);//通过这个方法来获得json的内容赋值给levelConfig
-            Debug.Log(" 成功加载关卡配置，共有关卡：" + levelConfig.levels.Count);
-            Debug.Log(levelConfig.levels[1].steps);
+            Debug.LogError("找不到 levelConfig.json，请确认放在 Resources 文件夹!");
+            return;
         }
-        else
-        {
-            Debug.LogError($"Config file not found at : {path}");
-        }
+
+        levelConfig = JsonUtility.FromJson<LevelConfig>(jsonFile.text);
+        Debug.Log("成功加载关卡配置，共有关卡：" + levelConfig.levels.Count);
     }
     private void LoadWordsConfig()
     {
-        //定义文件查找路径，统一的json安置在StreamingAssetsPath这个路径下，打包的时候的特殊文件夹，不会被压缩
-        string path = Path.Combine(Application.streamingAssetsPath, wordsConfigFileName);
-        if (File.Exists(path))
-        {
-            string json = File.ReadAllText(path);
-            wordsConfig = JsonUtility.FromJson<WordsConfig>(json);//通过这个方法来获得json的内容赋值给levelConfig
-            Debug.Log(" 成功加载词语配置，共有词语：" + wordsConfig.words.Count);
+        // //定义文件查找路径，统一的json安置在StreamingAssetsPath这个路径下，打包的时候的特殊文件夹，不会被压缩
+        // string path = Path.Combine(Application.streamingAssetsPath, wordsConfigFileName);
+        // if (File.Exists(path))
+        // {
+        //     string json = File.ReadAllText(path);
+        //     wordsConfig = JsonUtility.FromJson<WordsConfig>(json);//通过这个方法来获得json的内容赋值给levelConfig
+        //     Debug.Log(" 成功加载词语配置，共有词语：" + wordsConfig.words.Count);
 
-        }
-        else
+        // }
+        // else
+        // {
+        //     Debug.LogError($"Config file not found at : {path}");
+        // }
+        TextAsset jsonFile = Resources.Load<TextAsset>("configs/words");
+        if (jsonFile == null)
         {
-            Debug.LogError($"Config file not found at : {path}");
+            Debug.LogError("找不到 wordsConfig.json，请确认放在 Resources！");
+            return;
         }
+
+        wordsConfig = JsonUtility.FromJson<WordsConfig>(jsonFile.text);
+        Debug.Log("成功加载词语配置，共有词语：" + wordsConfig.words.Count);
     }
     private void LoadLanguageConfig()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, languageConfigFileName);
-        if (File.Exists(path))
+        // string path = Path.Combine(Application.streamingAssetsPath, languageConfigFileName);
+        // if (File.Exists(path))
+        // {
+        //     string json = File.ReadAllText(path);
+        //     languageConfig = JsonUtility.FromJson<LanguageDataConfig>(json);
+        //     languageDict = languageConfig.languages.ToDictionary(x => x.id, x => x.text);
+        //     Debug.Log("成功加载多语言表json，共有多语言" + languageConfig.languages.Count);
+        // }
+        // else
+        // {
+        //     Debug.LogError($"Config file not found at : {path}");
+        // }
+        TextAsset jsonFile = Resources.Load<TextAsset>("configs/language");
+        if (jsonFile == null)
         {
-            string json = File.ReadAllText(path);
-            languageConfig = JsonUtility.FromJson<LanguageDataConfig>(json);
-            languageDict = languageConfig.languages.ToDictionary(x => x.id, x => x.text);
-            Debug.Log("成功加载多语言表json，共有多语言" + languageConfig.languages.Count);
+            Debug.LogError("找不到 languageConfig.json，请确认放在 Resources！");
+            return;
         }
-        else
-        {
-            Debug.LogError($"Config file not found at : {path}");
-        }
+
+        languageConfig = JsonUtility.FromJson<LanguageDataConfig>(jsonFile.text);
+        languageDict = languageConfig.languages.ToDictionary(x => x.id, x => x.text);
+
+        Debug.Log("成功加载多语言表，共有：" + languageConfig.languages.Count);
     }
     #endregion
 
@@ -133,4 +165,4 @@ public class LevelConfigLoader : MonoBehaviour
 
     }
 }
-    #endregion
+#endregion
