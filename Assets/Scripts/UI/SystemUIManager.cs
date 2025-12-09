@@ -63,15 +63,12 @@ public enum UIType
     Victory
 }
 
-[RequireComponent(typeof(Canvas))]
-
 /// <summary>
 /// 加入新界面时须向该类添加 InitXXX 方法，并补充 InitUICallbacks 和 LoadUI 方法的switch分支
 /// </summary>
 public class SystemUIManager : MonoBehaviour
 {
     private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
-    private const string MAIN_CAMERA_TAG = "MainCamera";
 
 #region 异常消息内容常量
     private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";
@@ -588,6 +585,7 @@ public class SystemUIManager : MonoBehaviour
     {
         EnergyUIController.NumEnergy = PlayerEnergy.GetEnergy();
         EnergyUIController.maxEnergy = PlayerEnergy.MaxEnergy;
+        EnergyUIController.SecondsToRecover = PlayerEnergy.SecondsToRecover;
     }
     private void InitHomeUI()
     {
@@ -684,8 +682,6 @@ public class SystemUIManager : MonoBehaviour
 
     private void InitUIManager()
     {
-        GetComponent<Canvas>().worldCamera = GameObject.FindGameObjectWithTag(MAIN_CAMERA_TAG).GetComponent<Camera>();
-
         Instance = this;
         uiInstances = new object[Enum.GetValues(typeof(UIType)).Length];
         uiInstances[(uint)UIType.Item] = new LinkedList<ItemUIController>();
