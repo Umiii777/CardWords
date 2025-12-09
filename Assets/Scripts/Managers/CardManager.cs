@@ -27,10 +27,20 @@ public class CardManager : MonoBehaviour
 
     public void UnregisterCard(Card card)
     {
+        Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
         if (allCards.Contains(card))
-            allCards.Remove(card);
-        else if(allCards.Count==0)
         {
+            allCards.Remove(card);
+            Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
+            if (allCards.Count == 0)
+            {
+                Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
+                OnCompleteLevel();
+            }
+        }
+        else if (allCards.Count == 0)
+        {
+            Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
             OnCompleteLevel();
         }
     }
@@ -43,7 +53,7 @@ public class CardManager : MonoBehaviour
             allRows.Add(row);
         }
     }
-    public void UnregisterCard(Row row)
+    public void UnregisterRow(Row row)
     {
         if (allRows.Contains(row))
         {
@@ -62,7 +72,7 @@ public class CardManager : MonoBehaviour
         List<Card> currentLevelCardsOnFront = new List<Card>();
         foreach (var card in allCards)
         {
-            if (card.isFront && card.isOnMainRow&&card.cardData.isMainCard)
+            if (card.isFront && card.isOnMainRow && card.cardData.isMainCard)
             {
                 currentLevelCardsOnFront.Add(card);
             }

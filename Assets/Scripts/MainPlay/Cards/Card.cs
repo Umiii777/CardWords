@@ -209,10 +209,10 @@ public class Card : MonoBehaviour
         CardManager.Instance.allCards.Add(this);
     }
 
-    private void OnDisable()
-    {
-        CardManager.Instance.allCards.Remove(this);
-    }
+    // private void OnDisable()
+    // {
+    //     CardManager.Instance.allCards.Remove(this);
+    // }
     #endregion
 
     #region MainCard方法
@@ -235,8 +235,9 @@ public class Card : MonoBehaviour
     public void CompleteMainCard()
     {
         currentMainRow.isEmpty = true;
-        gameObject.SetActive(false);
         onCompleteMainCard.RaiseEvent(this, this);
+        gameObject.SetActive(false);
+
     }
     #endregion
 
@@ -244,6 +245,7 @@ public class Card : MonoBehaviour
     {
         onCompleteCard.RaiseEvent(this, this);
         gameObject.SetActive(false);
+
     }
 
 
@@ -254,7 +256,7 @@ public class Card : MonoBehaviour
         {
             image.enabled = false;
         }
-        foreach(var text in allTexts)
+        foreach (var text in allTexts)
         {
             text.enabled = false;
         }
@@ -278,11 +280,11 @@ public class Card : MonoBehaviour
     {
         onFinishAnim.PlayAnims();
     }
-    
+
     public void EndDragAnimPlay()
     {
         OnEndDragAnim.PlayAnims();
     }
     #endregion
-    
+
 }

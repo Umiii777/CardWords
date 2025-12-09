@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -136,7 +137,7 @@ public class CardDragHandler : MonoBehaviour,
         {
 
             TryMerge(best);
-            
+
             CardStack.EndDragStackSetCg(top);
             cg.blocksRaycasts = true;
 
@@ -297,10 +298,13 @@ public class CardDragHandler : MonoBehaviour,
             {
                 //触发card自身的被合成东西+表现
                 card.CardSetAllInvisible();
+///动画搞得没法通关
                 card.onFinishAnim.endingAnims = () =>
-                top.gameObject.SetActive(false);
+                top.CompleteNormalCard();
+
+
                 card.CardSetAnimPlay();
-                
+
                 target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
 
@@ -316,7 +320,7 @@ public class CardDragHandler : MonoBehaviour,
                 {
                     card.CardSetAllInvisible();
                     card.onFinishAnim.endingAnims = () =>
-                    card.gameObject.SetActive(false);
+                    card.CompleteNormalCard();
                     card.CardSetAnimPlay();
                 }
                 target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
@@ -346,7 +350,7 @@ public class CardDragHandler : MonoBehaviour,
 
         // 第一种情况: 单到单（目标是单张且正面）
         if (target.cardData.mainId == top.cardData.mainId &&
-            target.isFront && !target.isInStack && !top.isInStack)
+            target.isFront && !target.isInStack && !top.isInStack && !top.cardData.isMainCard)
         {
             Debug.Log("准备单到单");
             CardStack.OneAddToOne(target, top);
@@ -363,9 +367,10 @@ public class CardDragHandler : MonoBehaviour,
             return;
         }
 
+
         // 第二种情况: 单到多（把单张加入到已有的 stack 顶部）
         if (target.cardData.mainId == top.cardData.mainId && !top.isInStack &&
-            target.isFront && target.isInStack && !top.childCards.Contains(target))
+            target.isFront && target.isInStack && !top.childCards.Contains(target) && !top.cardData.isMainCard)
         {
             Debug.Log("准备单到多");
             // 允许把单张放到已有堆栈

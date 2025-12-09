@@ -62,7 +62,7 @@ public class LevelConfigLoader : MonoBehaviour
         // {
         //     Debug.LogError($"Config file not found at : {path}");
         // }
-        TextAsset jsonFile = Resources.Load<TextAsset>("configs/levels"); // 不用.json扩展名
+        TextAsset jsonFile = Resources.Load<TextAsset>("configs/level"); // 不用.json扩展名
         if (jsonFile == null)
         {
             Debug.LogError("找不到 levelConfig.json，请确认放在 Resources 文件夹!");
