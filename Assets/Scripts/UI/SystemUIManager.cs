@@ -566,6 +566,7 @@ public class SystemUIManager : MonoBehaviour
     {
         //启动时直接显示大厅
         uiInstances[(uint)UIType.Home] = CreateUI(null, homeUIPrefab, InitHomeUI);
+        InitInLevelUIs();
 
 //#if UNITY_EDITOR
         // UI加载示例：
@@ -706,7 +707,7 @@ public class SystemUIManager : MonoBehaviour
         initingHome = () => AudioManager.Instance.PlayBGM(
             homeBGMTypes[DateTimeOffset.UtcNow.ToUnixTimeSeconds() % homeBGMTypes.Length]
         );
-        loadingLevel = async (level, _) => { InitInLevelUIs(); LevelManager.Instance.InitCurrentLevel(level); };
+        loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
         addingSteps = async () => StepManager.Instance.AddExtraSteps();
         unlockingSlot = async row => Row.OnChangeMainRowType(row);
     #endregion

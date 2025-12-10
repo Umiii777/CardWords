@@ -80,7 +80,6 @@ public class PlayerEnergy
             {
                 if (Energy < MaxEnergy)
                 {
-                    Debug.Log(SecondsToRecover);
                     yield return waitOneSec;
                     SecondsToRecover = (SecondsToRecover - 1 + SECONDS_TO_RECOVER) % SECONDS_TO_RECOVER;
                     if (SecondsToRecover == 0)
