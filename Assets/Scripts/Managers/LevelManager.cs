@@ -276,8 +276,10 @@ public class LevelManager : MonoBehaviour
                 //改变生成的卡牌的布局
                 RectTransform currentTransform = card.GetComponent<RectTransform>();
                 currentTransform.SetParent(canvas, false);
+                currentTransform.localScale = Vector3.one;
                 currentTransform.anchoredPosition = new Vector2(currentRowX[i] + startX, rowY - j * cardColumnOffset);
                 currentTransform.SetParent(dragLayer, false);
+                currentTransform.localScale = Vector3.one;
             }
         }
         //TODO：将剩下的卡牌分给CardDeck,数据传递
