@@ -544,7 +544,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1353108658}
         m_TargetAssemblyTypeName: SystemUIManager, Assembly-CSharp
         m_MethodName: FireLoadUI
         m_Mode: 5
@@ -2170,6 +2170,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
+--- !u!114 &1353108658 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3072738582506611242, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
+  m_PrefabInstance: {fileID: 1353108657}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a201edd37aba9548a0b1a852e284440, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1372688636
 GameObject:
   m_ObjectHideFlags: 0

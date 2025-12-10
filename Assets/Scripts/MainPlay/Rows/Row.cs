@@ -31,7 +31,7 @@ public class Row : MonoBehaviour
 
     public void OnClickUnlockedRow()
     {
-        SystemUIManager.LoadUI(UIType.UnlockSlot, this);
+        _= SystemUIManager.LoadUI(UIType.UnlockSlot, this);
     }
 
 
