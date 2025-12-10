@@ -117,6 +117,7 @@ public class Card : MonoBehaviour
             tmContent.alpha = 0f;
             cardContentImage.gameObject.SetActive(false);
             cardBaseStyle.sprite = CardVisualManager.Instance.spriteBack;
+            tmLength.text = "";
         }
     }
     public void SetFront()
