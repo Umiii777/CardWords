@@ -434,7 +434,7 @@ public class SystemUIManager : MonoBehaviour
                         PlayerAd.AddWatchedAdd();
                         Instance.OnWatchAd();
                     }
-                    if (PlayerAd.GetWatchedAd() == configs[1])
+                    if (PlayerAd.GetWatchedAd() >= configs[1])
                     {
                         PlayerAd.AddWatchedAdd(-configs[1]);
                         PlayerCoin.AddCoin(configs[0]);
@@ -607,35 +607,37 @@ public class SystemUIManager : MonoBehaviour
         itemUI.price = int.Parse(infos[1]);
         itemUI.descriptionText.text = infos[2];
         itemUI.iconImage.sprite = itemInfoIcon.Item2;
-        itemUI.clickingClose = () =>
+
+        void destroyItemUI()
         {
             (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
             Destroy(itemUI.gameObject);
-        };
-
-        if (!ItemUIController.dictCachedClickings.TryGetValue(itemType, out ValueTuple<Func<int, Task>, Func<Task>> cachedClickings))
+        }
+        itemUI.clickingClose = destroyItemUI;
+        if (!ItemUIController.clickingsCache.TryGetValue(itemType, out var cachedClickings))
         {
             cachedClickings = (
-            async price =>
-            {
-                if (PlayerCoin.TrySpendCoin(price))
+                async price =>
                 {
+                    if (PlayerCoin.TrySpendCoin(price))
+                    {
+                        PlayerItem.AddItem(itemType, 1);
+                        await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
+                        return;
+                    }
+                    await PopUpTips(TIPS_COIN_LACK, Instance.transform);
+                },
+                async () =>
+                {
+                    await Task.Delay(1000); //假装播放1秒广告
                     PlayerItem.AddItem(itemType, 1);
-                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
-                    return;
+                    await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
                 }
-                await PopUpTips(TIPS_COIN_LACK, Instance.transform);
-            },
-            async () =>
-            {
-                await Task.Delay(1000); //假装播放1秒广告
-                PlayerItem.AddItem(itemType, 1);
-                await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
-            }
             );
-            ItemUIController.dictCachedClickings.Add(itemType, cachedClickings);
+            ItemUIController.clickingsCache.Add(itemType, cachedClickings);
         }
-        (itemUI.clickingBuy, itemUI.clickingWatchAd) = cachedClickings;
+        itemUI.clickingBuy = async price => { await cachedClickings.Item1(price); destroyItemUI(); };
+        itemUI.clickingWatchAd = async () => { await cachedClickings.Item2(); destroyItemUI(); };
         itemUI.clickingWatchAd = FireAndBan(itemUI);
     }
     private void InitSettingsUI(bool isInLevel)
