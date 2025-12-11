@@ -190,7 +190,11 @@ public class SystemUIManager : MonoBehaviour
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
-                            () => { Instance.InitDefeatUI((float)args[0]); playLoadingAudio(UISFXtype.Defeat); }
+                            /* NOTE: 下面这行使用强制类型转换 (float)args[0] 会引发异常
+                                因为如果 args[0] 的实际类型是 int，则必须先拆箱为 int 再进行转换
+                                即 (float)(int)args[0]（double同理）。而 Convert.ToSingle 会自动进行拆箱
+                            */
+                            () => { Instance.InitDefeatUI(Convert.ToSingle(args[0])); playLoadingAudio(UISFXtype.Defeat); }
                         );
                     return;
                 case UIType.Item:
@@ -610,6 +614,8 @@ public class SystemUIManager : MonoBehaviour
 
         void destroyItemUI()
         {
+            if (itemUI == null)
+                return;
             (uiInstances[(uint)UIType.Item] as LinkedList<ItemUIController>).Remove(itemUI);
             Destroy(itemUI.gameObject);
         }
