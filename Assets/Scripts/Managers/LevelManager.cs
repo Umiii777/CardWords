@@ -69,11 +69,6 @@ public class LevelManager : MonoBehaviour
         PlayerPrefs.DeleteAll();
         Debug.Log(PlayerProgress.GetCurrentLevel());
         PlayerProgress.SetCurrentLevel(101);
-        //currentLevelNum = PlayerProgress.GetCurrentLevel();
-        //SystemUIManager.loadingLevel += async (_, _) => InitCurrentLevel(currentLevelNum);
-
-        
-
     }
     private void Start()
     {

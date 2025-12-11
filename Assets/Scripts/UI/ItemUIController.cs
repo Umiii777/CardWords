@@ -13,7 +13,7 @@ public class ItemUIController : AdProcessor<ItemUIController>, IAudioTrigger
     public static Dictionary<
         ItemType,
         ValueTuple<Func<int, Task>, Func<Task>>
-    > dictCachedClickings = new();
+    > clickingsCache = new();
 
 #region 按钮回调委托
     /// <summary>
