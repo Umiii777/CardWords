@@ -133,7 +133,7 @@ public class CardDragHandler : MonoBehaviour,
 
         }
         // 2. 落到卡上（合并逻辑）
-        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront && best.cg.blocksRaycasts)
+        if (best && !best.cardData.isMainCard && !best.isFromDeck && best.isFront && best.cg.blocksRaycasts && !top.cardData.isMainCard)
         {
 
             TryMerge(best);
@@ -159,6 +159,8 @@ public class CardDragHandler : MonoBehaviour,
         top.CardShake();
         CardStack.UpdateStackPositions(top);
         CardStack.EndDragStackSetCg(top);
+        if (!top.isInStack)
+            top.transform.SetAsLastSibling();
         cg.blocksRaycasts = true;
     }
 
@@ -298,7 +300,7 @@ public class CardDragHandler : MonoBehaviour,
             {
                 //触发card自身的被合成东西+表现
                 card.CardSetAllInvisible();
-///动画搞得没法通关
+                ///动画搞得没法通关
                 card.onFinishAnim.endingAnims = () =>
                 top.CompleteNormalCard();
 
