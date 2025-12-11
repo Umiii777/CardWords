@@ -98,10 +98,10 @@ public class Row : MonoBehaviour
     }
 
     //CardManger加载保存
-    private void OnEnable()
-    {
-        CardManager.Instance.allRows.Add(this);
-    }
+    // private void OnEnable()
+    // {
+    //     CardManager.Instance.allRows.Add(this);
+    // }
 
     private void OnDisable()
     {
