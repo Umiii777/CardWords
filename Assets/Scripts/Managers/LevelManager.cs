@@ -78,7 +78,7 @@ public class LevelManager : MonoBehaviour
         dragLayer = UIManager.Instance.dragLayer;
         rowLayer = UIManager.Instance.rowLayer;
     }
-
+    #region  关卡初始化
     public void InitCurrentLevel(int currentLevelNUm)
     {
         ClearLevel();
@@ -99,10 +99,8 @@ public class LevelManager : MonoBehaviour
         //数据层
         currentLevelData = LevelConfigLoader.Instance.GetLevelData(currentLevelNUm);
 
-
-        Debug.Log(currentLevelData.steps);
         stepManager.InitSetSteps(currentLevelData.steps);
-
+        LevelHint.Instance.SetLevelHint(currentLevelNUm);
         //表现层,可用列数，可用主槽位数，初始的卡牌排布
         int[] normalRows = currentLevelData.rows;
         int[] mainGroup = currentLevelData.mainGroup;
@@ -123,59 +121,8 @@ public class LevelManager : MonoBehaviour
         AudioManager.Instance.PlayBGM(AudioManager.BGMType.PlayTheme);
 
     }
-    [ContextMenu("直接通关,到下一关")]
-    public void TestLevelComplete()
-    {
-        currentLevelNum++;
-        PlayerProgress.SetCurrentLevel(currentLevelNum);
-        SystemUIManager.LoadUI(UIType.Victory, 0);
-    }
-
-    //加载关卡配置，TODO：初始化对象池
-    // [ContextMenu("测试读取")]
-    // public void LoadLevel()
-    // {
-    //     //清空此前数据
-    //     currentNormalCardDatas.Clear();
-    //     currentMainCardDatas.Clear();
-    //     currentTotalCardDatas.Clear();
-    //     currentWordsData.Clear();//用于从words表中获取内容的操作列表
-    //     currentCardDeckDatas.Clear();
-    //     currentCardsOnSlot.Clear();
-    //     rowManager.rows.Clear();
-    //     rowManager.mainRows.Clear();
-
-    //     currentCardInitNum = 0;// 根据这个顺序先给下方的卡牌赋值
-
-    //     //数据层
-    //     currentLevelData = LevelConfigLoader.Instance.GetLevelData(101);
-
-
-    //     Debug.Log(currentLevelData.steps);
-    //     stepManager.InitSetSteps(currentLevelData.steps);
-
-    //     //表现层,可用列数，可用主槽位数，初始的卡牌排布
-    //     int[] normalRows = currentLevelData.rows;
-    //     int[] mainGroup = currentLevelData.mainGroup;
-    //     int mainRows = currentLevelData.column;
-
-    //     Debug.Log(normalRows.Count());
-    //     Debug.Log(mainRows);
-
-    //     //设置关卡的列排布
-    //     SetLevelLayout(normalRows, mainRows);
-    //     //初始化关卡数据,得到的总卡结果是：currentTotalCardDatas
-    //     SetLevelCardsData(currentLevelData);
-    //     //初始化牌组内容
-
-
-    //     //表现层，根据排列数组生成卡牌,同时也把剩下的数据给了CardDeck
-    //     SetLevelCardLayout(normalRows);
-    // }
-
-
-
-    #region 处理关卡排布
+    #endregion
+    #region 处理关卡整体排布
     public void SetLevelLayout(int[] rows, int mainRow)
     {
         //规定行列的高
@@ -187,7 +134,10 @@ public class LevelManager : MonoBehaviour
         //处理mainrow
         SetLevelMainRow(currentMainRowX, mainRow);
     }
+    #endregion
     //生成关卡的普通列分布
+    #region 处理关卡普通列
+
     public void SetLevelRow(float[] rowx, int[] rows)
     {
         for (int i = 0; i < rowx.Count(); i++)
@@ -215,6 +165,8 @@ public class LevelManager : MonoBehaviour
         }
         Debug.Log(rowManager.rows);
     }
+    #endregion
+    #region 处理关卡主列
     //生成关卡的主列分布
     public void SetLevelMainRow(float[] mainRowx, int mainrow)
     {
@@ -255,6 +207,8 @@ public class LevelManager : MonoBehaviour
 
         }
     }
+    #endregion
+    #region 读取关卡排列
     //读取关卡的卡牌排列
     public void SetLevelCardLayout(int[] rows)
     {
@@ -368,22 +322,9 @@ public class LevelManager : MonoBehaviour
     #region 清除关卡
     public void ClearLevel()
     {
-        Debug.LogError("HasInClearLevel");
+        //Debug.LogError("HasInClearLevel");
         rowManager.rows.Clear();
         rowManager.mainRows.Clear();
-        // // 清卡牌
-        // foreach (var card in CardManager.Instance.allCards)
-        // {
-        //     cardPool.Release(card.gameObject);
-        // }
-        // CardManager.Instance.allCards.Clear();
-
-        // // 清列
-        // foreach (var row in CardManager.Instance.allRows)
-        // {
-        //     rowPool.Release(row.gameObject);
-        // }
-        // CardManager.Instance.allRows.Clear();
         List<Card> cards = CardManager.Instance.allCards;
         for (int i = 0; i < cards.Count; i++)
         {
@@ -394,14 +335,7 @@ public class LevelManager : MonoBehaviour
 
 
         List<Row> rows = CardManager.Instance.allRows;
-        // for (int i = 0; i < rows.Count; i++)
-        // {
-        //     rowPool.Release(rows[i].gameObject);
-        // }
-        // for (int i = 0; i < rows.Count; i++)
-        // {
-        //     mainRowpool.Release(rows[i].gameObject);
-        // }
+
         foreach (var normalRow in mornalRowPoolList)
         {
             rowPool.Release(normalRow.gameObject);
@@ -410,13 +344,22 @@ public class LevelManager : MonoBehaviour
         {
             mainRowpool.Release(mainRow.gameObject);
         }
-
-
+        mornalRowPoolList.Clear();
+        mainRowPoolList.Clear();
         rows.Clear();
 
 
         CardManager.Instance.allRows.Clear();
 
+    }
+    #endregion
+    #region 测试功能方法组
+    [ContextMenu("直接通关,到下一关")]
+    public void TestLevelComplete()
+    {
+        currentLevelNum++;
+        PlayerProgress.SetCurrentLevel(currentLevelNum);
+        SystemUIManager.LoadUI(UIType.Victory, 0);
     }
     #endregion
 }

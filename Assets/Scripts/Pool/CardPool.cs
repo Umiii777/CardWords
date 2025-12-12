@@ -38,6 +38,14 @@ public class CardPool : MonoBehaviour
 
     private void OnGetCard(GameObject card)
     {
+        var r = card.GetComponent<Card>();
+        if (r != null)
+        {
+            r.isOnMainRow = false;
+            r.isFromDeck = false;
+            r.childCards.Clear(); // default
+            r.isFront =false;
+        }
         card.SetActive(true);
     }
 
