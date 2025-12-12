@@ -115,7 +115,7 @@ public class SystemUIManager : MonoBehaviour
 #region 游戏内所有道具的信息和图标
     public string[] itemInfos;
     public Sprite[] itemIcons;
-    private Dictionary<ItemType, ValueTuple<string, Sprite>> dictItemInfoIcons;
+    private Dictionary<ItemType, (string ItemInfo, Sprite ItemIcon)> dictItemInfoIcons;
 #endregion
 
 #region 各界面预制体
@@ -153,9 +153,12 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     private TextMeshProUGUI[] inLevelCoinsTexts;
     /// <summary>
-    /// 使用道具按钮
+    /// 关卡内道具按钮，以及右上角显示道具数量的文本、广告图标
     /// </summary>
-    private Button[] inLevelItemButtons;
+    private readonly Dictionary<
+        ItemType,
+        (Button ItemButton, TextMeshProUGUI ItemCountText, GameObject AdIcon)
+    > inLevelItems = new();
 #endregion
 
     private object[] uiInstances;
@@ -164,7 +167,7 @@ public class SystemUIManager : MonoBehaviour
     /// <br/><br/>
     /// Values: { Item1: UIType 对应的预制体; Item2: UIType 对应的初始化方法（即 SystemUIManager.InitXXX）}
     /// </summary>
-    private Dictionary<UIType, ValueTuple<MonoBehaviour, Action>> dictPrefabInitings;
+    private Dictionary<UIType, (MonoBehaviour UIPrefab, Action Initing)> dictPrefabInitings;
 
 #region 静态方法
     /// <summary>
@@ -245,8 +248,8 @@ public class SystemUIManager : MonoBehaviour
                         ));
                     Instance.uiInstances[(uint)type] = Instance.CreateUI(
                         Instance.uiInstances[(uint)type] as MonoBehaviour,
-                        Instance.dictPrefabInitings[type].Item1,
-                        Instance.dictPrefabInitings[type].Item2
+                        Instance.dictPrefabInitings[type].UIPrefab,
+                        Instance.dictPrefabInitings[type].Initing
                     );
                     return;
                 }
@@ -349,8 +352,8 @@ public class SystemUIManager : MonoBehaviour
                     }
                     if (PlayerCoin.TrySpendCoin(price))
                     {
+                        Instance.OnUpdateCoin();
                         PlayerEnergy.AddEnergy(1);
-                        Instance.OnUpdateCoin(-price);
                         await onAddEnergy();
                         return;
                     }
@@ -386,7 +389,7 @@ public class SystemUIManager : MonoBehaviour
                     }
                     if (PlayerEnergy.TrySpendEnergy(HomeUIController.NumEnergyToPlay))
                     {
-                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，目前没必要调 OnUpdateEnergy
+                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，因此目前没必要调 OnUpdateEnergy
                         await loadingLevel(level, default); // 加载玩家到达的最后一个关卡
                         destroyUI(type);
                         return;
@@ -415,12 +418,13 @@ public class SystemUIManager : MonoBehaviour
                     //Instance.OnWatchAd(); // 目前没必要调 OnWatchAd
                     destroyUI(type);
                 };
-                ShopUIController.clickingBuy = async (ItemType, count, price) =>
+                ShopUIController.clickingBuy = async (itemType, count, price) =>
                 {
                     if (PlayerCoin.TrySpendCoin(price))
                     {
-                        PlayerItem.AddItem(ItemType, count);
-                        Instance.OnUpdateCoin(-price);
+                        Instance.OnUpdateCoin();
+                        PlayerItem.AddItem(itemType, count);
+                        Instance.OnUpdateItem(itemType);
                         await PopUpTips(TIPS_SUCCESSFUL_REDEEM);
                         return;
                     }
@@ -437,9 +441,9 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerAd.GetWatchedAd() >= configs[1])
                     {
                         PlayerAd.AddWatchedAdd(-configs[1]);
-                        PlayerCoin.AddCoin(configs[0]);
                         Instance.OnWatchAd();
-                        Instance.OnUpdateCoin(configs[0]);
+                        PlayerCoin.AddCoin(configs[0]);
+                        Instance.OnUpdateCoin(true);
                         await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     }
                 };
@@ -461,7 +465,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     int numCoins = VictoryUIController.numCoinsToReceive;
                     PlayerCoin.AddCoin(numCoins);
-                    Instance.OnUpdateCoin(numCoins, true);
+                    Instance.OnUpdateCoin(true, true);
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
                     destroyUI(type);
@@ -476,7 +480,7 @@ public class SystemUIManager : MonoBehaviour
                     int numCoins = VictoryUIController.numCoinsToReceive * 10;
                     await Task.Delay(1000); //假装播放1秒广告
                     PlayerCoin.AddCoin(numCoins);
-                    Instance.OnUpdateCoin(numCoins, true);
+                    Instance.OnUpdateCoin(true, true);
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING);
                     await LoadUI(UIType.Home);
                     destroyUI(type);
@@ -599,14 +603,14 @@ public class SystemUIManager : MonoBehaviour
     }
     private void InitItemUI(ItemUIController itemUI, ItemType itemType)
     {
-        ValueTuple<string, Sprite> itemInfoIcon = dictItemInfoIcons[itemType];
-        string[] infos = itemInfoIcon.Item1.Split('`');
+        var (ItemInfo, ItemIcon) = dictItemInfoIcons[itemType];
+        string[] infos = ItemInfo.Split('`');
 
         itemUI.itemType = itemType;
         itemUI.nameText.text = infos[0];
         itemUI.price = int.Parse(infos[1]);
         itemUI.descriptionText.text = infos[2];
-        itemUI.iconImage.sprite = itemInfoIcon.Item2;
+        itemUI.iconImage.sprite = ItemIcon;
 
         void destroyItemUI()
         {
@@ -623,7 +627,9 @@ public class SystemUIManager : MonoBehaviour
                 {
                     if (PlayerCoin.TrySpendCoin(price))
                     {
+                        Instance.OnUpdateCoin(false, true);
                         PlayerItem.AddItem(itemType, 1);
+                        Instance.OnUpdateItem(itemType);
                         await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
                         return;
                     }
@@ -633,13 +639,14 @@ public class SystemUIManager : MonoBehaviour
                 {
                     await Task.Delay(1000); //假装播放1秒广告
                     PlayerItem.AddItem(itemType, 1);
+                    Instance.OnUpdateItem(itemType);
                     await PopUpTips(TIPS_SUCCESSFUL_RECEIVING, Instance.transform);
                 }
             );
             ItemUIController.clickingsCache.Add(itemType, cachedClickings);
         }
-        itemUI.clickingBuy = async price => { await cachedClickings.Item1(price); destroyItemUI(); };
-        itemUI.clickingWatchAd = async () => { await cachedClickings.Item2(); destroyItemUI(); };
+        itemUI.clickingBuy = async price => { await cachedClickings.ClickingBuy(price); destroyItemUI(); };
+        itemUI.clickingWatchAd = async () => { await cachedClickings.ClickingWatchAd(); destroyItemUI(); };
         itemUI.clickingWatchAd = FireAndBan(itemUI);
     }
     private void InitSettingsUI(bool isInLevel)
@@ -663,9 +670,9 @@ public class SystemUIManager : MonoBehaviour
 #endregion
 
 #region 玩家资源更新响应
-    private void OnUpdateCoin(int count, bool isInLevel = false)
+    private void OnUpdateCoin(bool isGaining = false, bool isInLevel = false)
     {
-        if (count > 0)
+        if (isGaining)
             AudioManager.Instance.PlayUISFX(UISFXtype.GetCoins);
 
         int numCoins = PlayerCoin.GetCoin();
@@ -681,6 +688,14 @@ public class SystemUIManager : MonoBehaviour
         EnergyUIController.NumEnergy = numEnergy;
         HomeUIController.NumEnergy = numEnergy;
         ShopUIController.NumEnergy = numEnergy;
+    }
+    private void OnUpdateItem(ItemType itemType)
+    {
+        int itemCount = PlayerItem.GetItem(itemType);
+        bool isItemLeft = itemCount > 0;
+        var (_, itemCountText, adIcon) = inLevelItems[itemType];
+        itemCountText.text = isItemLeft ? itemCount.ToString() : "";
+        adIcon.SetActive(!isItemLeft);
     }
     private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
 #endregion
@@ -733,33 +748,58 @@ public class SystemUIManager : MonoBehaviour
             .ToArray();
         Array.ForEach(inLevelButtons, b => b.onClick.AddListener(() => AudioManager.Instance.PlayUISFX(UISFXtype.ClickButton)));
 
-        inLevelItemButtons = inLevelButtons
-            .Where(b => Enum.GetNames(typeof(ItemType))
-                .Any(n => n.Equals(b.name, StringComparison.OrdinalIgnoreCase))
-            ).ToArray();
-        InitItemButtons();
+        Array.ForEach(
+            inLevelButtons,
+            b =>
+            {
+                if (!Enum.TryParse(b.name, true, out ItemType itemType))
+                    return;
+                inLevelItems.Add(
+                    itemType,
+                    (b, b.GetComponentInChildren<TextMeshProUGUI>(), b.transform.GetChild(0).GetChild(1).gameObject)
+                );
+            }
+        );
+        InitInLevelItems();
     }
 
-    private void InitItemButtons()
+    private void InitInLevelItems()
     {
-        foreach (var i in Enumerable.Range(0, inLevelItemButtons.Length))
+        foreach (var kv in inLevelItems)
         {
-            Action[] usingItems = new Action[]
+            ItemType itemType = kv.Key;
+            var (itemButton, itemCountText, adIcon) = kv.Value;
+        #region 绑定按钮响应
+            Action clicking = null;
+            switch (itemType)
             {
-                async () => await RowManager.Instance.HintTry(),
-                DeckManager.Instance.ShuffleDeck
-            };
-            inLevelItemButtons[i].onClick.AddListener(async () =>
+                case ItemType.Hint:
+                    clicking = async () => await RowManager.Instance.HintTry();
+                    break;
+                case ItemType.Shuffle:
+                    clicking = DeckManager.Instance.ShuffleDeck;
+                    break;
+            }
+            itemButton.onClick.AddListener(async() =>
             {
-                ItemType type = (ItemType)i + 1;
-                if (PlayerItem.TrySpendItem(type, 1))
+                if (PlayerItem.TrySpendItem(itemType, 1))
                 {
-                    usingItems[i]();
+                    OnUpdateItem(itemType);
+                    clicking();
                     return;
                 }
-                await LoadUI(UIType.Item, type);
+                await LoadUI(UIType.Item, itemType);
                 await PopUpTips(TIPS_ASKING_ITEM);
             });
+        #endregion
+        #region 初始化道具角标
+            int itemCount = PlayerItem.GetItem(itemType);
+            if (itemCount > 0)
+            {
+                itemCountText.text = itemCount.ToString();
+                adIcon.SetActive(false);
+            }
+        #endregion
         }
     }
 
