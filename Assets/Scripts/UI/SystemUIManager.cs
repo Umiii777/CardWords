@@ -190,10 +190,6 @@ public class SystemUIManager : MonoBehaviour
                         Instance.uiInstances[(uint)type] = Instance.CreateUI(
                             Instance.uiInstances[(uint)type] as DefeatUIController,
                             Instance.defeatUIPrefab,
-                            /* NOTE: 下面这行使用强制类型转换 (float)args[0] 会引发异常
-                                因为如果 args[0] 的实际类型是 int，则必须先拆箱为 int 再进行转换
-                                即 (float)(int)args[0]（double同理）。而 Convert.ToSingle 会自动进行拆箱
-                            */
                             () => { Instance.InitDefeatUI(Convert.ToSingle(args[0])); playLoadingAudio(UISFXtype.Defeat); }
                         );
                     return;
@@ -321,7 +317,7 @@ public class SystemUIManager : MonoBehaviour
                         return;
                     if (PlayerEnergy.TrySpendEnergy(1))
                     {
-                        //Instance.OnUpdateEnergy(); // 没必要调 OnUpdateEnergy
+                        //Instance.OnUpdateEnergy(); // 目前没必要调 OnUpdateEnergy
                         await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
                         destroyUI(type);
                         return;
@@ -390,7 +386,7 @@ public class SystemUIManager : MonoBehaviour
                     }
                     if (PlayerEnergy.TrySpendEnergy(HomeUIController.NumEnergyToPlay))
                     {
-                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，没必要调 OnUpdateEnergy
+                        //Instance.OnUpdateEnergy(); // 进关卡后不会立即显示体力值，目前没必要调 OnUpdateEnergy
                         await loadingLevel(level, default); // 加载玩家到达的最后一个关卡
                         destroyUI(type);
                         return;
@@ -416,7 +412,7 @@ public class SystemUIManager : MonoBehaviour
                 ShopUIController.clickingClose = () =>
                 {
                     PlayerAd.SetWatchedAd(0);
-                    //Instance.OnWatchAd(); // 没必要调 OnWatchAd
+                    //Instance.OnWatchAd(); // 目前没必要调 OnWatchAd
                     destroyUI(type);
                 };
                 ShopUIController.clickingBuy = async (ItemType, count, price) =>
