@@ -43,7 +43,7 @@ public class DeckManager : MonoBehaviour
         currentDeckCardDatas = currentFullDeckDatas;
         //当钱deck中的卡牌总数
         currentLevelDeckTotalNum = currentDeckCardDatas.Count;
-        deckHandler.NewLevelResetDeckStyle();
+
 
         Debug.Log("当前的deck中有" + currentLevelDeckTotalNum + "张卡牌");
     }
@@ -78,7 +78,7 @@ public class DeckManager : MonoBehaviour
         //currentDeckCardDatas.Remove(currentCard.cardData);      //从当前的数据库中移出这个数据
         currentCard.SetCardVisual();
         RectTransform currentCardRect = cardObj.GetComponent<RectTransform>();
-        currentCardRect.SetParent(canvas, false);
+        currentCardRect.SetParent(UIManager.Instance.dragLayer, false);
         currentCardRect.anchoredPosition = firstPresetPos;
         currentDeckCount++;
 
@@ -112,8 +112,15 @@ public class DeckManager : MonoBehaviour
         deckHandler.ShuffleAnim();
         AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
         currentDeckCardDatas.Shuffle();
-        
 
+    }
+
+    public void LevelStartResetDeck()
+    {
+        deckHandler.NewLevelResetDeckStyle();
+        currentDeckCardsHasSet.Clear();
+        currentDeckCount = 0;
+        hasRemovedNum = 0;
     }
 
 

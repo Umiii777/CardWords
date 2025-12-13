@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
 public class CardPool : MonoBehaviour
 {
+    public static CardPool Instance;
     [Header("卡牌预制体")]
     [SerializeField] private GameObject cardPrefab;
 
@@ -12,6 +14,10 @@ public class CardPool : MonoBehaviour
     private IObjectPool<GameObject> pool;
 
     private Transform DragLayer;
+    public void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -44,7 +50,14 @@ public class CardPool : MonoBehaviour
             r.isOnMainRow = false;
             r.isFromDeck = false;
             r.childCards.Clear(); // default
-            r.isFront =false;
+            r.isFront = false;
+            r.isInStack = false;
+            r.topParent = null;
+            r.stackIndex = 0;
+            r.isFromDeck = false;
+            r.childCards = new List<Card>();
+            r.isStackStyleApplied = false;
+              
         }
         card.SetActive(true);
     }
@@ -52,7 +65,8 @@ public class CardPool : MonoBehaviour
     private void OnReleaseCard(GameObject card)
     {
         card.SetActive(false);
-        card.transform.SetParent(transform); // 回收到pool节点下，保持Hierarchy整洁
+        card.GetComponent<Card>().ResetStyle();
+        card.transform.SetParent(transform,false); // 回收到pool节点下，保持Hierarchy整洁
     }
 
     private void OnDestroyCard(GameObject card)
@@ -76,4 +90,8 @@ public class CardPool : MonoBehaviour
             pool.Release(obj);
         }
     }
+}
+
+public class staticCardPool
+{
 }
