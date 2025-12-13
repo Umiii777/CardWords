@@ -321,7 +321,7 @@ public class SystemUIManager : MonoBehaviour
                     if (PlayerEnergy.TrySpendEnergy(1))
                     {
                         //Instance.OnUpdateEnergy(); // 目前没必要调 OnUpdateEnergy
-                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
+                        await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), default)); // 重新加载当前关卡
                         destroyUI(type);
                         return;
                     }
@@ -406,7 +406,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     if (uiGameObj(type) == null)
                         return;
-                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), null)); // 重新加载当前关卡
+                    await (loadingLevel is null ? Task.CompletedTask : loadingLevel(PlayerProgress.GetCurrentLevel(), default)); // 重新加载当前关卡
                     destroyUI(type);
                 };
                 return;
