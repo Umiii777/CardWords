@@ -631,9 +631,10 @@ public class SystemUIManager : MonoBehaviour
                         PlayerItem.AddItem(itemType, 1);
                         Instance.OnUpdateItem(itemType);
                         await PopUpTips(TIPS_SUCCESSFUL_REDEEM, Instance.transform);
-                        return;
+                        return true;
                     }
                     await PopUpTips(TIPS_COIN_LACK, Instance.transform);
+                    return false;
                 },
                 async () =>
                 {
@@ -645,7 +646,7 @@ public class SystemUIManager : MonoBehaviour
             );
             ItemUIController.clickingsCache.Add(itemType, cachedClickings);
         }
-        itemUI.clickingBuy = async price => { await cachedClickings.ClickingBuy(price); destroyItemUI(); };
+        itemUI.clickingBuy = async price => { if (await cachedClickings.ClickingBuy(price)) destroyItemUI(); };
         itemUI.clickingWatchAd = async () => { await cachedClickings.ClickingWatchAd(); destroyItemUI(); };
         itemUI.clickingWatchAd = FireAndBan(itemUI);
     }
@@ -692,10 +693,9 @@ public class SystemUIManager : MonoBehaviour
     private void OnUpdateItem(ItemType itemType)
     {
         int itemCount = PlayerItem.GetItem(itemType);
-        bool isItemLeft = itemCount > 0;
         var (_, itemCountText, adIcon) = inLevelItems[itemType];
-        itemCountText.text = isItemLeft ? itemCount.ToString() : "";
-        adIcon.SetActive(!isItemLeft);
+        itemCountText.text = itemCount.ToString();
+        adIcon.SetActive(itemCount <= 0);
     }
     private void OnWatchAd() => ShopUIController.NumWatchedAd = PlayerAd.GetWatchedAd();
 #endregion
@@ -743,8 +743,8 @@ public class SystemUIManager : MonoBehaviour
         Array.ForEach(inLevelCoinsTexts, t => t.text = PlayerCoin.GetCoin().ToString());
 
         Button[] inLevelButtons = inLevelUIs
-            .Select(o => { o.TryGetComponent(out Button b); return b; })
-            .Where(b => b != null)
+            .Select(o => o.GetComponent<Button>())
+            .OfType<Button>()
             .ToArray();
         Array.ForEach(inLevelButtons, b => b.onClick.AddListener(() => AudioManager.Instance.PlayUISFX(UISFXtype.ClickButton)));
 
