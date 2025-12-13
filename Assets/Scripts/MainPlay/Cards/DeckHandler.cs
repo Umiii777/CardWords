@@ -66,4 +66,8 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
     {
         rectTransform.DOShakeAnchorPos(1f, 5f, 10, 90f, false, true, ShakeRandomnessMode.Harmonic);
     }
+    public void NewLevelResetDeckStyle()
+    {
+        DeckStyleNormal();
+    }
 }

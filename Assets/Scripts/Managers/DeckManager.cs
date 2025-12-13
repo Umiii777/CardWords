@@ -43,6 +43,7 @@ public class DeckManager : MonoBehaviour
         currentDeckCardDatas = currentFullDeckDatas;
         //当钱deck中的卡牌总数
         currentLevelDeckTotalNum = currentDeckCardDatas.Count;
+        deckHandler.NewLevelResetDeckStyle();
 
         Debug.Log("当前的deck中有" + currentLevelDeckTotalNum + "张卡牌");
     }

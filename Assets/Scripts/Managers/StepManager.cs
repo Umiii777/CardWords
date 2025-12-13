@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using DG.Tweening;
+using TreeEditor;
 
 public class StepManager : MonoBehaviour
 {
@@ -32,6 +33,7 @@ public class StepManager : MonoBehaviour
         maxSteps = currentLevelStep;
         currentSteps = maxSteps;
         tmPro.text = currentSteps.ToString();
+        tmPro.color = Color.white;
     }
 
     public void StepsChange(Object obj)
