@@ -359,7 +359,7 @@ public class LevelManager : MonoBehaviour
     {
         currentLevelNum++;
         PlayerProgress.SetCurrentLevel(currentLevelNum);
-        SystemUIManager.LoadUI(UIType.Victory, 0);
+        _= SystemUIManager.LoadUI(UIType.Victory, 0);
     }
     #endregion
 }

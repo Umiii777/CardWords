@@ -78,16 +78,19 @@ public class PlayerEnergy
             WaitForSecondsRealtime waitOneSec = new(1f);
             while (true)
             {
+                yield return waitOneSec;
                 if (Energy < MaxEnergy)
                 {
-                    yield return waitOneSec;
                     SecondsToRecover = (SecondsToRecover - 1 + SECONDS_TO_RECOVER) % SECONDS_TO_RECOVER;
                     if (SecondsToRecover == 0)
                         AddEnergy(1);
                     timing?.Invoke();
                 }
-                else
-                    yield return null;
+                else /*if (SecondsToRecover != SECONDS_TO_RECOVER - 1) // 目前没必要调 timing
+                {*/
+                    SecondsToRecover = SECONDS_TO_RECOVER - 1;
+                    /*timing?.Invoke();
+                }*/
             }
         }
         timerCoroutine = SystemUIManager.Instance.StartCoroutine(timer());
