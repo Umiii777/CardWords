@@ -44,7 +44,8 @@ public static class CardContentDetector
                 (code >= 0x1F300 && code <= 0x1F5FF) ||   // 杂项符号
                 (code >= 0x1F600 && code <= 0x1F64F) ||   // 表情符
                 (code >= 0x1F680 && code <= 0x1F6FF) ||   // 交通符号
-                (code >= 0x1F900 && code <= 0x1F9FF) ||
+                (code >= 0x1F900 && code <= 0x1F9FF) || (code >= 0x2600 && code <= 0x26FF) ||   // ☀ ⛅ 等
+(code >= 0x2700 && code <= 0x27BF) ||
                 (code == 0x2764) || (code == 0xFE0F) || (code == 0x200D)
                 )     // 补充符号
             {

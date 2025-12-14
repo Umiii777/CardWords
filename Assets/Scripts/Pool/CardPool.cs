@@ -45,6 +45,7 @@ public class CardPool : MonoBehaviour
     private void OnGetCard(GameObject card)
     {
         var r = card.GetComponent<Card>();
+        card.SetActive(true);
         if (r != null)
         {
             r.isOnMainRow = false;
@@ -57,21 +58,23 @@ public class CardPool : MonoBehaviour
             r.isFromDeck = false;
             r.childCards = new List<Card>();
             r.isStackStyleApplied = false;
+            r.cg.blocksRaycasts = true;
               
         }
-        card.SetActive(true);
+        
     }
 
     private void OnReleaseCard(GameObject card)
     {
         card.SetActive(false);
         card.GetComponent<Card>().ResetStyle();
+        card.GetComponent<Card>().CardSetAllVisible();
         card.transform.SetParent(transform,false); // 回收到pool节点下，保持Hierarchy整洁
     }
 
     private void OnDestroyCard(GameObject card)
     {
-        Destroy(card);
+        //Destroy(card);
     }
 
     public GameObject Get() => pool.Get();

@@ -90,7 +90,7 @@ public class DeckManager : MonoBehaviour
         deckHandler.DeckStyleNormal();
         foreach (var card in currentDeckCardsHasSet)
         {
-            card.gameObject.SetActive(false);
+            cardPool.Release(card.gameObject);
         }
         currentDeckCardsHasSet.Clear();
         currentDeckCount = 0;

@@ -256,16 +256,16 @@ public class Card : MonoBehaviour
     {
         currentMainRow.isEmpty = true;
         onCompleteMainCard.RaiseEvent(this, this);
-        gameObject.SetActive(false);
-
+        // gameObject.SetActive(false);
+        CardPool.Instance.Release(gameObject);
     }
     #endregion
 
     public void CompleteNormalCard()
     {
         onCompleteCard.RaiseEvent(this, this);
-        gameObject.SetActive(false);
-
+        // gameObject.SetActive(false);
+        CardPool.Instance.Release(gameObject);
     }
 
 
@@ -279,6 +279,17 @@ public class Card : MonoBehaviour
         foreach (var text in allTexts)
         {
             text.enabled = false;
+        }
+    }
+    public void CardSetAllVisible()
+    {
+        foreach (var image in allImages)
+        {
+            image.enabled = true;
+        }
+        foreach(var text in allTexts)
+        {
+            text.enabled = true;
         }
     }
 
