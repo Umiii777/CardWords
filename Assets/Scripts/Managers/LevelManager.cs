@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+
+
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -208,7 +208,7 @@ public class LevelManager : MonoBehaviour
         }
     }
     #endregion
-    #region 读取关卡排列
+    #region 读取关卡排列,生成卡牌
     //读取关卡的卡牌排列
     public void SetLevelCardLayout(int[] rows)
     {
@@ -325,6 +325,8 @@ public class LevelManager : MonoBehaviour
         //Debug.LogError("HasInClearLevel");
         rowManager.rows.Clear();
         rowManager.mainRows.Clear();
+        DeckManager.Instance.LevelStartResetDeck();
+
         List<Card> cards = CardManager.Instance.allCards;
         for (int i = 0; i < cards.Count; i++)
         {
@@ -351,6 +353,7 @@ public class LevelManager : MonoBehaviour
 
         CardManager.Instance.allRows.Clear();
 
+
     }
     #endregion
     #region 测试功能方法组
@@ -359,7 +362,7 @@ public class LevelManager : MonoBehaviour
     {
         currentLevelNum++;
         PlayerProgress.SetCurrentLevel(currentLevelNum);
-        _= SystemUIManager.LoadUI(UIType.Victory, 0);
+        _ = SystemUIManager.LoadUI(UIType.Victory, 0);
     }
     #endregion
 }

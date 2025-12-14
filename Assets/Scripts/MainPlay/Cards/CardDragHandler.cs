@@ -300,6 +300,12 @@ public class CardDragHandler : MonoBehaviour,
             {
                 //触发card自身的被合成东西+表现
                 card.CardSetAllInvisible();
+                target.SetMainCardVisualOnCombine(1);
+                EndDragMinus.RaiseEvent(top, this);
+
+                onSuccessDrag.RaiseEvent(top, this);
+                OnSeccussDragFromDeck();
+
                 ///动画搞得没法通关
                 card.onFinishAnim.endingAnims = () =>
                 top.CompleteNormalCard();
@@ -307,17 +313,16 @@ public class CardDragHandler : MonoBehaviour,
 
                 card.CardSetAnimPlay();
 
-                target.SetMainCardVisualOnCombine(1);
-                EndDragMinus.RaiseEvent(top, this);
 
-                onSuccessDrag.RaiseEvent(top, this);
-                OnSeccussDragFromDeck();
             }
             //相同id，且top在stack中
             else if (top.cardData.mainId == target.cardData.mainId && top.isInStack)
             {
                 //先调用row的移除整个stack的事件
                 RemoveStackOnMainRow(top.GetTop());
+                target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
+
+                onSuccessDrag.RaiseEvent(top, this);
                 foreach (var card in top.GetTop().childCards)
                 {
                     card.CardSetAllInvisible();
@@ -325,9 +330,7 @@ public class CardDragHandler : MonoBehaviour,
                     card.CompleteNormalCard();
                     card.CardSetAnimPlay();
                 }
-                target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
 
-                onSuccessDrag.RaiseEvent(top, this);
             }
             else
             {
@@ -446,20 +449,7 @@ public class CardDragHandler : MonoBehaviour,
     #endregion
 
 
-    //消除卡牌的行为
-    public void OnCardEliminate(List<Card> eliminateCards)
-    {
-        foreach (var item in eliminateCards)
-        {
-            Destroy(item.gameObject);
-        }
-    }
-    public void OnCardEliminate(Card eliminateCard)
-    {
 
-        Destroy(eliminateCard);
-
-    }
 
     public void OnSeccussDragFromDeck() //card放在row里面处理了，这里处理的是mainCard和
     {

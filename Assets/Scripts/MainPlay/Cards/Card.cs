@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
+
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
@@ -21,7 +21,7 @@ public class Card : MonoBehaviour
     public bool isFront;
     public Sprite[] sprites; //0是卡背面，1是显示字的内容面
     public bool isFromDeck = false;
-    private bool isStackStyleApplied = false;
+    public bool isStackStyleApplied = false;
 
     //跟拖拽相关的变量
     public bool isOnRow;
@@ -46,6 +46,9 @@ public class Card : MonoBehaviour
     private int textStackOffsetPos = 100;
     private int textStackOffsetSize = 30;
 
+
+    private float textOriginalSize;
+
     //触发的事件
     public CardDataEventSO deckSuccessDrag;
 
@@ -68,6 +71,10 @@ public class Card : MonoBehaviour
         cg = GetComponent<CanvasGroup>();
         allImages = GetComponentsInChildren<Image>();
         allTexts = GetComponentsInChildren<TextMeshProUGUI>();
+    }
+    public void Start()
+    {
+        textOriginalSize = tmContent.fontSize;
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
     public void SetCardVisual()
@@ -169,7 +176,7 @@ public class Card : MonoBehaviour
         cardContentImage.sprite = sprite;
     }
 
-
+    #region 样式变化
     public void InStackStyle()
     {
         if (!isStackStyleApplied)
@@ -188,7 +195,19 @@ public class Card : MonoBehaviour
         tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
         tmContent.fontSize = textStackOffsetSize;
     }
+    public void ResetStyle()
+    {
+        if (isStackStyleApplied)
+        {
+            tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, -textStackOffsetPos);
+            tmContent.fontSize = textOriginalSize;
+            isStackStyleApplied = false;
 
+            cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(0, -textStackOffsetPos);
+            cardContentImage.rectTransform.localScale = new Vector3(1.8f, 1.8f, 1);
+        }
+    }
+    #endregion
 
     #region Stack相关
 
@@ -237,16 +256,16 @@ public class Card : MonoBehaviour
     {
         currentMainRow.isEmpty = true;
         onCompleteMainCard.RaiseEvent(this, this);
-        gameObject.SetActive(false);
-
+        // gameObject.SetActive(false);
+        CardPool.Instance.Release(gameObject);
     }
     #endregion
 
     public void CompleteNormalCard()
     {
         onCompleteCard.RaiseEvent(this, this);
-        gameObject.SetActive(false);
-
+        // gameObject.SetActive(false);
+        CardPool.Instance.Release(gameObject);
     }
 
 
@@ -260,6 +279,17 @@ public class Card : MonoBehaviour
         foreach (var text in allTexts)
         {
             text.enabled = false;
+        }
+    }
+    public void CardSetAllVisible()
+    {
+        foreach (var image in allImages)
+        {
+            image.enabled = true;
+        }
+        foreach(var text in allTexts)
+        {
+            text.enabled = true;
         }
     }
 
