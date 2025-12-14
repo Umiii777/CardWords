@@ -10,6 +10,7 @@ public class DeckManager : MonoBehaviour
     public CardPool cardPool;
     public RectTransform canvas;
     public DeckHandler deckHandler;
+    public ObjectEventSO DrawACardFromDeck;
 
 
     public int currentLevelDeckTotalNum;  //当前关卡的牌库卡牌持有数量
@@ -50,24 +51,36 @@ public class DeckManager : MonoBehaviour
 
     public void DrawCard()
     {
-        //当牌库已经被取出数据数量
-        if (currentDeckCount == currentDeckCardDatas.Count - 1)
+        if (currentDeckCardDatas.Count > 0)
         {
-            deckHandler.DeckStyleReadyShuffle();
-        }
-        if (currentDeckCount >= currentDeckCardDatas.Count)
-        {
-            Debug.Log("执行了ResetDeck");
-            ResetDeck();
-            AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
+            if (currentDeckCount == currentDeckCardDatas.Count - 1)
+            {
+                deckHandler.DeckStyleReadyShuffle();
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
+            if (currentDeckCount == currentDeckCardDatas.Count)
+            {
+                Debug.Log("执行了ResetDeck");
+                ResetDeck();
+                AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
+            else
+            {
+                GameObject cardObj = cardPool.Get();
+                SetACardFromDeck(cardObj);
+                AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.DrawCard);
+                //currentCardRect.SetParent(dragla)
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
         }
         else
         {
-            GameObject cardObj = cardPool.Get();
-            SetACardFromDeck(cardObj);
-            AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.DrawCard);
-            //currentCardRect.SetParent(dragla)
+            SystemUIManager.PopUpTips("牌库已经没有更多牌了");
         }
+        //当牌库已经被取出数据数量
+
+
     }
     private void SetACardFromDeck(GameObject cardObj)
     {
@@ -90,7 +103,7 @@ public class DeckManager : MonoBehaviour
         deckHandler.DeckStyleNormal();
         foreach (var card in currentDeckCardsHasSet)
         {
-            cardPool.Release(card.gameObject);
+            CardManager.Instance.UnregisterCard(card);
         }
         currentDeckCardsHasSet.Clear();
         currentDeckCount = 0;

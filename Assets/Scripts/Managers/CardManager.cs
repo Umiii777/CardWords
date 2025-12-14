@@ -32,6 +32,7 @@ public class CardManager : MonoBehaviour
         {
             allCards.Remove(card);
             Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
+            CardPool.Instance.Release(card.gameObject);
             if (allCards.Count == 0)
             {
                 Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");

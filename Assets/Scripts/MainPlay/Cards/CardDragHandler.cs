@@ -187,7 +187,7 @@ public class CardDragHandler : MonoBehaviour,
             }
         }
         Debug.Log("当前Allcard有多少牌" + CardManager.Instance.allCards.Count);
-        Debug.Log("当前卡片的堆叠区域是" + maxArea);
+        //Debug.Log("当前卡片的堆叠区域是" + maxArea);
         return maxArea > 0.5 ? best : null; // 用 maxArea，而不是 bestArea
     }
     private Row FindBestOverlapRow()
