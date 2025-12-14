@@ -30,30 +30,45 @@ public static class CardContentDetector
     public static bool IsEmoji(string input)
     {
         if (string.IsNullOrEmpty(input))
-            return false;
+        return false;
 
-        StringInfo si = new StringInfo(input);
+    for (int i = 0; i < input.Length; i++)
+    {
+        int codePoint;
 
-        for (int i = 0; i < si.LengthInTextElements; i++)
+        // 处理代理对（emoji 基本都在这里）
+        if (char.IsHighSurrogate(input[i]) && i + 1 < input.Length && char.IsLowSurrogate(input[i + 1]))
         {
-            string element = si.SubstringByTextElements(i, 1);
-            int code = char.ConvertToUtf32(element, 0);
-
-            // emoji 区间判断（与你原逻辑一致）
-            if ((code >= 0x1F000 && code <= 0x1FAFF) ||   // 表情/物体/人物
-                (code >= 0x1F300 && code <= 0x1F5FF) ||   // 杂项符号
-                (code >= 0x1F600 && code <= 0x1F64F) ||   // 表情符
-                (code >= 0x1F680 && code <= 0x1F6FF) ||   // 交通符号
-                (code >= 0x1F900 && code <= 0x1F9FF) || (code >= 0x2600 && code <= 0x26FF) ||   // ☀ ⛅ 等
-(code >= 0x2700 && code <= 0x27BF) ||
-                (code == 0x2764) || (code == 0xFE0F) || (code == 0x200D)
-                )     // 补充符号
-            {
-                return true;
-            }
+            codePoint = char.ConvertToUtf32(input[i], input[i + 1]);
+            i++; // 跳过低位代理
+        }
+        else
+        {
+            codePoint = input[i];
         }
 
-        return false;
+        // === Emoji 主区间 ===
+        if (
+            (codePoint >= 0x1F000 && codePoint <= 0x1FAFF) || // 表情、人物、动物、物体
+            (codePoint >= 0x2600  && codePoint <= 0x26FF)  || // ☀ ☎ ⚛ ☪
+            (codePoint >= 0x2700  && codePoint <= 0x27BF)  || // ✔ ✡
+            (codePoint >= 0x2300  && codePoint <= 0x23FF)     // ⌨ ⏰
+        )
+        {
+            return true;
+        }
+
+        // === 关键补充 ===
+        if (
+            codePoint == 0xFE0F || // 变体选择符 ❤️ ☎️
+            codePoint == 0x200D    // ZWJ 👨‍👩‍👧‍👦 🧛‍♀️
+        )
+        {
+            return true;
+        }
+    }
+
+    return false;
     }
 
     // 判断是否你的图片key

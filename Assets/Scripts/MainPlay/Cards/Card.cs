@@ -257,7 +257,7 @@ public class Card : MonoBehaviour
         currentMainRow.isEmpty = true;
         onCompleteMainCard.RaiseEvent(this, this);
         // gameObject.SetActive(false);
-        CardPool.Instance.Release(gameObject);
+
     }
     #endregion
 
@@ -265,7 +265,6 @@ public class Card : MonoBehaviour
     {
         onCompleteCard.RaiseEvent(this, this);
         // gameObject.SetActive(false);
-        CardPool.Instance.Release(gameObject);
     }
 
 

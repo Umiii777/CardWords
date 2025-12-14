@@ -16,7 +16,7 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
     private Vector3 shakeEffectScale = new Vector3(0.8f, 0.8f, 1);
     private Vector3 orginalScale = new Vector3(1, 1, 1);
 
-    public ObjectEventSO DrawACardFromDeck;
+    
     private RectTransform rectTransform;
     public Image deckStyle;
     public TextMeshProUGUI tmPro;
@@ -48,8 +48,6 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
             rectTransform.DOScale(orginalScale, 0.1f);
         };
 
-
-        DrawACardFromDeck.RaiseEvent(this, this);
     }
     public void DeckStyleReadyShuffle()
     {
