@@ -364,5 +364,13 @@ public class LevelManager : MonoBehaviour
         PlayerProgress.SetCurrentLevel(currentLevelNum);
         _ = SystemUIManager.LoadUI(UIType.Victory, 0);
     }
+    [ContextMenu("直接从11关开始")]
+    public void TestLevel30()
+    {
+        currentLevelNum = 111;
+        PlayerProgress.SetCurrentLevel(currentLevelNum);
+        _ = SystemUIManager.LoadUI(UIType.Victory, 0);
+    }
     #endregion
+
 }
