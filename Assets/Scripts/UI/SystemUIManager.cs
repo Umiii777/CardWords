@@ -337,6 +337,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     Instance.OnUpdateEnergy();
                     await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
+                    PlayerEnergy.ResetSecondsToRecover();
                 }
                 PlayerEnergy.timing = () =>
                 {
@@ -695,6 +696,7 @@ public class SystemUIManager : MonoBehaviour
     {
         int numEnergy = PlayerEnergy.GetEnergy();
         EnergyUIController.NumEnergy = numEnergy;
+        EnergyUIController.SecondsToRecover = PlayerEnergy.SecondsToRecover;
         HomeUIController.NumEnergy = numEnergy;
         ShopUIController.NumEnergy = numEnergy;
     }
