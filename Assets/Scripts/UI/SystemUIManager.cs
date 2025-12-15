@@ -91,7 +91,7 @@ public class SystemUIManager : MonoBehaviour
     /// 游戏运行时的画面最高帧率
     /// </summary>
     public const uint MAX_FPS_RUNTIME = 60;
-    private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
+    private const int MAX_LEVEL = 130; //TODO: 该常量应被定义在更合理的位置，而非 SystemUIManager 类中
     public static SystemUIManager Instance;
 
 #region 静态委托
