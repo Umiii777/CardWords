@@ -69,7 +69,7 @@ public class PlayerEnergy
         PlayerPrefs.DeleteKey(Key_MaxEnergy);
         PlayerPrefs.Save();
     }
-    public static void ResetSecondsToRecover() => SecondsToRecover = SECONDS_TO_RECOVER - 1;
+    public static void ResetSecondsToRecover() => { SecondsToRecover = SECONDS_TO_RECOVER - 1; timing?.Invoke(); }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void StartTimer()

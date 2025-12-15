@@ -336,8 +336,8 @@ public class SystemUIManager : MonoBehaviour
                 static async Task onAddEnergy()
                 {
                     Instance.OnUpdateEnergy();
-                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
                     PlayerEnergy.ResetSecondsToRecover();
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
                 }
                 PlayerEnergy.timing = () =>
                 {
@@ -696,7 +696,6 @@ public class SystemUIManager : MonoBehaviour
     {
         int numEnergy = PlayerEnergy.GetEnergy();
         EnergyUIController.NumEnergy = numEnergy;
-        EnergyUIController.SecondsToRecover = PlayerEnergy.SecondsToRecover;
         HomeUIController.NumEnergy = numEnergy;
         ShopUIController.NumEnergy = numEnergy;
     }
