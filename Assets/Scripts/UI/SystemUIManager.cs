@@ -69,8 +69,6 @@ public enum UIType
 [RequireComponent(typeof(Canvas))]
 public class SystemUIManager : MonoBehaviour
 {
-    private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
-
 #region 异常消息内容常量
     private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";
     private const string EXCEPITON_ILLEGAL_ENUM_ARG = "参数 @ 的值为 #，不在枚举 $ 之中";
@@ -87,8 +85,13 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
     private const string TIPS_WAIT_FOR_MORE_LEVELS = "更多关卡，敬请期待！";
     private const string TIPS_ASKING_ITEM = "道具数量不足，请兑换";
-#endregion
+    #endregion
 
+    /// <summary>
+    /// 游戏运行时的画面最高帧率
+    /// </summary>
+    public const uint MAX_FPS_RUNTIME = 60;
+    private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
     public static SystemUIManager Instance;
 
 #region 静态委托
@@ -96,20 +99,20 @@ public class SystemUIManager : MonoBehaviour
     /// 进入大厅委托
     /// </summary>
     public static Action initingHome;
+    /// </summary>
+    /// <summary>
+    /// 增加步数委托
+    /// </summary>
+    public static Action addingSteps;
+    /// <summary>
+    /// 开启槽位委托
+    /// </summary>
+    public static Action<Row> unlockingSlot;
     /// <summary>
     /// 关卡加载委托
     /// <br/><br/>
     /// 第一个参数为要加载的关卡编号，第二个参数为额外信息
-    /// </summary>
     public static Func<int, object, Task> loadingLevel;
-    /// <summary>
-    /// 增加步数委托
-    /// </summary>
-    public static Func<Task> addingSteps;
-    /// <summary>
-    /// 开启槽位委托
-    /// </summary>
-    public static Func<Row, Task> unlockingSlot;
 #endregion
 
 #region 游戏内所有道具的信息和图标
@@ -310,7 +313,7 @@ public class SystemUIManager : MonoBehaviour
                 DefeatUIController.clickingWatchAd = async _=>
                 {
                     await Task.Delay(1000); //假装播放1秒广告
-                    await (addingSteps is null ? Task.CompletedTask : addingSteps()); // 增加步数
+                    addingSteps?.Invoke(); // 增加步数
                     destroyUI(type);
                 };
                 DefeatUIController.clickingWatchAd = FireAndBan(typeof(DefeatUIController), DefeatUIController.clickingWatchAd);
@@ -455,7 +458,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     await Task.Delay(1000); //假装播放1秒广告
                     await PopUpTips(TIPS_SUCCESSFL_UNLOCKING);
-                    await (unlockingSlot is null ? Task.CompletedTask : unlockingSlot(row));
+                    unlockingSlot?.Invoke(row); // 解锁槽位
                     destroyUI(type);
                 };
                 UnlockSlotUIController.clickingWatchAd = FireAndBan(typeof(UnlockSlotUIController), UnlockSlotUIController.clickingWatchAd);
@@ -496,7 +499,7 @@ public class SystemUIManager : MonoBehaviour
         }
     }
 
-    //TODO: 删除两个 FireAndBan 方法，改为为各UI类添加 bool 字段用于判断是否正在处理广告
+    //TODO: 移除所有 FireAndBan 方法，改为在各UI类中添加 bool 字段用于判断是否正在处理广告
     /// <summary>
     /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
     /// <br/><br/>
@@ -504,7 +507,7 @@ public class SystemUIManager : MonoBehaviour
     /// </summary>
     /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
-    private static Func<Task> FireAndBan<T>(AdProcessor<T> uiInstance) where T : MonoBehaviour
+    private static Func<Task> FireAndBan<T>(AdProcessor<T> uiInstance) where T : AdProcessor<T>
     {
         Func<Task> clicking = uiInstance.clickingWatchAd;
         async Task fireAndBan()
@@ -533,7 +536,7 @@ public class SystemUIManager : MonoBehaviour
     private static Func<T, Task> FireAndBan<T>(
         Type typeOfUIController,
         Func<T, Task> clickingFunc,
-        string nameOfClickingFunc = nameof(StaticAdProcessor<MonoBehaviour, object>.clickingWatchAd)
+        string nameOfClickingFunc = nameof(DefeatUIController.clickingWatchAd)
     )
     {
         FieldInfo clickingField = typeOfUIController.GetField(
@@ -562,6 +565,11 @@ public class SystemUIManager : MonoBehaviour
 
     void Awake()
     {
+#if UNITY_EDITOR
+        Application.targetFrameRate = -1; // 编辑器中无帧率限制
+#else
+        Application.targetFrameRate = (int)MAX_FPS_RUNTIME;
+#endif
         InitUIManager();
         Array.ForEach(Enum.GetValues(typeof(UIType)) as UIType[], t => InitUICallbacks(t));
     }
@@ -726,9 +734,9 @@ public class SystemUIManager : MonoBehaviour
         initingHome = () => AudioManager.Instance.PlayBGM(
             homeBGMTypes[DateTimeOffset.UtcNow.ToUnixTimeSeconds() % homeBGMTypes.Length]
         );
+        addingSteps = () => StepManager.Instance.AddExtraSteps();
+        unlockingSlot = row => Row.OnChangeMainRowType(row);
         loadingLevel = async (level, _) => LevelManager.Instance.InitCurrentLevel(level);
-        addingSteps = async () => StepManager.Instance.AddExtraSteps();
-        unlockingSlot = async row => Row.OnChangeMainRowType(row);
     #endregion
     }
 

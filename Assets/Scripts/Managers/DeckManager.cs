@@ -76,7 +76,7 @@ public class DeckManager : MonoBehaviour
         }
         else
         {
-            SystemUIManager.PopUpTips("牌库已经没有更多牌了");
+            _= SystemUIManager.PopUpTips("牌库已经没有更多牌了");
         }
         //当牌库已经被取出数据数量
 

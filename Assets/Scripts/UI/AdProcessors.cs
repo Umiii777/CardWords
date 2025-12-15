@@ -2,16 +2,32 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : MonoBehaviour
+public abstract class StaticAdProcessor<This, T> : MonoBehaviour where This : StaticAdProcessor<This, T>
 {
     /// <summary>
     /// 看广告领东西按钮回调
     /// </summary>
-    public static Func<U, Task> clickingWatchAd;
+    public static Func<T, Task> clickingWatchAd;
 
     protected static bool isWatchingAd;
 
-    /* TODO: 重新评估 SystemUIManager.FireAndBan 的设计及其与 ProcessAd 的取舍
+    protected static void ProcessClicking(Action clickingAction)
+    {
+        if (!isWatchingAd)
+            clickingAction?.Invoke();
+    }
+    protected static async Task ProcessClicking(Func<Task> clickingFunc)
+    {
+        if (!isWatchingAd)
+            await (clickingFunc is null ? Task.CompletedTask : clickingFunc());
+    }
+    protected static async Task ProcessClicking<U>(Func<U, Task> clickingFunc, U clickingArg)
+    {
+        if (!isWatchingAd)
+            await (clickingFunc is null ? Task.CompletedTask : clickingFunc(clickingArg));
+    }
+
+    /*TODO: 移除所有 FireAndBan 方法，重新启用 ProcessAd
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
         if (toWait is not null)
@@ -25,37 +41,17 @@ public abstract class StaticAdProcessor<Tag, U> : MonoBehaviour where Tag : Mono
         afterWait?.Invoke();
     }
     */
-
-    public static void ProcessClicking(Action clickingAction)
-    {
-        if (!isWatchingAd)
-            clickingAction?.Invoke();
-    }
-    public static async Task ProcessClicking(Func<Task> clickingFunc)
-    {
-        if (!isWatchingAd)
-            await (clickingFunc is null ? Task.CompletedTask : clickingFunc());
-    }
-    public static async Task ProcessClicking<T>(Func<T, Task> clickingFunc, T clickingArg)
-    {
-        if (!isWatchingAd)
-            await (clickingFunc is null ? Task.CompletedTask : clickingFunc(clickingArg));
-    }
 }
 
-public abstract class AdProcessor<Tag> : MonoBehaviour where Tag : MonoBehaviour
+public abstract class AdProcessor<This> : StaticAdProcessor<This, object> where This : AdProcessor<This>
 {
     /// <summary>
     /// 看广告领东西按钮回调
     /// </summary>
-    public Func<Task> clickingWatchAd;
+    public new Func<Task> clickingWatchAd;
 
-    /*
+    /*TODO: 移除所有 FireAndBan 方法，重新启用 ProcessAd
     public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
         await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
     */
-
-    protected static void ProcessClicking(Action clickingAction) => StaticAdProcessor<Tag, object>.ProcessClicking(clickingAction);
-    protected static async Task ProcessClicking(Func<Task> clickingFunc) => await StaticAdProcessor<Tag, object>.ProcessClicking(clickingFunc);
-    protected static async Task ProcessClicking<T>(Func<T, Task> clickingFunc, T clickingArg) => await StaticAdProcessor<Tag, object>.ProcessClicking(clickingFunc, clickingArg);
 }
