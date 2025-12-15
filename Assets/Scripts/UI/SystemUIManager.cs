@@ -69,7 +69,7 @@ public enum UIType
 [RequireComponent(typeof(Canvas))]
 public class SystemUIManager : MonoBehaviour
 {
-    private const int MAX_LEVEL = 110; //TODO: 该常量应在 PlayerProgress 类中定义
+    private const int MAX_LEVEL = 130; //TODO: 该常量应在 PlayerProgress 类中定义
 
 #region 异常消息内容常量
     private const string EXCEPITON_ILLEGAL_LOADUI_ARG = "未传入生成界面所必需的参数，将鼠标指针放在 @.# 上以查看参数说明";

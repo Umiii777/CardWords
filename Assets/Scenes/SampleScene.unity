@@ -2920,7 +2920,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   clickInterval: 0.2
-  DrawACardFromDeck: {fileID: 11400000, guid: c762e89076721694b9a263664493f72c, type: 2}
   deckStyle: {fileID: 0}
   tmPro: {fileID: 0}
 --- !u!1 &1385267407
@@ -3081,6 +3080,7 @@ MonoBehaviour:
   cardPool: {fileID: 716188989}
   canvas: {fileID: 801774033}
   deckHandler: {fileID: 1372688640}
+  DrawACardFromDeck: {fileID: 11400000, guid: c762e89076721694b9a263664493f72c, type: 2}
   currentLevelDeckTotalNum: 0
 --- !u!114 &1578489380
 MonoBehaviour:
