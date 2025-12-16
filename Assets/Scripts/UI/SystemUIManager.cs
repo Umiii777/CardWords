@@ -85,7 +85,7 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
     private const string TIPS_WAIT_FOR_MORE_LEVELS = "更多关卡，敬请期待！";
     private const string TIPS_ASKING_ITEM = "道具数量不足，请兑换";
-    #endregion
+#endregion
 
     /// <summary>
     /// 游戏运行时的画面最高帧率
@@ -502,11 +502,11 @@ public class SystemUIManager : MonoBehaviour
 
     //TODO: 移除所有 FireAndBan 方法，改为在各UI类中添加 bool 字段用于判断是否正在处理广告
     /// <summary>
-    /// 开始处理广告，同时禁用看广告领东西按钮的响应，直到处理完广告
+    /// 开始处理广告，同时禁用观看广告按钮的响应，直到广告处理完毕
     /// <br/><br/>
     /// 用于派生自 AdProcessor 的界面类型
     /// </summary>
-    /// <param name="uiInstance">包含看广告领东西按钮的界面实例</param>
+    /// <param name="uiInstance">观看广告按钮所在的界面实例</param>
     /// <returns>须代入按钮回调的新委托</returns>
     private static Func<Task> FireAndBan<T>(AdProcessor<T> uiInstance) where T : AdProcessor<T>
     {

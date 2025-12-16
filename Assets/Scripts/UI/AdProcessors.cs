@@ -2,12 +2,12 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class StaticAdProcessor<This, T> : MonoBehaviour where This : StaticAdProcessor<This, T>
+public abstract class AdProcessor<TSelf> : MonoBehaviour where TSelf : AdProcessor<TSelf>
 {
     /// <summary>
-    /// 看广告领东西按钮回调
+    /// 观看广告按钮回调
     /// </summary>
-    public static Func<T, Task> clickingWatchAd;
+    public Func<Task> clickingWatchAd;
 
     protected static bool isWatchingAd;
 
@@ -21,14 +21,27 @@ public abstract class StaticAdProcessor<This, T> : MonoBehaviour where This : St
         if (!isWatchingAd)
             await (clickingFunc is null ? Task.CompletedTask : clickingFunc());
     }
-    protected static async Task ProcessClicking<U>(Func<U, Task> clickingFunc, U clickingArg)
+    protected static async Task ProcessClicking<T>(Func<T, Task> clickingFunc, T clickingArg)
     {
         if (!isWatchingAd)
             await (clickingFunc is null ? Task.CompletedTask : clickingFunc(clickingArg));
     }
 
-    /*TODO: 移除所有 FireAndBan 方法，重新启用 ProcessAd
-    public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
+    /*TODO: 移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
+    protected static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
+        await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
+    */
+}
+
+public abstract class StaticAdProcessor<TSelf, T> : AdProcessor<TSelf> where TSelf : StaticAdProcessor<TSelf, T>
+{
+    /// <summary>
+    /// 观看广告按钮回调
+    /// </summary>
+    public static new Func<T, Task> clickingWatchAd;
+
+    /*TODO: 移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
+    protected static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
         if (toWait is not null)
             await Task.WhenAll(toWait.GetInvocationList()
@@ -40,18 +53,5 @@ public abstract class StaticAdProcessor<This, T> : MonoBehaviour where This : St
             );
         afterWait?.Invoke();
     }
-    */
-}
-
-public abstract class AdProcessor<This> : StaticAdProcessor<This, object> where This : AdProcessor<This>
-{
-    /// <summary>
-    /// 看广告领东西按钮回调
-    /// </summary>
-    public new Func<Task> clickingWatchAd;
-
-    /*TODO: 移除所有 FireAndBan 方法，重新启用 ProcessAd
-    public static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
-        await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
     */
 }
