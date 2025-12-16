@@ -81,7 +81,7 @@ public class SystemUIManager : MonoBehaviour
     private const string TIPS_SUCCESSFUL_REDEEM = "兑换成功！";
     private const string TIPS_SUCCESSFUL_RECEIVING = "领取成功！";
     private const string TIPS_ENERGY_ADDED = "体力 + @";
-    private const string TIPS_ENERGY_IS_FULL = "兑换失败，体力已满";
+    private const string TIPS_ENERGY_IS_FULL = "体力已满，无法兑换";
     private const string TIPS_SUCCESSFL_UNLOCKING = "槽位已开启！";
     private const string TIPS_WAIT_FOR_MORE_LEVELS = "更多关卡，敬请期待！";
     private const string TIPS_ASKING_ITEM = "道具数量不足，请兑换";
@@ -91,7 +91,6 @@ public class SystemUIManager : MonoBehaviour
     /// 游戏运行时的画面最高帧率
     /// </summary>
     public const uint MAX_FPS_RUNTIME = 60;
-    private const int MAX_LEVEL = 130; //TODO: 该常量应被定义在更合理的位置，而非 SystemUIManager 类中
     public static SystemUIManager Instance;
 
 #region 静态委托
@@ -121,7 +120,7 @@ public class SystemUIManager : MonoBehaviour
     private Dictionary<ItemType, (string ItemInfo, Sprite ItemIcon)> dictItemInfoIcons;
 #endregion
 
-#region 各界面预制体
+#region UI预制体
     [SerializeField]
     private DefeatUIController defeatUIPrefab;
     [SerializeField]
@@ -138,10 +137,9 @@ public class SystemUIManager : MonoBehaviour
     private UnlockSlotUIController unlockSlotUIPrefab;
     [SerializeField]
     private VictoryUIController victoryUIPrefab;
-#endregion
-
     [SerializeField]
     private RectTransform tipsPrefab;
+#endregion
 
 #region 关卡内UI相关
     private const string IN_LEVEL_UI_TAG = "InLevelUI";
@@ -164,6 +162,8 @@ public class SystemUIManager : MonoBehaviour
     > inLevelItems = new();
 #endregion
 
+    [SerializeField, Min(101), Space(30)]
+    private uint maxLevel = 110; //TODO: 该字段应被定义在更合理的位置，而非 SystemUIManager 类中
     private object[] uiInstances;
     /// <summary>
     /// Keys: 所有生成时不传其他参数的 UIType 枚举值
@@ -386,7 +386,7 @@ public class SystemUIManager : MonoBehaviour
                     if (loadingLevel is null)
                         return;
                     int level = PlayerProgress.GetCurrentLevel();
-                    if (level > MAX_LEVEL)
+                    if (level > Instance.maxLevel)
                     {
                         await PopUpTips(TIPS_WAIT_FOR_MORE_LEVELS);
                         return;
