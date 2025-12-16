@@ -59,6 +59,7 @@ public class CardPool : MonoBehaviour
             r.childCards = new List<Card>();
             r.isStackStyleApplied = false;
             r.cg.blocksRaycasts = true;
+            r.slotCount = 0;
               
         }
         

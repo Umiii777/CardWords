@@ -67,6 +67,7 @@ public class CardManager : MonoBehaviour
         //让levelManager监听胜利
         Debug.Log("关卡胜利了");
         CompleteLevel.RaiseEvent(this, this);
+        
     }
     public List<Card> GetCurrentLevelCardOnFront()
     {

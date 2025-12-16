@@ -303,16 +303,19 @@ public class CardDragHandler : MonoBehaviour,
                 target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
 
-                onSuccessDrag.RaiseEvent(top, this);
-                OnSeccussDragFromDeck();
-
-                ///动画搞得没法通关
+                //关卡胜利判断应该在步数之前
                 card.onFinishAnim.endingAnims = () =>
                 top.CompleteNormalCard();
 
 
-                card.CardSetAnimPlay();
+                OnSeccussDragFromDeck();
 
+                ///动画搞得没法通关
+
+
+
+                card.CardSetAnimPlay();
+                onSuccessDrag.RaiseEvent(top, this);
 
             }
             //相同id，且top在stack中
@@ -322,7 +325,7 @@ public class CardDragHandler : MonoBehaviour,
                 RemoveStackOnMainRow(top.GetTop());
                 target.SetMainCardVisualOnCombine(top.GetTop().childCards.Count);
 
-                onSuccessDrag.RaiseEvent(top, this);
+
                 foreach (var card in top.GetTop().childCards)
                 {
                     card.CardSetAllInvisible();
@@ -330,7 +333,7 @@ public class CardDragHandler : MonoBehaviour,
                     card.CompleteNormalCard();
                     card.CardSetAnimPlay();
                 }
-
+                onSuccessDrag.RaiseEvent(top, this);
             }
             else
             {
