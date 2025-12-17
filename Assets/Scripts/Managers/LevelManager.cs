@@ -323,7 +323,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("关卡失败");
         if (CardManager.Instance.allCards.Count != 0)
         {
-            SystemUIManager.LoadUI(UIType.Defeat, 0);
+            _= SystemUIManager.LoadUI(UIType.Defeat, 0);
         }
 
     }
