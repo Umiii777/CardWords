@@ -64,7 +64,7 @@ public class StepManager : MonoBehaviour
     //步数耗尽的方法
     public void StepsRunningOut()
     {
-
+        if(CardManager.Instance.allCards.Count != 0)
         onLevelDefeat.RaiseEvent(this, this);
     }
     //步数增加的方法

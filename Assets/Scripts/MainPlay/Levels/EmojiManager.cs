@@ -20,13 +20,13 @@ public class EmojiManager : MonoBehaviour
 
         string fileName = ConvertEmojiToFileName(emoji);
 
+        // 尝试加载没有 _fe0f 后缀的 emoji 图片
         Sprite sprite = Resources.Load<Sprite>("emojis/" + fileName);
 
-        // 尝试去掉 FE0F（很多资源不包含 FE0F）
-        if (sprite == null && fileName.Contains("_fe0f"))
+        // 如果没有找到，尝试加载没有变体选择符的版本
+        if (sprite == null)
         {
-            string noFe0f = fileName.Replace("_fe0f", "");
-            sprite = Resources.Load<Sprite>("emojis/" + noFe0f);
+            Debug.LogWarning("Emoji sprite not found without '_fe0f': " + fileName);
         }
 
         if (sprite == null)
@@ -41,20 +41,27 @@ public class EmojiManager : MonoBehaviour
 
 
     // 👩‍⚖️ → emoji_u1f469_200d_2696_fe0f
-    private string ConvertEmojiToFileName(string emoji)
+private string ConvertEmojiToFileName(string emoji)
+{
+    List<string> hexList = new List<string>();
+
+    StringInfo si = new StringInfo(emoji);
+    int len = si.LengthInTextElements;
+
+    for (int i = 0; i < len; i++)
     {
-        List<string> hexList = new List<string>();
+        string element = si.SubstringByTextElements(i, 1);
+        int code = char.ConvertToUtf32(element, 0);
 
-        StringInfo si = new StringInfo(emoji);
-        int len = si.LengthInTextElements;
-
-        for (int i = 0; i < len; i++)
+        // 如果是 ZWJ 或变体选择符，跳过并继续处理
+        if (code == 0x200D || code == 0xFE0F)
         {
-            string element = si.SubstringByTextElements(i, 1);
-            int code = char.ConvertToUtf32(element, 0);
-            hexList.Add(code.ToString("x"));
+            continue; // 直接跳过 ZWJ 和变体选择符
         }
 
-        return "emoji_u" + string.Join("_", hexList);
+        hexList.Add(code.ToString("x"));
     }
+
+    return "emoji_u" + string.Join("_", hexList);
+}
 }

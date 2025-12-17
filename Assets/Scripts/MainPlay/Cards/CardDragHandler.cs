@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -302,10 +303,11 @@ public class CardDragHandler : MonoBehaviour,
                 card.CardSetAllInvisible();
                 target.SetMainCardVisualOnCombine(1);
                 EndDragMinus.RaiseEvent(top, this);
-
+                top.CompleteNormalCard();
                 //关卡胜利判断应该在步数之前
                 card.onFinishAnim.endingAnims = () =>
-                top.CompleteNormalCard();
+                CardManager.Instance.UnregisterPoolCards(card);
+
 
 
                 OnSeccussDragFromDeck();
@@ -316,6 +318,7 @@ public class CardDragHandler : MonoBehaviour,
 
                 card.CardSetAnimPlay();
                 onSuccessDrag.RaiseEvent(top, this);
+
 
             }
             //相同id，且top在stack中
@@ -329,11 +332,13 @@ public class CardDragHandler : MonoBehaviour,
                 foreach (var card in top.GetTop().childCards)
                 {
                     card.CardSetAllInvisible();
-                    card.onFinishAnim.endingAnims = () =>
                     card.CompleteNormalCard();
+                    card.onFinishAnim.endingAnims = () =>
+                    CardManager.Instance.UnregisterPoolCards(card);
                     card.CardSetAnimPlay();
                 }
                 onSuccessDrag.RaiseEvent(top, this);
+
             }
             else
             {
@@ -463,4 +468,5 @@ public class CardDragHandler : MonoBehaviour,
     }
 
     #endregion
+
 }

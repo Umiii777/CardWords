@@ -257,6 +257,7 @@ public class Card : MonoBehaviour
         currentMainRow.isEmpty = true;
         onCompleteMainCard.RaiseEvent(this, this);
         // gameObject.SetActive(false);
+        CardManager.Instance.UnregisterPoolCards(this);
 
     }
     #endregion
