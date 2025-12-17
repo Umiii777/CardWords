@@ -8,6 +8,9 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour
 {
+    [Header("测试相关")]
+    public int testNum = 109;
+
     [Header("生成的列位置相关")]
     public float rowY = 240;
     public float mainRowY = 500;
@@ -306,6 +309,7 @@ public class LevelManager : MonoBehaviour
     public async void OnLevelComplete()
     {
         currentLevelNum++;
+        Debug.Log("关卡胜利");
         PlayerProgress.SetCurrentLevel(currentLevelNum);
 
         await SystemUIManager.LoadUI(UIType.Victory);
@@ -313,9 +317,15 @@ public class LevelManager : MonoBehaviour
     #endregion
 
     #region 关卡失败
-    public async void OnLevelDefeat()
+    public void OnLevelDefeat()
     {
-        await SystemUIManager.LoadUI(UIType.Defeat, 0);
+
+        Debug.Log("关卡失败");
+        if (CardManager.Instance.allCards.Count != 0)
+        {
+            SystemUIManager.LoadUI(UIType.Defeat, 0);
+        }
+
     }
     #endregion
 
@@ -367,7 +377,7 @@ public class LevelManager : MonoBehaviour
     [ContextMenu("直接从11关开始")]
     public void TestLevel30()
     {
-        currentLevelNum = 111;
+        currentLevelNum = testNum;
         PlayerProgress.SetCurrentLevel(currentLevelNum);
         _ = SystemUIManager.LoadUI(UIType.Victory, 0);
     }

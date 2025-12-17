@@ -64,6 +64,7 @@ public class StepManager : MonoBehaviour
     //步数耗尽的方法
     public void StepsRunningOut()
     {
+
         onLevelDefeat.RaiseEvent(this, this);
     }
     //步数增加的方法
