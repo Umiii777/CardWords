@@ -12,7 +12,7 @@ public class ItemUIController : AdProcessor<ItemUIController>, IAudioTrigger
 {
     public static Dictionary<
         ItemType,
-        (Func<int, Task> ClickingBuy, Func<Task> ClickingWatchAd)
+        (Func<int, Task<bool>> ClickingBuy, Func<Task> ClickingWatchAd)
     > clickingsCache = new();
 
 #region 按钮回调委托
@@ -39,8 +39,13 @@ public class ItemUIController : AdProcessor<ItemUIController>, IAudioTrigger
 
 #region 按钮回调方法
     public void OnClickClose() => ProcessClicking(clickingClose);
-    public async void OnClickReceive() => await ProcessClicking(clickingWatchAd);
     public async void OcClickBuy() => await ProcessClicking(clickingBuy, price);
+    public async void OnClickReceive()
+    {
+        isWatchingAd = true;
+        await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd());
+        isWatchingAd = false;
+    }
 #endregion
 
     void Start()
