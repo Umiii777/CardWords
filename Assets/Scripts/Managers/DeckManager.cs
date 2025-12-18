@@ -104,6 +104,7 @@ public class DeckManager : MonoBehaviour
         foreach (var card in currentDeckCardsHasSet)
         {
             CardManager.Instance.UnregisterCard(card);
+            CardManager.Instance.UnregisterPoolCards(card);
         }
         currentDeckCardsHasSet.Clear();
         currentDeckCount = 0;

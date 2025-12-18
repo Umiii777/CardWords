@@ -9,7 +9,7 @@ using UnityEngine;
 public class LevelManager : MonoBehaviour
 {
     [Header("测试相关")]
-    public int testNum = 109;
+    public int testNum = 115;
 
     [Header("生成的列位置相关")]
     public float rowY = 240;

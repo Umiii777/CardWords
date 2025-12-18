@@ -82,7 +82,7 @@
                 6
             ],
             "column": 4,
-            "steps": 60
+            "steps": 80
         },
         {
             "num": 5,
@@ -107,7 +107,7 @@
                 6
             ],
             "column": 4,
-            "steps": 80
+            "steps": 100
         },
         {
             "num": 6,
