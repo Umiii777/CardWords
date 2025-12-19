@@ -20,23 +20,38 @@ public class EmojiManager : MonoBehaviour
 
         string fileName = ConvertEmojiToFileName(emoji);
 
-        // 尝试加载没有 _fe0f 后缀的 emoji 图片
+        // 1️⃣ 原样加载（带 fe0f / zwj）
         Sprite sprite = Resources.Load<Sprite>("emojis/" + fileName);
-
-        // 如果没有找到，尝试加载没有变体选择符的版本
-        if (sprite == null)
+        if (sprite != null)
         {
-            Debug.LogWarning("Emoji sprite not found without '_fe0f': " + fileName);
+            emojiCache[emoji] = sprite;
+            return sprite;
         }
 
-        if (sprite == null)
+        // 2️⃣ 去掉 fe0f 再试（❤️ 的关键）
+        if (fileName.Contains("_fe0f"))
         {
-            Debug.LogWarning("Emoji sprite not found: " + fileName);
-            return null;
+            string noFe0f = fileName.Replace("_fe0f", "");
+            sprite = Resources.Load<Sprite>("emojis/" + noFe0f);
+            if (sprite != null)
+            {
+                emojiCache[emoji] = sprite;
+                return sprite;
+            }
         }
 
-        emojiCache[emoji] = sprite;
-        return sprite;
+        // 3️⃣ 最终兜底：只用第一个 code point（防止再炸）
+        int firstCodePoint = char.ConvertToUtf32(emoji, 0);
+        string fallback = "emoji_u" + firstCodePoint.ToString("x");
+        sprite = Resources.Load<Sprite>("emojis/" + fallback);
+        if (sprite != null)
+        {
+            emojiCache[emoji] = sprite;
+            return sprite;
+        }
+
+        Debug.LogError("❌ Emoji sprite not found: " + fileName);
+        return null;
     }
 
 
