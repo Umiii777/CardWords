@@ -8,11 +8,11 @@ public class MainRowPool : MonoBehaviour
     [SerializeField] private GameObject mainRowPrefab;
 
     [Header("预生成数量（根据关卡规模调整）")]
-    [SerializeField] private int preloadCount = 3;
+    [SerializeField] private int preloadCount = 5;
 
     private IObjectPool<GameObject> pool;
 
-    private void Awake()
+    private void Start()
     {
         pool = new ObjectPool<GameObject>(
             createFunc: CreateRow,
@@ -34,6 +34,14 @@ public class MainRowPool : MonoBehaviour
     }
     private void OnGetRow(GameObject row)
     {
+        var r = row.GetComponent<Row>();
+        if (r != null)
+        {
+            r.cardsOnRow.Clear();
+            r.isEmpty = true;
+            r.rowType = RowType.main; // default
+            r.rowNum = -1;
+        }
         row.SetActive(true);
     }
     private void OnReleaseRow(GameObject row)

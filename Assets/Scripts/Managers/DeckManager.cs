@@ -9,16 +9,19 @@ public class DeckManager : MonoBehaviour
     //组件引用
     public CardPool cardPool;
     public RectTransform canvas;
+    public DeckHandler deckHandler;
+    public ObjectEventSO DrawACardFromDeck;
+
 
     public int currentLevelDeckTotalNum;  //当前关卡的牌库卡牌持有数量
 
     private CardData currentCardData;
     private List<CardData> currentDeckCardDatas;
 
-    private List<Card> currentSetCards;
+    private List<Card> currentDeckCardsHasSet = new List<Card>();
 
-    private int currentDeckCount;//牌库中的第x张牌
-    private int DeckSetNum;
+    private int currentDeckCount = 0;//牌库中的第x张牌
+    private int hasRemovedNum = 0;
 
     //参数设置
     private Vector2 firstPresetPos = new Vector2(0, -780);
@@ -37,40 +40,101 @@ public class DeckManager : MonoBehaviour
     //每关卡开始时，初始化牌库
     public void InitCardDeck(List<CardData> currentFullDeckDatas)
     {
+        //当前deck中的卡牌数据list
         currentDeckCardDatas = currentFullDeckDatas;
-        currentLevelDeckTotalNum = currentFullDeckDatas.Count;
+        //当钱deck中的卡牌总数
+        currentLevelDeckTotalNum = currentDeckCardDatas.Count;
+
+
         Debug.Log("当前的deck中有" + currentLevelDeckTotalNum + "张卡牌");
     }
 
     public void DrawCard()
     {
-        //当牌库已经被取出数据数量
-        if (DeckSetNum > currentLevelDeckTotalNum)
+        if (currentDeckCardDatas.Count > 0)
         {
-            ResetDeck();
+            if (currentDeckCount == currentDeckCardDatas.Count - 1)
+            {
+                deckHandler.DeckStyleReadyShuffle();
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
+            if (currentDeckCount == currentDeckCardDatas.Count)
+            {
+                Debug.Log("执行了ResetDeck");
+                ResetDeck();
+                AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
+            else
+            {
+                GameObject cardObj = cardPool.Get();
+                SetACardFromDeck(cardObj);
+                AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.DrawCard);
+                //currentCardRect.SetParent(dragla)
+                DrawACardFromDeck.RaiseEvent(this, this);
+            }
         }
         else
         {
-            GameObject cardObj = cardPool.Get();
-            SetACardFromDeck(cardObj);
-            //currentCardRect.SetParent(dragla)
+            _= SystemUIManager.PopUpTips("牌库已经没有更多牌了");
         }
+        //当牌库已经被取出数据数量
+
+
     }
     private void SetACardFromDeck(GameObject cardObj)
     {
         Card currentCard = cardObj.GetComponent<Card>();
         currentCard.isFront = true;
+        currentCard.isFromDeck = true;
         currentCard.cardData = currentDeckCardDatas[currentDeckCount];
         //currentDeckCardDatas.Remove(currentCard.cardData);      //从当前的数据库中移出这个数据
         currentCard.SetCardVisual();
         RectTransform currentCardRect = cardObj.GetComponent<RectTransform>();
-        currentCardRect.SetParent(canvas, false);
+        currentCardRect.SetParent(UIManager.Instance.dragLayer, false);
         currentCardRect.anchoredPosition = firstPresetPos;
         currentDeckCount++;
+
+        currentDeckCardsHasSet.Add(currentCard);
     }
+
     public void ResetDeck()
     {
+        deckHandler.DeckStyleNormal();
+        foreach (var card in currentDeckCardsHasSet)
+        {
+            CardManager.Instance.UnregisterCard(card);
+            CardManager.Instance.UnregisterPoolCards(card);
+        }
+        currentDeckCardsHasSet.Clear();
+        currentDeckCount = 0;
+        hasRemovedNum = 0;
+    }
 
+    public void DeckMinusEvent(Card cardFromDeck)
+    {
+        Debug.Log("减少了一张卡牌" + cardFromDeck.cardData.cardContent);
+        currentDeckCardDatas.Remove(cardFromDeck.cardData);
+        currentDeckCardsHasSet.Remove(cardFromDeck);
+        hasRemovedNum++;
+        currentDeckCount--;
+    }
+    public void ShuffleDeck()
+    {
+        Debug.Log("开始打乱牌库");
+        ResetDeck();
+        deckHandler.ShuffleAnim();
+        AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
+        currentDeckCardDatas.Shuffle();
+
+    }
+
+    public void LevelStartResetDeck()
+    {
+        deckHandler.NewLevelResetDeckStyle();
+        currentDeckCardsHasSet.Clear();
+        currentDeckCount = 0;
+        hasRemovedNum = 0;
     }
 
 

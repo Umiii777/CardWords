@@ -9,7 +9,7 @@ public class PlayerProgress : MonoBehaviour
     // 获取当前已解锁的最大关卡ID（默认是1）
     public static int GetCurrentLevel()
     {
-        return PlayerPrefs.GetInt(Key_CurrentLevel, 1);
+        return PlayerPrefs.GetInt(Key_CurrentLevel, 101);
     }
 
     // 更新玩家的最高关卡进度
