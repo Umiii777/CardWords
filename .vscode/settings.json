@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "CardOfWords.sln",
+    "dotnet.defaultSolution": "CardWords.sln",
     "Codegeex.GenerationPreference": "automatic",
     "Codegeex.Chat.fontSize": 15
 }
