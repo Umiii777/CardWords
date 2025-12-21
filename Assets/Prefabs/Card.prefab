@@ -504,6 +504,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: f70a2d65d5e52a34e93cdb04d3b8c1be, type: 3}
   isFromDeck: 0
   isStackStyleApplied: 0
+  isDeckStyleApplied: 0
   isOnRow: 0
   isOnMainRow: 0
   cg: {fileID: 0}

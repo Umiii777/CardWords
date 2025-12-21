@@ -58,6 +58,7 @@ public class CardPool : MonoBehaviour
             r.isFromDeck = false;
             r.childCards = new List<Card>();
             r.isStackStyleApplied = false;
+            r.isDeckStyleApplied = false;
             r.cg.blocksRaycasts = true;
             r.slotCount = 0;
               

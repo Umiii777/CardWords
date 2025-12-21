@@ -22,6 +22,7 @@ public class Card : MonoBehaviour
     public Sprite[] sprites; //0是卡背面，1是显示字的内容面
     public bool isFromDeck = false;
     public bool isStackStyleApplied = false;
+    public bool isDeckStyleApplied = false;
 
     //跟拖拽相关的变量
     public bool isOnRow;
@@ -46,8 +47,13 @@ public class Card : MonoBehaviour
     private int textStackOffsetPos = 100;
     private int textStackOffsetSize = 30;
 
+    private int imageDeckOffsetPos = 70;
+
+    private Vector4 originalCardMargin;
+    private Vector4 inDeckCardMargin;
 
     private float textOriginalSize;
+    private float textDeckSize = 30;
 
     //触发的事件
     public CardDataEventSO deckSuccessDrag;
@@ -75,6 +81,9 @@ public class Card : MonoBehaviour
     public void Start()
     {
         textOriginalSize = tmContent.fontSize;
+
+        originalCardMargin = tmContent.margin;
+        inDeckCardMargin = new Vector4(150, originalCardMargin.y, originalCardMargin.z, originalCardMargin.w);
     }
     //每次拖拽完成后都应该调用这个SetCardVisual
     public void SetCardVisual()
@@ -188,13 +197,28 @@ public class Card : MonoBehaviour
             cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
             cardContentImage.rectTransform.localScale = new Vector3(0.3f, 0.3f, 1);
         }
-
     }
+    public void InDeckStyle()
+    {
+        if (!isDeckStyleApplied)
+        {
+            tmContent.margin = inDeckCardMargin;
+            tmContent.fontSize = textDeckSize;
+            isDeckStyleApplied = true;
+
+            cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(imageDeckOffsetPos, 0);
+            cardContentImage.rectTransform.localScale = new Vector3(0.3f, 0.3f, 1);
+            tmLength.enabled = false;
+        }
+    }
+
     public void InPresetStyle()
     {
         tmContent.rectTransform.anchoredPosition = tmContent.rectTransform.anchoredPosition + new Vector2(0, textStackOffsetPos);
         tmContent.fontSize = textStackOffsetSize;
     }
+
+
     public void ResetStyle()
     {
         if (isStackStyleApplied)
@@ -205,6 +229,17 @@ public class Card : MonoBehaviour
 
             cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(0, -textStackOffsetPos);
             cardContentImage.rectTransform.localScale = new Vector3(1.8f, 1.8f, 1);
+        }
+        if (isDeckStyleApplied)
+        {
+            tmContent.margin = originalCardMargin;
+            tmContent.fontSize = textOriginalSize;
+            isDeckStyleApplied = false;
+
+            cardContentImage.rectTransform.anchoredPosition = cardContentImage.rectTransform.anchoredPosition + new Vector2(-imageDeckOffsetPos, 0);
+            cardContentImage.rectTransform.localScale = new Vector3(1.8f, 1.8f, 1);
+
+            tmLength.enabled = true;
         }
     }
     #endregion
@@ -287,7 +322,7 @@ public class Card : MonoBehaviour
         {
             image.enabled = true;
         }
-        foreach(var text in allTexts)
+        foreach (var text in allTexts)
         {
             text.enabled = true;
         }
