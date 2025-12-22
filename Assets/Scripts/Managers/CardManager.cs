@@ -38,6 +38,10 @@ public class CardManager : MonoBehaviour
                 Debug.Log("移除了一张卡牌,还剩" + allCards.Count + "张卡牌");
                 OnCompleteLevel();
             }
+            else
+            {
+                RowManager.Instance.CrashDefeatCheck();
+            }
         }
         else if (allCards.Count == 0)
         {
@@ -70,8 +74,7 @@ public class CardManager : MonoBehaviour
     {
         //让levelManager监听胜利
         Debug.Log("关卡胜利了");
-        CompleteLevel.RaiseEvent(this, this);
-        
+        CompleteLevel.RaiseEvent(this, this);       
     }
     public List<Card> GetCurrentLevelCardOnFront()
     {

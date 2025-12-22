@@ -16,7 +16,7 @@ public class DeckManager : MonoBehaviour
     public int currentLevelDeckTotalNum;  //当前关卡的牌库卡牌持有数量
 
     private CardData currentCardData;
-    private List<CardData> currentDeckCardDatas;
+    public List<CardData> currentDeckCardDatas;
 
     private List<Card> currentDeckCardsHasSet = new List<Card>();
 

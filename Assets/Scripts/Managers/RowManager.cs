@@ -17,6 +17,13 @@ public class RowManager : MonoBehaviour
 
     public static RowManager Instance;
 
+    //判定失败相关
+    public List<CardData> AllCurentCardsData = new List<CardData>();
+    public List<CardData> AllCurentCardsMangerData = new List<CardData>();
+
+    private CardData firsitDefeatData;
+    private CardData secondDefeatData;
+
     public void Awake()
     {
         Instance = this;
@@ -126,5 +133,53 @@ public class RowManager : MonoBehaviour
         await SystemUIManager.PopUpTips("请点击牌库获得新卡牌");
         Debug.Log("没找到可合成相同的卡牌");
 
+    }
+    public void CrashDefeatCheck()
+    {
+        // AllCurentCardsMangerData = CardManager.Instance.allCards.ConvertAll(card => card.cardData);
+        // AllCurentCardsData.AddRange(AllCurentCardsData);
+        // allcurent + DeckManager.Instance.currentDeckCardDatas;
+
+        //开始遍历所有的row
+        for (int i = 0; i < rows.Count; i++)
+        {
+            if (rows[i].cardsOnRow.Count >= 1)
+            {
+                firsitDefeatData = rows[i].cardsOnRow[rows[i].cardsOnRow.Count - 1].cardData;
+                for (int j = 1; j < rows.Count; j++)
+                {
+                    if (rows[j].cardsOnRow.Count >= 1)
+                    {
+                        secondDefeatData = rows[j].cardsOnRow[rows[j].cardsOnRow.Count - 1].cardData;
+                        if (firsitDefeatData.mainId == secondDefeatData.mainId && !secondDefeatData.isMainCard && !firsitDefeatData.isMainCard)
+                        {
+                            return;
+                        }
+                    }
+                }
+                foreach (var cardData in DeckManager.Instance.currentDeckCardDatas)
+                {
+                    secondDefeatData = cardData;
+                    if (firsitDefeatData.mainId == secondDefeatData.mainId && !secondDefeatData.isMainCard && !firsitDefeatData.isMainCard)
+                    {
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+        List<Card> currentMaincards = CardManager.Instance.GetCurrentLevelCardOnFront();
+        foreach (var maincard in currentMaincards)
+        {
+            if (firsitDefeatData.mainId == maincard.cardData.mainId && !maincard.cardData.isMainCard && !firsitDefeatData.isMainCard)
+            {
+                return;
+            }
+        }
+        _=SystemUIManager.PopUpTips("卡死了");
+        Debug.LogError("卡死了");
     }
 }

@@ -88,6 +88,7 @@ public class Row : MonoBehaviour
             // Debug.Log("执行了设置卡翻面");
             // Debug.Log(cardsOnRow[cardsOnRow.Count - 1].cardData.cardContent);
             cardsOnRow[cardsOnRow.Count - 1].SetFront();
+            RowManager.Instance.CrashDefeatCheck();
 
         }
         else
