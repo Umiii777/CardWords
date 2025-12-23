@@ -67,6 +67,7 @@ public class DeckManager : MonoBehaviour
                 ResetDeck();
                 AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
                 DrawACardFromDeck.RaiseEvent(this, this);
+                RowManager.Instance.CrashDefeatCheck();
             }
             else
             {
@@ -80,6 +81,7 @@ public class DeckManager : MonoBehaviour
         else
         {
             _ = SystemUIManager.PopUpTips("牌库已经没有更多牌了");
+            RowManager.Instance.CrashDefeatCheck();
         }
         //当牌库已经被取出数据数量
 
