@@ -2,8 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-
-
+using DG.Tweening;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -19,6 +18,13 @@ public class LevelManager : MonoBehaviour
     public RectTransform canvas;
     [Header("生成的卡牌位置相关")]
     private float cardColumnOffset = 50;
+
+    [Header("生成的卡牌动画———关卡进入发牌")]
+    public Vector2 anim_DealPosStart;
+    private Vector2 anim_DealPosEnd;
+    public float flyTime = 0.1f;
+    float dealInterval = 0.08f; // 发牌节奏
+
 
 
 
@@ -249,9 +255,19 @@ public class LevelManager : MonoBehaviour
                 RectTransform currentTransform = card.GetComponent<RectTransform>();
                 currentTransform.SetParent(canvas, false);
                 currentTransform.localScale = Vector3.one;
-                currentTransform.anchoredPosition = new Vector2(currentRowX[i] + startX, rowY - j * cardColumnOffset);
+                //currentTransform.anchoredPosition = new Vector2(currentRowX[i] + startX, rowY - j * cardColumnOffset);
                 currentTransform.SetParent(dragLayer, false);
                 currentTransform.localScale = Vector3.one;
+
+
+                //发牌动画
+                currentTransform.anchoredPosition = anim_DealPosStart;
+                anim_DealPosEnd = new Vector2(currentRowX[i] + startX, rowY - j * cardColumnOffset);
+                float delay = currentCardInitNum * dealInterval;
+                currentTransform.DOAnchorPos(anim_DealPosEnd, flyTime).SetDelay(delay).SetEase(Ease.OutCubic);
+
+
+
             }
         }
         //TODO：将剩下的卡牌分给CardDeck,数据传递
@@ -323,7 +339,7 @@ public class LevelManager : MonoBehaviour
         Debug.Log("关卡失败");
         if (CardManager.Instance.allCards.Count != 0)
         {
-            _= SystemUIManager.LoadUI(UIType.Defeat, 0);
+            _ = SystemUIManager.LoadUI(UIType.Defeat, 0);
         }
 
     }

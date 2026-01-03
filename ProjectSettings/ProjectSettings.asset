@@ -47,7 +47,7 @@ PlayerSettings:
   defaultScreenWidthWeb: 1080
   defaultScreenHeightWeb: 1920
   m_StereoRenderingPath: 0
-  m_ActiveColorSpace: 1
+  m_ActiveColorSpace: 0
   unsupportedMSAAFallback: 0
   m_SpriteBatchVertexThreshold: 300
   m_MTRendering: 1
@@ -164,7 +164,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.CardWordsStudio.CardWords
-    Standalone: com.DefaultCompany.2DProject
+    Standalone: com.CardWordsStudio.CardWords
   buildNumber:
     Standalone: 0
     VisionOS: 0

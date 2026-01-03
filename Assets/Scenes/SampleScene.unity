@@ -122,6 +122,97 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &31310334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 31310335}
+  - component: {fileID: 31310337}
+  - component: {fileID: 31310336}
+  m_Layer: 5
+  m_Name: spine_shuffle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &31310335
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31310334}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1372688637}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -8, y: 3}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &31310336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31310334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d85b887af7e6c3f45a2e2d2920d641bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 2100000, guid: 7bae70b3d19d00c42af12f5b8011ff82, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  skeletonDataAsset: {fileID: 11400000, guid: 805febeb7c002b14bacb18ccd5be6197, type: 2}
+  initialSkinName: 
+  initialFlipX: 0
+  initialFlipY: 0
+  startingAnimation: xipai
+  startingLoop: 0
+  timeScale: 1
+  freeze: 1
+  updateWhenInvisible: 3
+  unscaledTime: 0
+  allowMultipleCanvasRenderers: 0
+  canvasRenderers: []
+  separatorSlotNames: []
+  enableSeparatorSlots: 0
+  separatorParts: []
+  updateSeparatorPartLocation: 1
+  meshGenerator:
+    settings:
+      useClipping: 1
+      zSpacing: 0
+      pmaVertexColors: 1
+      tintBlack: 0
+      canvasGroupTintBlack: 0
+      calculateTangents: 0
+      addNormals: 0
+      immutableTriangles: 0
+--- !u!222 &31310337
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 31310334}
+  m_CullTransparentMesh: 1
 --- !u!1 &71035635
 GameObject:
   m_ObjectHideFlags: 0
@@ -363,6 +454,8 @@ MonoBehaviour:
   mainRowY: 500
   startX: -540
   canvas: {fileID: 801774033}
+  anim_DealPosStart: {x: 400, y: -780}
+  flyTime: 0.5
   cardPool: {fileID: 716188989}
   rowPool: {fileID: 716188985}
   mainRowpool: {fileID: 716188986}
@@ -2976,6 +3069,7 @@ GameObject:
   - component: {fileID: 1372688639}
   - component: {fileID: 1372688638}
   - component: {fileID: 1372688640}
+  - component: {fileID: 1372688641}
   m_Layer: 5
   m_Name: CardDeck
   m_TagString: Untagged
@@ -2997,6 +3091,7 @@ RectTransform:
   m_Children:
   - {fileID: 1084001881}
   - {fileID: 832968332}
+  - {fileID: 31310335}
   m_Father: {fileID: 801774033}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3057,6 +3152,26 @@ MonoBehaviour:
   clickInterval: 0.2
   deckStyle: {fileID: 0}
   tmPro: {fileID: 0}
+  shuffleAnim: {fileID: 1372688641}
+--- !u!114 &1372688641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1372688636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a34f7bed741682a47b6005c1cc68df9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spineObject: {fileID: 31310336}
+  animConfigs:
+  - 0,xipai,false,0
+  isPlayingStart: 1
+  onAnimsEnd:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1385267407
 GameObject:
   m_ObjectHideFlags: 0
@@ -3217,6 +3332,8 @@ MonoBehaviour:
   deckHandler: {fileID: 1372688640}
   DrawACardFromDeck: {fileID: 11400000, guid: c762e89076721694b9a263664493f72c, type: 2}
   currentLevelDeckTotalNum: 0
+  anim_deckStartPos: {x: 400, y: -780}
+  anim_drawFlyTime: 0.5
 --- !u!114 &1578489380
 MonoBehaviour:
   m_ObjectHideFlags: 0

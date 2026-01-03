@@ -1,0 +1,13 @@
+
+xipai.png
+size: 205, 262
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+02_ui_zjdi03
+  rotate: false
+  xy: 2, 2
+  size: 201, 258
+  orig: 201, 258
+  offset: 0, 0
+  index: -1

@@ -10,7 +10,7 @@ public class SpineController : MonoBehaviour
     public Action endingAnims;
 
     [SerializeField]
-    private SkeletonGraphic spineObject;
+    public SkeletonGraphic spineObject;
     [SerializeField]
     private string[] animConfigs;
     [SerializeField]

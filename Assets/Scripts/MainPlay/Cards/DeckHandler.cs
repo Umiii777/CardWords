@@ -21,6 +21,9 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
     public Image deckStyle;
     public TextMeshProUGUI tmPro;
 
+    //洗牌spine动画
+    public SpineController shuffleAnim;
+
     public void Start()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -53,11 +56,13 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
     {
         deckStyle.sprite = CardVisualManager.Instance.refreshDeck;
         tmPro.text = "刷新牌库";
+        shuffleAnim.spineObject.color = new Color(1, 1, 1, 0f);
     }
     public void DeckStyleNormal()
     {
         deckStyle.sprite = CardVisualManager.Instance.normalDeck;
         tmPro.text = "";
+        shuffleAnim.spineObject.color = new Color(1, 1, 1, 1f);
 
     }
     public void ShuffleAnim()
@@ -67,5 +72,11 @@ public class DeckHandler : MonoBehaviour, IPointerClickHandler
     public void NewLevelResetDeckStyle()
     {
         DeckStyleNormal();
+    }
+
+    //动画表现
+    public void ShuffleAnimPlay()
+    {
+        shuffleAnim.PlayAnims();
     }
 }

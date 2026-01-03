@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 public class DeckManager : MonoBehaviour
 {
     public static DeckManager Instance;
@@ -33,6 +34,13 @@ public class DeckManager : MonoBehaviour
     //新堆叠样式相关
     List<Card> deckStacking = new List<Card>();
 
+    //抽牌动画相关
+    public Vector2 anim_deckStartPos;
+    private Vector2 anim_deckEndPos;
+    public float anim_drawFlyTime = 5f;
+
+    public bool isFlying = false;
+
 
     private void Awake()
     {
@@ -54,6 +62,10 @@ public class DeckManager : MonoBehaviour
 
     public void DrawCard()
     {
+        if(isFlying !=false)
+        {
+            return;
+        }
         if (currentDeckCardDatas.Count > 0)
         {
             if (currentDeckCount == currentDeckCardDatas.Count - 1)
@@ -65,6 +77,12 @@ public class DeckManager : MonoBehaviour
             {
                 Debug.Log("执行了ResetDeck");
                 ResetDeck();
+
+                // deckHandler.shuffleAnim.enabled = true;
+                // deckHandler.shuffleAnim.endingAnims = () => deckHandler.shuffleAnim.enabled = false;
+                deckHandler.ShuffleAnimPlay();
+
+
                 AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
                 DrawACardFromDeck.RaiseEvent(this, this);
                 RowManager.Instance.CrashDefeatCheck();
@@ -97,7 +115,11 @@ public class DeckManager : MonoBehaviour
         currentCard.SetCardVisual();
         RectTransform currentCardRect = cardObj.GetComponent<RectTransform>();
         currentCardRect.SetParent(UIManager.Instance.dragLayer, false);
-        currentCardRect.anchoredPosition = firstPresetPos;
+
+        //currentCardRect.anchoredPosition = firstPresetPos;
+        anim_deckEndPos = firstPresetPos;
+        currentCardRect.anchoredPosition = anim_deckStartPos;
+
         currentDeckCount++;
 
         currentDeckCardsHasSet.Add(currentCard);
@@ -118,35 +140,48 @@ public class DeckManager : MonoBehaviour
     {
         if (deckStacking.Count == 1)
         {
-            deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+
+            //deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+            deckStacking[deckStacking.Count - 1].rectTransform.DOAnchorPos(anim_deckEndPos, anim_drawFlyTime);
             deckStacking[deckStacking.Count - 1].ResetStyle();
             deckStacking[deckStacking.Count - 1].cg.blocksRaycasts = true;
             return;
         }
         if (deckStacking.Count == 2)
         {
-            deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+
+            //deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+            deckStacking[deckStacking.Count - 1].rectTransform.DOAnchorPos(anim_deckEndPos, anim_drawFlyTime);
             deckStacking[deckStacking.Count - 1].ResetStyle();
             deckStacking[deckStacking.Count - 1].cg.blocksRaycasts = true;
 
-            deckStacking[deckStacking.Count - 2].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset, 0);
+            //deckStacking[deckStacking.Count - 2].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset, 0);
+            deckStacking[deckStacking.Count - 2].rectTransform.DOAnchorPos(firstPresetPos + new Vector2(presetOffset, 0), anim_drawFlyTime);
             deckStacking[deckStacking.Count - 2].InDeckStyle();
             deckStacking[deckStacking.Count - 2].cg.blocksRaycasts = false;
+            return;
         }
         if (deckStacking.Count >= 3)
         {
-            deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+            //deckStacking[deckStacking.Count - 1].rectTransform.anchoredPosition = firstPresetPos;
+
+
+            deckStacking[deckStacking.Count - 1].rectTransform.DOAnchorPos(anim_deckEndPos, anim_drawFlyTime);
             deckStacking[deckStacking.Count - 1].ResetStyle();
             deckStacking[deckStacking.Count - 1].cg.blocksRaycasts = true;
 
 
-            deckStacking[deckStacking.Count - 3].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset * 2, 0);
+            //deckStacking[deckStacking.Count - 3].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset * 2, 0);
+            deckStacking[deckStacking.Count - 3].rectTransform.DOAnchorPos(firstPresetPos + new Vector2(presetOffset*2, 0), anim_drawFlyTime);
             deckStacking[deckStacking.Count - 3].InDeckStyle();
             deckStacking[deckStacking.Count - 3].cg.blocksRaycasts = false;
 
-            deckStacking[deckStacking.Count - 2].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset, 0);
+            //deckStacking[deckStacking.Count - 2].rectTransform.anchoredPosition = firstPresetPos + new Vector2(presetOffset, 0);
+            deckStacking[deckStacking.Count - 2].rectTransform.DOAnchorPos(firstPresetPos + new Vector2(presetOffset, 0), anim_drawFlyTime);
             deckStacking[deckStacking.Count - 2].InDeckStyle();
             deckStacking[deckStacking.Count - 2].cg.blocksRaycasts = false;
+
+            return;
         }
     }
 
@@ -185,7 +220,7 @@ public class DeckManager : MonoBehaviour
         deckHandler.ShuffleAnim();
         AudioManager.Instance.PlayGameSFX(AudioManager.GameSFXtype.Shuffle);
         currentDeckCardDatas.Shuffle();
-        
+
     }
 
     public void LevelStartResetDeck()
