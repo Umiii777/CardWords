@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 using UnityEngine;
 
 public class CardStack
 {
     private const float offsetY = 50f;
+    private const float flyBackTime = 0.4f;
+
 
     // 添加 child 到 parent 堆顶,单对单
     public static void OneAddToOne(Card parent, Card child)
@@ -89,14 +92,32 @@ public class CardStack
         {
             RectTransform cRT = top.childCards[i].rectTransform;
             cRT.anchoredPosition = topRT.anchoredPosition + new Vector2(0, -offsetY * i);
+            //cRT.DOAnchorPos(topRT.anchoredPosition + new Vector2(0, -offsetY * i),flyBackTime).SetEase(Ease.OutBounce);
+
             //top.childCards[i].cg.blocksRaycasts = false;
         }
         for (int i = 0; i < top.childCards.Count - 1; i++)
         {
             top.childCards[i].InStackStyle();
         }
+    }
 
+    public static void UpdateStackPositionsWithAnim(Card parent, Vector2 targetPos)
+    {
+        Card top = parent.GetTop();
+        RectTransform topRT = top.rectTransform;
+        for (int i = 1; i < top.childCards.Count; i++)
+        {
+            RectTransform cRT = top.childCards[i].rectTransform;
+            //cRT.anchoredPosition = targetPos + new Vector2(0, -offsetY * i);
+            cRT.DOAnchorPos(targetPos + new Vector2(0, -offsetY * i),flyBackTime).SetEase(Ease.OutBounce);
 
+            //top.childCards[i].cg.blocksRaycasts = false;
+        }
+        for (int i = 0; i < top.childCards.Count - 1; i++)
+        {
+            top.childCards[i].InStackStyle();
+        }
     }
 
     public static void ChangeAllStackSibings(Card currentCard)

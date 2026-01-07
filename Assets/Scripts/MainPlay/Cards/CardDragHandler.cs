@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 
 public class CardDragHandler : MonoBehaviour,
     IBeginDragHandler, IDragHandler, IEndDragHandler
@@ -19,6 +20,8 @@ public class CardDragHandler : MonoBehaviour,
     private Vector2 originalPos;
     private Transform bestSlot = null;
     private float bestArea = 0f;
+
+    private float flyBackTime = 0.4f;
 
     //同时存在的时候先减再增加，传递给row的事件，让row帮助翻牌库的牌，同时检测是否为空
     //对应事件由rowManager来订阅
@@ -156,9 +159,13 @@ public class CardDragHandler : MonoBehaviour,
 
 
         // 默认：回原位
-        top.rectTransform.anchoredPosition = originalPos;
-        top.CardShake();
-        CardStack.UpdateStackPositions(top);
+        //top.rectTransform.anchoredPosition = originalPos;
+        //top.CardShake();
+        /*用动画效果对位置变更进行替换*/
+        ReturnPosWithAnim();
+
+
+
         CardStack.EndDragStackSetCg(top);
         if (!top.isInStack)
             top.transform.SetAsLastSibling();
@@ -217,8 +224,9 @@ public class CardDragHandler : MonoBehaviour,
         //普通卡放不到mainRow
         if (row.rowType == RowType.main && !top.cardData.isMainCard)
         {
-            top.rectTransform.anchoredPosition = originalPos;
-            CardStack.UpdateStackPositions(top);
+            // top.rectTransform.anchoredPosition = originalPos;
+            // CardStack.UpdateStackPositions(top);
+            ReturnPosWithAnim();
             return;
         }
         //普通卡可以放到空row
@@ -279,17 +287,21 @@ public class CardDragHandler : MonoBehaviour,
     #region 放在mainCard上面
     private void PlaceOnMainCard(Card target)   //合成到主卡上，从下面到上面
     {
+        //当主卡不在槽位上面
         if (!target.isOnMainRow)
         {
             if (top.isInStack)
             {
-                top.rectTransform.anchoredPosition = originalPos;
-                CardStack.UpdateStackPositions(top);
+                // top.rectTransform.anchoredPosition = originalPos;
+                // CardStack.UpdateStackPositions(top);
+                ReturnPosWithAnim();
+
                 CardStack.EndDragStackSetCg(top);
 
                 return;
             }
-            top.rectTransform.anchoredPosition = originalPos;
+            //top.rectTransform.anchoredPosition = originalPos;
+            top.rectTransform.DOAnchorPos(originalPos, flyBackTime).SetEase(Ease.OutBounce);
             cg.blocksRaycasts = true;
             return;
         }
@@ -344,8 +356,11 @@ public class CardDragHandler : MonoBehaviour,
             {
                 if (top.isInStack)
                 {
-                    top.rectTransform.anchoredPosition = originalPos;
-                    CardStack.UpdateStackPositions(top);
+                    // top.rectTransform.anchoredPosition = originalPos;
+                    // CardStack.UpdateStackPositions(top);
+
+
+                    ReturnPosWithAnim();
                     CardStack.EndDragStackSetCg(top);
                     return;
                 }
@@ -421,8 +436,11 @@ public class CardDragHandler : MonoBehaviour,
 
 
         // 默认：不匹配，回退
-        top.rectTransform.anchoredPosition = originalPos;
-        CardStack.UpdateStackPositions(top);
+
+        // top.rectTransform.anchoredPosition = originalPos;
+        // CardStack.UpdateStackPositions(top);
+
+        ReturnPosWithAnim();
         return;
     }
     #endregion
@@ -465,6 +483,13 @@ public class CardDragHandler : MonoBehaviour,
         {
             onDragFromDeck.RaiseEvent(top, this);
         }
+    }
+
+    public void ReturnPosWithAnim()
+    {
+        top.rectTransform.DOAnchorPos(originalPos, flyBackTime).SetEase(Ease.OutBounce);
+
+        CardStack.UpdateStackPositionsWithAnim(top, originalPos);
     }
 
     #endregion

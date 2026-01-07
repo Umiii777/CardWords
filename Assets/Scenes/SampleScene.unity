@@ -149,7 +149,7 @@ RectTransform:
   m_GameObject: {fileID: 31310334}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1372688637}
@@ -183,7 +183,7 @@ MonoBehaviour:
   initialSkinName: 
   initialFlipX: 0
   initialFlipY: 0
-  startingAnimation: xipai
+  startingAnimation: 
   startingLoop: 0
   timeScale: 1
   freeze: 1
@@ -2320,7 +2320,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1084001881
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2347,7 +2347,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1084001880}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -3090,8 +3090,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1084001881}
-  - {fileID: 832968332}
   - {fileID: 31310335}
+  - {fileID: 832968332}
   m_Father: {fileID: 801774033}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -3333,7 +3333,8 @@ MonoBehaviour:
   DrawACardFromDeck: {fileID: 11400000, guid: c762e89076721694b9a263664493f72c, type: 2}
   currentLevelDeckTotalNum: 0
   anim_deckStartPos: {x: 400, y: -780}
-  anim_drawFlyTime: 0.5
+  anim_drawFlyTime: 0.3
+  isFlying: 0
 --- !u!114 &1578489380
 MonoBehaviour:
   m_ObjectHideFlags: 0
