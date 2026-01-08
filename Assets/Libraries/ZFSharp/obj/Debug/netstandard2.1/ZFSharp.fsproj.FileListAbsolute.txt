@@ -1,0 +1,11 @@
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\Debug\netstandard2.1\ZFSharp.deps.json
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\Debug\netstandard2.1\ZFSharp.dll
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\Debug\netstandard2.1\ZFSharp.pdb
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\Debug\netstandard2.1\ZFSharp.xml
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.fsproj.AssemblyReference.cache
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.AssemblyInfoInputs.cache
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.AssemblyInfo.fs
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.fsproj.CoreCompileInputs.cache
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.dll
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.xml
+c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\obj\Debug\netstandard2.1\ZFSharp.pdb

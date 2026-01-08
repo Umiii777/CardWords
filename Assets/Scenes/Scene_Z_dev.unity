@@ -3043,7 +3043,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8501351000994176550, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2162533897712794021}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
 --- !u!114 &1353108658 stripped
@@ -3057,6 +3060,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a201edd37aba9548a0b1a852e284440, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &1353108662 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8501351000994176550, guid: 3a5c059b12bb6bf4d86235d0c7d4bfb5, type: 3}
+  m_PrefabInstance: {fileID: 1353108657}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1372688636
 GameObject:
   m_ObjectHideFlags: 0
@@ -4187,6 +4195,54 @@ MonoBehaviour:
   spriteFrontMain: {fileID: 21300000, guid: babadddb159c01e4fba9956ec984d5d1, type: 3}
   refreshDeck: {fileID: 21300000, guid: 000e15773dc20be46b0d24575bcaccc5, type: 3}
   normalDeck: {fileID: 21300000, guid: d2ac44e7db31202429f6c35e35224281, type: 3}
+--- !u!224 &2162533897712794021
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2526845765447326769}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1353108662}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -980, y: -1820}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2526845765447326769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2162533897712794021}
+  - component: {fileID: 2526845765447326770}
+  m_Layer: 5
+  m_Name: DailyCheckInUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2526845765447326770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2526845765447326769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1304074879, guid: 3bff0219147eb6942a98a7423945acfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
