@@ -8,9 +8,8 @@ using Spine.Unity;
 public class SpineController : MonoBehaviour
 {
     public Action endingAnims;
-
-    [SerializeField]
     public SkeletonGraphic spineObject;
+
     [SerializeField]
     private string[] animConfigs;
     [SerializeField]
