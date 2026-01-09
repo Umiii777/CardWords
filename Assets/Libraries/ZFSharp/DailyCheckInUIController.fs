@@ -2,12 +2,17 @@
 
 open UnityEngine
 
-type DailyCheckInController =
-    inherit StaticAdProcessor<DailyCheckInController, Object>
+type DailyCheckInController() =
+    inherit StaticAdProcessor<DailyCheckInController, Object>()
 
-    member _.Start() =
+    [<DefaultValue>]
+    val mutable public tipsContent: string
+
+    member this.Start() =
         task {
             do! Async.Sleep 3000
-            do! SystemUIManager.PopUpTips "Hello, F#!"
+            do! SystemUIManager.PopUpTips this.tipsContent
         } |> ignore
-        Debug.Log "Hello, F#!"
+#if DEBUG
+        Debug.Log this.tipsContent
+#endif

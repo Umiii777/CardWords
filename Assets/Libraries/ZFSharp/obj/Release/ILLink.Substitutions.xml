@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="ZFSharp">
+    <resource name="FSharpSignatureData.ZFSharp" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedData.ZFSharp" action="remove"></resource>
+    <resource name="FSharpSignatureDataB.ZFSharp" action="remove"></resource>
+    <resource name="FSharpSignatureCompressedDataB.ZFSharp" action="remove"></resource>
+    <resource name="FSharpOptimizationData.ZFSharp" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedData.ZFSharp" action="remove"></resource>
+    <resource name="FSharpOptimizationDataB.ZFSharp" action="remove"></resource>
+    <resource name="FSharpOptimizationCompressedDataB.ZFSharp" action="remove"></resource>
+    <resource name="FSharpOptimizationInfo.ZFSharp" action="remove"></resource>
+    <resource name="FSharpSignatureInfo.ZFSharp" action="remove"></resource>
+  </assembly>
+</linker>
