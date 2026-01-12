@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="DailyCheckInUIController.fs" />
+    <Compile Include="CheckInUIController.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +21,10 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\Library\ScriptAssemblies\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

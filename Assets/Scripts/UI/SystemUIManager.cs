@@ -162,7 +162,7 @@ public class SystemUIManager : MonoBehaviour
     > inLevelItems = new();
 #endregion
 
-    [SerializeField, Min(101), Space(30)]
+    [SerializeField, Min(101), Space(32)]
     private uint maxLevel = 110; //TODO: 该字段应被定义在更合理的位置，而非 SystemUIManager 类中
     private object[] uiInstances;
     /// <summary>
