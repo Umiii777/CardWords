@@ -93,8 +93,7 @@ type CheckInUIController () =
     let SerializeRewardInfos () =
 #if DEBUG
         if rewardInfos = [] then
-            rewardInfos <- []
-            //TODO: 实现该函数的剩余部分
+            ()//TODO: 实现该函数的剩余部分（rewardInfos <- ...）
 #else
 #endif
 
@@ -102,7 +101,7 @@ type CheckInUIController () =
     /// 读取 rewardInfos 并将信息显示到界面
     /// </summary>
     let RenderRewards () =
-        //TODO: 实现该函数
-        Debug.Log rewardInfos
+        //Debug.Log rewardInfos
+        ()//TODO: 实现该函数
 
 and Base = AdProcessor<CheckInUIController>
