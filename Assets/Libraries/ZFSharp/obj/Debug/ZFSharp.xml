@@ -2,23 +2,24 @@
 <doc>
 <assembly><name>ZFSharp</name></assembly>
 <members>
-<member name="F:ZFSharp.CheckInUIController.rewardDetails">
- <summary>
- 奖励内容详情
- <br/>
- ※ 仅用于测试
- </summary>
-</member>
-<member name="F:ZFSharp.CheckInUIController.rewardStates">
- <summary>
- 奖励领取状态
- <br/>
- ※ 仅用于测试
- </summary>
-</member>
 <member name="F:ZFSharp.CheckInUIController.rewardSprites">
  <summary>
  奖励道具贴图
+ </summary>
+</member>
+<member name="F:ZFSharp.CheckInUIController.rewardDetails">
+ <summary>
+ 本周奖励内容详情
+ </summary>
+</member>
+<member name="F:ZFSharp.CheckInUIController.rewardStates@">
+ <summary>
+ 本周奖励领取状态
+ </summary>
+</member>
+<member name="F:ZFSharp.CheckInUIController.pullingRewardStates@">
+ <summary>
+ 玩家本周奖励领取状态拉取回调
  </summary>
 </member>
 <member name="F:ZFSharp.CheckInUIController.clickingCheckIn@">
@@ -31,9 +32,14 @@
  关闭界面按钮回调
  </summary>
 </member>
-<member name="F:ZFSharp.CheckInUIController.rewardInfos">
+<member name="P:ZFSharp.CheckInUIController.rewardStates(ZFSharp.RewardState[])">
  <summary>
- 本周签到奖励信息
+ 本周奖励领取状态
+ </summary>
+</member>
+<member name="P:ZFSharp.CheckInUIController.pullingRewardStates(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task})">
+ <summary>
+ 玩家本周奖励领取状态拉取回调
  </summary>
 </member>
 <member name="P:ZFSharp.CheckInUIController.clickingClose(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,Microsoft.FSharp.Core.Unit})">
@@ -44,6 +50,16 @@
 <member name="P:ZFSharp.CheckInUIController.clickingCheckIn(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task})">
  <summary>
  签到按钮回调
+ </summary>
+</member>
+<member name="P:ZFSharp.CheckInUIController.rewardStates">
+ <summary>
+ 本周奖励领取状态
+ </summary>
+</member>
+<member name="P:ZFSharp.CheckInUIController.pullingRewardStates">
+ <summary>
+ 玩家本周奖励领取状态拉取回调
  </summary>
 </member>
 <member name="P:ZFSharp.CheckInUIController.clickingClose">
