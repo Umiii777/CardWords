@@ -1,26 +1,26 @@
 namespace ZFSharp
 
-open System
-open System.Threading.Tasks
 open UnityEngine
 open TMPro
 
-[<Struct; Serializable>]
-type RewardDetail = {
-    [<DefaultValue>] mutable Title: string
-    [<DefaultValue>] mutable SpriteIdx: int
-    [<DefaultValue>] mutable Count: string
+[<Struct>]
+type CheckInReward = {
+    mutable Title: string
+    mutable Contents: Reward array
 }
 
-/// <summary>
-/// 签到界面控制器
-/// <br/>
-/// 绑定该类的静态委托以控制界面行为
-/// </summary>
 type CheckInUIController () =
-    inherit StaticAdProcessor<CheckInUIController, Object> ()
+    inherit StaticAdProcessor<This, Object> ()
 
-//#region 回调委托
+    static let mutable rewards: CheckInReward array = [||]
+    static member val public states: CheckInState array = [||] with get, set
+
+    [<SerializeField; DefaultValue>]
+    val mutable private rewardSprites: Sprite array
+    [<SerializeField; DefaultValue; Space(32f)>]
+    val mutable private serializedRewards: CheckInReward array //TODO: 删除该字段，改为从 JSON 文件读取奖励
+
+//#region 按钮回调委托
     /// <summary>
     /// 关闭界面按钮回调
     /// </summary>
@@ -28,49 +28,19 @@ type CheckInUIController () =
     /// <summary>
     /// 签到按钮回调
     /// </summary>
-    static member val public clickingCheckIn = fun () -> Task.CompletedTask with get, set
-    /// <summary>
-    /// 玩家本周奖励领取状态拉取回调
-    /// </summary>
-    static member val public pullingRewardStates = fun () -> Task.CompletedTask with get, set
+    static member val public clickingCheckIn = fun () -> task {} with get, set
 //#endregion
-
-    /// <summary>
-    /// 本周奖励领取状态
-    /// </summary>
-    static member val public rewardStates: RewardState array = [||] with get, set
-
-    /// <summary>
-    /// 奖励道具贴图
-    /// </summary>
-    [<DefaultValue; SerializeField>]
-    val mutable rewardSprites: Sprite array
-
-//#region 奖励领取状态和内容详情 ※仅用于测试
-#if DEBUG
-    [<DefaultValue; Space(32f)>]
-    val mutable public debugRewardStates: RewardState array
-    [<DefaultValue; SerializeField>]
-    val mutable debugRewardDetails: RewardDetail array
-#endif
-//#endregion
-
-    /// <summary>
-    /// 本周奖励内容详情
-    /// </summary>
-    [<NonSerialized>]
-    static let mutable rewardDetails: RewardDetail list list = []
 
 //#region 按钮回调方法
-    member __.OnClickClose () = BaseAP.ProcessClicking CheckInUIController.clickingClose
+    member __.OnClickClose () = BaseAP.ProcessClicking This.clickingClose
     member __.OnClickReceive () =
         if not BaseAP.isWatchingAd then
-            task { do! CheckInUIController.clickingCheckIn () } |> ignore
+            task { do! This.clickingCheckIn () } |> ignore
     member o.OnClickReceiveMore () =
         if not BaseAP.isWatchingAd then
             task {
                 o.SetIsWatchingAd true
-                do! CheckInUIController.clickingWatchAd.Invoke null
+                do! This.clickingWatchAd.Invoke null
                 o.SetIsWatchingAd false
             } |> ignore
     member private __.SetIsWatchingAd isWatching = BaseAP.isWatchingAd <- isWatching
@@ -78,35 +48,19 @@ type CheckInUIController () =
 
     member o.Awake () =
         task {
-            do! CheckInUIController.pullingRewardStates ()
-#if DEBUG
-            do! SerializeRewardDetails o
-#else
-            //do! SerializeRewardDetails ()
-#endif
+            do! This.SerializeRewards o
+            DisplayRewards o
         } |> ignore
 
-    member o.Start () =
-        DisplayRewards o
-
-    /// <summary>
-    /// 读取本周奖励内容详情并序列化到 rewardDetails 字段
-    /// </summary>
-#if DEBUG
-    let SerializeRewardDetails (o: CheckInUIController) =
+    static member SerializeRewards (o: This, ?isForced: bool) =
+        let isForced = defaultArg isForced false
         task {
-            rewardDetails <- [ List.ofArray o.debugRewardDetails ] //TODO: 实现该函数，然后删除这行临时代码
+            if isForced || Array.isEmpty rewards then
+                rewards <- o.serializedRewards
         }
-#else
-    (*let SerializeRewardDetails () =
-        task { rewardDetails <- JSON.parse ... }
-    *)
-#endif
 
-    /// <summary>
-    /// 将奖励信息显示到界面
-    /// </summary>
-    let DisplayRewards (o: CheckInUIController) =
-        o.GetComponentInChildren<TextMeshProUGUI>().text <- string rewardDetails //TODO: 实现该函数，然后删除这行临时代码
+    let DisplayRewards (o: This) =
+        o.GetComponentInChildren<TextMeshProUGUI>().text <- string rewards //TODO: 实现该函数，然后删除这行临时代码
 
-and BaseAP = AdProcessor<CheckInUIController>
+and BaseAP = AdProcessor<This>
+and This = CheckInUIController

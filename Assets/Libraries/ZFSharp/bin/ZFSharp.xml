@@ -2,24 +2,14 @@
 <doc>
 <assembly><name>ZFSharp</name></assembly>
 <members>
-<member name="F:ZFSharp.CheckInUIController.rewardSprites">
+<member name="F:ZFSharp.RewardType.E">
  <summary>
- 奖励道具贴图
+ Energy - 体力
  </summary>
 </member>
-<member name="F:ZFSharp.CheckInUIController.rewardDetails">
+<member name="F:ZFSharp.RewardType.C">
  <summary>
- 本周奖励内容详情
- </summary>
-</member>
-<member name="F:ZFSharp.CheckInUIController.rewardStates@">
- <summary>
- 本周奖励领取状态
- </summary>
-</member>
-<member name="F:ZFSharp.CheckInUIController.pullingRewardStates@">
- <summary>
- 玩家本周奖励领取状态拉取回调
+ Coin - 金币
  </summary>
 </member>
 <member name="F:ZFSharp.CheckInUIController.clickingCheckIn@">
@@ -32,34 +22,14 @@
  关闭界面按钮回调
  </summary>
 </member>
-<member name="P:ZFSharp.CheckInUIController.rewardStates(ZFSharp.RewardState[])">
- <summary>
- 本周奖励领取状态
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.pullingRewardStates(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task})">
- <summary>
- 玩家本周奖励领取状态拉取回调
- </summary>
-</member>
 <member name="P:ZFSharp.CheckInUIController.clickingClose(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,Microsoft.FSharp.Core.Unit})">
  <summary>
  关闭界面按钮回调
  </summary>
 </member>
-<member name="P:ZFSharp.CheckInUIController.clickingCheckIn(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task})">
+<member name="P:ZFSharp.CheckInUIController.clickingCheckIn(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task{Microsoft.FSharp.Core.Unit}})">
  <summary>
  签到按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.rewardStates">
- <summary>
- 本周奖励领取状态
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.pullingRewardStates">
- <summary>
- 玩家本周奖励领取状态拉取回调
  </summary>
 </member>
 <member name="P:ZFSharp.CheckInUIController.clickingClose">
@@ -70,13 +40,6 @@
 <member name="P:ZFSharp.CheckInUIController.clickingCheckIn">
  <summary>
  签到按钮回调
- </summary>
-</member>
-<member name="T:ZFSharp.CheckInUIController">
- <summary>
- 签到界面控制器
- <br/>
- 绑定该类的静态委托以控制界面行为
  </summary>
 </member>
 </members>

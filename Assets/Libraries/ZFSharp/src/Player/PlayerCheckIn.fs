@@ -1,6 +1,6 @@
 namespace ZFSharp
 
-type RewardState =
+type CheckInState =
     | Received = 0
     | Outdated = 1
     | Available = 2

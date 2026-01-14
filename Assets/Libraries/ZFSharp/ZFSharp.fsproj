@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="src\Player\PlayerCheckIn.fs" />
+    <Compile Include="src\UI\Reward.fs" />
     <Compile Include="src\UI\CheckInUIController.fs" />
   </ItemGroup>
 
