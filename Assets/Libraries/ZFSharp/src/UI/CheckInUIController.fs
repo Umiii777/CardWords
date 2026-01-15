@@ -1,16 +1,14 @@
 namespace ZFSharp
 
 open UnityEngine
-open TMPro
 
-[<Struct>]
-type CheckInReward = {
-    mutable Title: string
-    mutable Contents: Reward array
-}
+type CheckInReward = struct
+    val mutable Title: string
+    val mutable Contents: Reward array
+end
 
 type CheckInUIController () =
-    inherit StaticAdProcessor<This, Object> ()
+    inherit StaticAdProcessor<This, unit> ()
 
     static let mutable rewards: CheckInReward array = [||]
     static member val public states: CheckInState array = [||] with get, set
@@ -24,23 +22,21 @@ type CheckInUIController () =
     /// <summary>
     /// 关闭界面按钮回调
     /// </summary>
-    static member val public clickingClose = id with get, set
+    static member val public clickingClose = System.Action ignore with get, set
     /// <summary>
     /// 签到按钮回调
     /// </summary>
-    static member val public clickingCheckIn = fun () -> task {} with get, set
+    static member val public clickingCheckIn = System.Func<Task> wait with get, set
 //#endregion
 
 //#region 按钮回调方法
     member __.OnClickClose () = BaseAP.ProcessClicking This.clickingClose
-    member __.OnClickReceive () =
-        if not BaseAP.isWatchingAd then
-            task { do! This.clickingCheckIn () } |> ignore
+    member __.OnClickReceive () = BaseAP.ProcessClicking This.clickingCheckIn |> ignore
     member o.OnClickReceiveMore () =
         if not BaseAP.isWatchingAd then
             task {
                 o.SetIsWatchingAd true
-                do! This.clickingWatchAd.Invoke null
+                do! This.clickingWatchAd.Invoke ()
                 o.SetIsWatchingAd false
             } |> ignore
     member private __.SetIsWatchingAd isWatching = BaseAP.isWatchingAd <- isWatching
@@ -60,7 +56,9 @@ type CheckInUIController () =
         }
 
     let DisplayRewards (o: This) =
-        o.GetComponentInChildren<TextMeshProUGUI>().text <- string rewards //TODO: 实现该函数，然后删除这行临时代码
+        o.GetComponentInChildren<TextMP>().text <- string rewards //FIXME: 实现该函数，然后删除这行临时代码
 
+and Task = System.Threading.Tasks.Task
+and TextMP = TMPro.TextMeshProUGUI
 and BaseAP = AdProcessor<This>
 and This = CheckInUIController

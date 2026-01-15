@@ -1,6 +1,6 @@
 namespace ZFSharp
 
-type RewardType =
+type RewardCode =
     /// <summary>
     /// Coin - 金币
     /// </summary>
@@ -10,8 +10,7 @@ type RewardType =
     /// </summary>
     | E = 1001
 
-[<Struct>]
-type Reward = {
-   mutable Type: string
-   mutable Count: int
-}
+type Reward = struct
+   val mutable Code: string
+   val mutable Count: int
+end

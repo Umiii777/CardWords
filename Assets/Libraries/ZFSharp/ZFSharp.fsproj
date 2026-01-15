@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="src\Helpers.fs" />
     <Compile Include="src\Player\PlayerCheckIn.fs" />
     <Compile Include="src\UI\Reward.fs" />
     <Compile Include="src\UI\CheckInUIController.fs" />

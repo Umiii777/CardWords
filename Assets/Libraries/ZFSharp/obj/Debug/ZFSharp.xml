@@ -2,12 +2,12 @@
 <doc>
 <assembly><name>ZFSharp</name></assembly>
 <members>
-<member name="F:ZFSharp.RewardType.E">
+<member name="F:ZFSharp.RewardCode.E">
  <summary>
  Energy - 体力
  </summary>
 </member>
-<member name="F:ZFSharp.RewardType.C">
+<member name="F:ZFSharp.RewardCode.C">
  <summary>
  Coin - 金币
  </summary>
@@ -22,12 +22,12 @@
  关闭界面按钮回调
  </summary>
 </member>
-<member name="P:ZFSharp.CheckInUIController.clickingClose(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,Microsoft.FSharp.Core.Unit})">
+<member name="P:ZFSharp.CheckInUIController.clickingClose(System.Action)">
  <summary>
  关闭界面按钮回调
  </summary>
 </member>
-<member name="P:ZFSharp.CheckInUIController.clickingCheckIn(Microsoft.FSharp.Core.FSharpFunc{Microsoft.FSharp.Core.Unit,System.Threading.Tasks.Task{Microsoft.FSharp.Core.Unit}})">
+<member name="P:ZFSharp.CheckInUIController.clickingCheckIn(System.Func{System.Threading.Tasks.Task})">
  <summary>
  签到按钮回调
  </summary>
