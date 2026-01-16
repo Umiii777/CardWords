@@ -15,18 +15,18 @@ type CheckInUIController () =
 
     [<SerializeField; DefaultValue>]
     val mutable private rewardSprites: Sprite array
-    [<SerializeField; DefaultValue; Space(32f)>]
+    [<SerializeField; DefaultValue; Space 32f>]
     val mutable private serializedRewards: CheckInReward array //TODO: 删除该字段，改为从 JSON 文件读取奖励
 
 //#region 按钮回调委托
     /// <summary>
     /// 关闭界面按钮回调
     /// </summary>
-    static member val public clickingClose = System.Action ignore with get, set
+    static member val public clickingClose = Action ignore with get, set
     /// <summary>
     /// 签到按钮回调
     /// </summary>
-    static member val public clickingCheckIn = System.Func<Task> wait with get, set
+    static member val public clickingCheckIn = FTask wait with get, set
 //#endregion
 
 //#region 按钮回调方法
@@ -56,9 +56,7 @@ type CheckInUIController () =
         }
 
     let DisplayRewards (o: This) =
-        o.GetComponentInChildren<TextMP>().text <- string rewards //FIXME: 实现该函数，然后删除这行临时代码
+        do let t = o.GetComponentInChildren<TextMP> () in t.text <- string rewards //FIXME: 实现该函数，然后删除这行临时代码
 
-and Task = System.Threading.Tasks.Task
-and TextMP = TMPro.TextMeshProUGUI
-and BaseAP = AdProcessor<This>
-and This = CheckInUIController
+and private BaseAP = AdProcessor<This>
+and private This = CheckInUIController

@@ -1,6 +1,17 @@
 namespace ZFSharp
 
 [<AutoOpen>]
-module Helpers =
+module internal Helpers =
 
-    let wait _ = System.Threading.Tasks.Task.CompletedTask
+//#region 引用 / 别名
+    type Task = System.Threading.Tasks.Task
+    type FTask = System.Func<Task>
+    type Action = System.Action
+    type TextMP = TMPro.TextMeshProUGUI
+
+    let taskDone = Task.CompletedTask
+//#endregion
+
+    let delay value () = value
+
+    let wait = delay taskDone
