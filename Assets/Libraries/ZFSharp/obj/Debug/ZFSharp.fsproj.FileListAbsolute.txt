@@ -1,14 +1,3 @@
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\bin\ZFSharp.deps.json
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\bin\ZFSharp.dll
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\bin\ZFSharp.pdb
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\bin\ZFSharp.xml
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.fsproj.AssemblyReference.cache
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.AssemblyInfoInputs.cache
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.AssemblyInfo.fs
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.fsproj.CoreCompileInputs.cache
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.dll
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.xml
-c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Plugins\ZFSharp\obj\Debug\ZFSharp.pdb
 c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\ZFSharp.deps.json
 c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\ZFSharp.dll
 c:\Users\Kigh_VM\Programming\Unity\CardWords\Assets\Libraries\ZFSharp\bin\ZFSharp.pdb

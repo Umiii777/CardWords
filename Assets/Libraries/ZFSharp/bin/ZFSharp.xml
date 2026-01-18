@@ -42,5 +42,20 @@
  签到按钮回调
  </summary>
 </member>
+<member name="F:ZFSharp.NoStepUIController.clickingClose@">
+ <summary>
+ 关闭界面按钮回调
+ </summary>
+</member>
+<member name="P:ZFSharp.NoStepUIController.clickingClose(System.Action)">
+ <summary>
+ 关闭界面按钮回调
+ </summary>
+</member>
+<member name="P:ZFSharp.NoStepUIController.clickingClose">
+ <summary>
+ 关闭界面按钮回调
+ </summary>
+</member>
 </members>
 </doc>

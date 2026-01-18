@@ -55,6 +55,58 @@
             "locale": "zh-Hant"
           }
         }
+      },
+      "Assembly-CSharp/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "Assembly-CSharp-firstpass": "1.0.0",
+          "spine-unity": "1.0.0",
+          "spine-unity-editor": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Assembly-CSharp.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Assembly-CSharp.dll": {}
+        }
+      },
+      "Assembly-CSharp-firstpass/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "spine-unity": "1.0.0",
+          "spine-unity-editor": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Assembly-CSharp-firstpass.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Assembly-CSharp-firstpass.dll": {}
+        }
+      },
+      "spine-unity/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "compile": {
+          "bin/placeholder/spine-unity.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/spine-unity.dll": {}
+        }
+      },
+      "spine-unity-editor/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.1",
+        "dependencies": {
+          "spine-unity": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/spine-unity-editor.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/spine-unity-editor.dll": {}
+        }
       }
     }
   },
@@ -85,10 +137,31 @@
         "lib/netstandard2.1/zh-Hans/FSharp.Core.resources.dll",
         "lib/netstandard2.1/zh-Hant/FSharp.Core.resources.dll"
       ]
+    },
+    "Assembly-CSharp/1.0.0": {
+      "type": "project",
+      "path": "../../../Assembly-CSharp.csproj",
+      "msbuildProject": "../../../Assembly-CSharp.csproj"
+    },
+    "Assembly-CSharp-firstpass/1.0.0": {
+      "type": "project",
+      "path": "../../../Assembly-CSharp-firstpass.csproj",
+      "msbuildProject": "../../../Assembly-CSharp-firstpass.csproj"
+    },
+    "spine-unity/1.0.0": {
+      "type": "project",
+      "path": "../../../spine-unity.csproj",
+      "msbuildProject": "../../../spine-unity.csproj"
+    },
+    "spine-unity-editor/1.0.0": {
+      "type": "project",
+      "path": "../../../spine-unity-editor.csproj",
+      "msbuildProject": "../../../spine-unity-editor.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.1": [
+      "Assembly-CSharp >= 1.0.0",
       "FSharp.Core >= 10.0.100"
     ]
   },
@@ -117,7 +190,11 @@
       "frameworks": {
         "netstandard2.1": {
           "targetAlias": "netstandard2.1",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Kigh_VM\\Programming\\Unity\\CardWords\\Assembly-CSharp.csproj": {
+              "projectPath": "C:\\Users\\Kigh_VM\\Programming\\Unity\\CardWords\\Assembly-CSharp.csproj"
+            }
+          }
         }
       },
       "restoreAuditProperties": {

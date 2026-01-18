@@ -9,7 +9,7 @@ using TMPro;
 /// <br/><br/>
 /// 为该类的静态字段赋值以更新各个按钮和进度条的显示内容和及行为
 /// </summary>
-public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>, IAudioTrigger
+public class DefeatUIController : MonoBehaviour, IAudioTrigger
 {
 #region 静态公开字段
     /// <summary>
@@ -69,13 +69,15 @@ public class DefeatUIController : StaticAdProcessor<DefeatUIController, object>,
 #endregion
 
 #region 按钮回调方法
-    public async void OnClickHome() => await ProcessClicking(clickingHome);
-    public async void OnClickReplay() => await ProcessClicking(clickingReplay);
-    public async void OnClickContinue()
+    public async void OnClickHome() => await clickingHome();
+    public async void OnClickReplay() => await clickingReplay();
+    public async void OnClickContinue() //TODO: 001_清除失败界面的继续游戏按钮相关代码
     {
+        /*
         isWatchingAd = true;
         await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
         isWatchingAd = false;
+        */
     }
 #endregion
 

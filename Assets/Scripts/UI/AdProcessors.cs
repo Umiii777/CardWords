@@ -27,7 +27,7 @@ public abstract class AdProcessor<TSelf> : MonoBehaviour where TSelf : AdProcess
             await (clickingFunc is null ? Task.CompletedTask : clickingFunc(clickingArg));
     }
 
-    /*TODO: 移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
+    /*TODO: 002_移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
     protected static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate =>
         await StaticAdProcessor<MonoBehaviour, object>.ProcessAd(toWait, afterWait, toWaitArgs);
     */
@@ -40,7 +40,7 @@ public abstract class StaticAdProcessor<TSelf, T> : AdProcessor<TSelf> where TSe
     /// </summary>
     public static new Func<T, Task> clickingWatchAd;
 
-    /*TODO: 移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
+    /*TODO: 002_移除所有 FireAndBan 方法，重新编写并启用 ProcessAd 方法
     protected static async Task ProcessAd<T>(T toWait, Action afterWait = null, params object[] toWaitArgs) where T : Delegate
     {
         if (toWait is not null)

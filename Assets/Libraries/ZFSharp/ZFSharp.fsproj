@@ -12,11 +12,22 @@
     <Compile Include="src\Player\PlayerCheckIn.fs" />
     <Compile Include="src\UI\Reward.fs" />
     <Compile Include="src\UI\CheckInUIController.fs" />
+    <Compile Include="src\UI\NoStepUIController.fs" />
+    <Compile Include="src\UI\ZFSharpUIManager.fs" />
+    <Compile Include="src\UI\AudioPlayer.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(ProgramW6432)\Unity\Hub\Editor\2022.3.62f2\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(ProgramW6432)\Unity\Hub\Editor\2022.3.62f2\Editor\Data\Managed\UnityEngine\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(ProgramW6432)\Unity\Hub\Editor\2022.3.62f2\Editor\Data\Managed\UnityEngine\UnityEngine.AudioModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
