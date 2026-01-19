@@ -8,7 +8,7 @@ type CheckInReward = struct
 end
 
 type CheckInUIController () =
-    inherit StaticAdProcessor<UICI, unit> ()
+    inherit StaticAdProcessor<UICH, unit> ()
 
     static let mutable rewards: CheckInReward array = [||]
     static member val states: CheckInState array = [||] with get, set
@@ -30,19 +30,19 @@ type CheckInUIController () =
 //#endregion
 
 //#region 按钮回调方法
-    member __.OnClickClose () = AP<UICI>.ProcessClicking UICI.clickingClose
-    member __.OnClickReceive () = AP<UICI>.ProcessClicking UICI.clickingCheckIn |> ignore
+    member __.OnClickClose () = AP<UICH>.ProcessClicking UICH.clickingClose
+    member __.OnClickReceive () = AP<UICH>.ProcessClicking UICH.clickingCheckIn |> ignore
     member me.OnClickReceiveMore () =
-        if not AP<UICI>.isWatchingAd then
+        if not AP<UICH>.isWatchingAd then
             task {
                 me.SetIsWatchingAd true
-                do! UICI.clickingWatchAd.Invoke ()
+                do! UICH.clickingWatchAd.Invoke ()
                 me.SetIsWatchingAd false
             } |> ignore
-    member private __.SetIsWatchingAd isWatching = AP<UICI>.isWatchingAd <- isWatching
+    member private __.SetIsWatchingAd isWatching = AP<UICH>.isWatchingAd <- isWatching
 //#endregion
 
-    static member SerializeRewards (me: UICI, ?isForced: bool) =
+    static member SerializeRewards (me: UICH, ?isForced: bool) =
         let isForced = defaultArg isForced false
         task {
             if isForced || Array.isEmpty rewards then
@@ -51,11 +51,11 @@ type CheckInUIController () =
 
     member me.Awake () =
         task {
-            do! UICI.SerializeRewards me
+            do! UICH.SerializeRewards me
             DisplayRewards me
         } |> ignore
 
-    let DisplayRewards (me: UICI) =
+    let DisplayRewards (me: UICH) =
         do let t = me.GetComponentInChildren<TextMP> () in t.text <- string rewards //FIXME: 002_实现该函数，然后删除这行临时代码
 
-and internal UICI = CheckInUIController
+and internal UICH = CheckInUIController

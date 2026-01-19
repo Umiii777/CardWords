@@ -1,3 +1,5 @@
 *.cache
 *.cache.meta
+/obj/Debug*
+/obj/Release*
 .fake
