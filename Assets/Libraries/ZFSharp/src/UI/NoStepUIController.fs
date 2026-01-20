@@ -3,11 +3,6 @@ namespace ZFSharp
 type NoStepUIController () =
     inherit StaticAdProcessor<UINO, unit> ()
 
-    interface IAudioTrigger with
-        member me.PlayClickingAudio () =
-            (me :> IAudioTrigger).PlayClickingAudio null
-    end
-
     /// <summary>
     /// 关闭界面按钮回调
     /// </summary>

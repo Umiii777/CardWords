@@ -1,5 +1,5 @@
-*.cache
-*.cache.meta
-/obj/Debug*
-/obj/Release*
+!*.pdb*
+
+/obj*
+
 .fake

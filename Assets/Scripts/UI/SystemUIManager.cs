@@ -331,7 +331,7 @@ public class SystemUIManager : MonoBehaviour
                 {
                     Instance.OnUpdateEnergy();
                     PlayerEnergy.ResetSecondsToRecover();
-                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace("@", $"{1}"));
+                    await PopUpTips(TIPS_SUCCESSFUL_REDEEM + TIPS_ENERGY_ADDED.Replace('@', '1'));
                 }
                 PlayerEnergy.timing = () =>
                 {
