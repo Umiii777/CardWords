@@ -25,7 +25,6 @@ class  SettingsUIController : MonoBehaviour, IAudioTrigger
     [SerializeField]
     private GameObject confirmUI;
 
-
 #region 按钮回调委托
     public static Action clickingClose;
     public static Func<Task> clickingReplay;

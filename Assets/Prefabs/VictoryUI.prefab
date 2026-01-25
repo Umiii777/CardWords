@@ -402,7 +402,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 8188723824494120873}
         m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickReceive
+        m_MethodName: OnClickNormal
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -622,8 +622,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 8188723824494120873}
-        m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickReceiveMore
+        m_TargetAssemblyTypeName: StaticAdProcessor`2[[VictoryUIController, Assembly-CSharp
+        m_MethodName: OnClickReceive
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -920,7 +920,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 8188723824494120873}
         m_TargetAssemblyTypeName: VictoryUIController, Assembly-CSharp
-        m_MethodName: OnClickReceive
+        m_MethodName: OnClickNormal
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

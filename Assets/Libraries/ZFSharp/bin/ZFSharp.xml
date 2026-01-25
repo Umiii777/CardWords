@@ -2,49 +2,19 @@
 <doc>
 <assembly><name>ZFSharp</name></assembly>
 <members>
-<member name="F:ZFSharp.CheckInUIController.clickingCheckIn@">
+<member name="F:ZFSharp.CheckInUIController.clickingNormal@">
  <summary>
  签到按钮回调
  </summary>
 </member>
-<member name="F:ZFSharp.CheckInUIController.clickingClose@">
- <summary>
- 关闭界面按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.clickingClose(System.Action)">
- <summary>
- 关闭界面按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.clickingCheckIn(System.Func{System.Threading.Tasks.Task})">
+<member name="P:ZFSharp.CheckInUIController.clickingNormal(System.Func{System.Threading.Tasks.Task})">
  <summary>
  签到按钮回调
  </summary>
 </member>
-<member name="P:ZFSharp.CheckInUIController.clickingClose">
- <summary>
- 关闭界面按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.CheckInUIController.clickingCheckIn">
+<member name="P:ZFSharp.CheckInUIController.clickingNormal">
  <summary>
  签到按钮回调
- </summary>
-</member>
-<member name="F:ZFSharp.NoStepUIController.clickingClose@">
- <summary>
- 关闭界面按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.NoStepUIController.clickingClose(System.Action)">
- <summary>
- 关闭界面按钮回调
- </summary>
-</member>
-<member name="P:ZFSharp.NoStepUIController.clickingClose">
- <summary>
- 关闭界面按钮回调
  </summary>
 </member>
 </members>

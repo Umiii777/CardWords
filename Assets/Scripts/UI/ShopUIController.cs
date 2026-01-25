@@ -92,19 +92,12 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>, IAud
     /// </summary>
     public static Func<Task> clickingSettings;
     /// <summary>
-    /// 关闭界面按钮回调
-    /// <br/><br/>
-    /// 应将 Destroy(shopUI.gameObject) 加到最后
-    /// </summary>
-    public static Action clickingClose;
-    /// <summary>
     /// 购买礼包按钮回调
     /// </summary>
     public static Func<ItemType, int, int, Task> clickingBuy;
 #endregion
 
 #region 按钮回调方法
-    public void OnClickClose() => ProcessClicking(clickingClose);
     public async void OnClickSettings() => await ProcessClicking(clickingSettings);
     public async void OcClickBuy(string config)
     {
@@ -114,19 +107,14 @@ public class ShopUIController : StaticAdProcessor<ShopUIController, int[]>, IAud
             await (clickingBuy is null ? Task.CompletedTask : clickingBuy((ItemType)c[0], c[1], c[2]));
         }
     }
-    public async void OnClickReceive(string config)
+    public void OnClickReceive(string config)
     {
-        isWatchingAd = true;
         int[] c = config.Split(',').Select(s => int.Parse(s.Trim())).ToArray();
-        await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(c));
-        isWatchingAd = false;
+        OnClickReceive(c);
     }
 #endregion
 
-    void Start()
-    {
-        InitSharedFields();
-    }
+    void Start() => InitSharedFields();
 
     private void InitSharedFields()
     {

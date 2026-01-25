@@ -18,28 +18,14 @@ type CheckInUIController () =
     [<SerializeField; DefaultValue; Space 32f>]
     val mutable private serializedRewards: CheckInReward array //TODO: 001_删除该字段，改为从 JSON 文件读取奖励
 
-//#region 按钮回调委托
-    /// <summary>
-    /// 关闭界面按钮回调
-    /// </summary>
-    static member val clickingClose = Action ignore with get, set
     /// <summary>
     /// 签到按钮回调
     /// </summary>
-    static member val clickingCheckIn = FTask wait with get, set
-//#endregion
+    static member val clickingNormal = FTask wait with get, set
 
 //#region 按钮回调方法
-    member __.OnClickClose () = AP<UICH>.ProcessClicking UICH.clickingClose
-    member __.OnClickReceive () = AP<UICH>.ProcessClicking UICH.clickingCheckIn |> ignore
-    member me.OnClickReceiveMore () =
-        if not AP<UICH>.isWatchingAd then
-            task {
-                me.SetIsWatchingAd true
-                do! UICH.clickingWatchAd.Invoke ()
-                me.SetIsWatchingAd false
-            } |> ignore
-    member private __.SetIsWatchingAd isWatching = AP<UICH>.isWatchingAd <- isWatching
+    member __.OnClickNormal () = AP<UICH>.ProcessClicking UICH.clickingNormal |> ignore
+    member me.OnClickReceive () = if not AP<UICH>.isWatchingAd then base.OnClickReceive()
 //#endregion
 
     static member SerializeRewards (me: UICH, ?isForced: bool) =

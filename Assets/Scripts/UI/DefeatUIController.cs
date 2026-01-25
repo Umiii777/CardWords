@@ -71,7 +71,7 @@ public class DefeatUIController : MonoBehaviour, IAudioTrigger
 #region 按钮回调方法
     public async void OnClickHome() => await clickingHome();
     public async void OnClickReplay() => await clickingReplay();
-    public async void OnClickContinue() //TODO: 001_清除失败界面的继续游戏按钮相关代码
+    public void OnClickContinue() //TODO: 001_清除失败界面的继续游戏按钮相关代码
     {
         /*
         isWatchingAd = true;

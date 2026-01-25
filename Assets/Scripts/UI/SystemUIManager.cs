@@ -458,7 +458,7 @@ public class SystemUIManager : MonoBehaviour
                 UnlockSlotUIController.clickingWatchAd = FireAndBan(typeof(UnlockSlotUIController), UnlockSlotUIController.clickingWatchAd);
                 return;
             case UIType.Victory:
-                VictoryUIController.clickingReceive = async _=>
+                VictoryUIController.clickingNormal = async _=>
                 {
                     int numCoins = VictoryUIController.numCoinsToReceive;
                     PlayerCoin.AddCoin(numCoins);
@@ -467,10 +467,10 @@ public class SystemUIManager : MonoBehaviour
                     await LoadUI(UIType.Home);
                     DestroyUI(type);
                 };
-                VictoryUIController.clickingReceive = FireAndBan(
+                VictoryUIController.clickingNormal = FireAndBan(
                     typeof(VictoryUIController),
-                    VictoryUIController.clickingReceive,
-                    nameof(VictoryUIController.clickingReceive)
+                    VictoryUIController.clickingNormal,
+                    nameof(VictoryUIController.clickingNormal)
                 );
                 VictoryUIController.clickingWatchAd = async _=>
                 {

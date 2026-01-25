@@ -8,10 +8,10 @@ type ZFSharpUIManager () =
     let InitUICallbacks (uiType: UIType) =
         match uiType with
         | UIType.NoStep ->
-            UINO.clickingClose <- fun () -> ignore (task {
+            UINO.clickingClose <- Action (fun () -> ignore (task {
                 do! UI.LoadUI (UIType.Defeat, 0)
                 UI.DestroyUI uiType
-            })
+            }))
             UINO.clickingWatchAd <- FUnitTask (fun () -> task {
                 do! Task.Delay 1000 //假装播放1秒广告
                 UI.addingSteps.Invoke () // 增加步数

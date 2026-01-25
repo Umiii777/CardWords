@@ -16,11 +16,11 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     /// </summary>
     public static int numCoinsToReceive = 10;
     /// <summary>
-    /// 领取奖励按钮回调
+    /// 单倍领取按钮回调
     /// <br/><br/>
     /// 应将 Destroy(victoryUI.gameObject) 加到最后
     /// </summary>
-    public static Func<object, Task> clickingReceive;
+    public static Func<object, Task> clickingNormal;
 #endregion
 
     /// <summary>
@@ -29,31 +29,17 @@ public class VictoryUIController : StaticAdProcessor<VictoryUIController, object
     [SerializeField]
     private TextMeshProUGUI coinCountText;
 
-#region 按钮回调方法
-    public async void OnClickReceive()
+    public async void OnClickNormal()
     {
         if (!isWatchingAd)
         {
             isWatchingAd = true;
-            await (clickingReceive is null ? Task.CompletedTask : clickingReceive(default));
+            await (clickingNormal is null ? Task.CompletedTask : clickingNormal(default));
             isWatchingAd = false;
         }
     }
-    public async void OnClickReceiveMore()
-    {
-        if (!isWatchingAd)
-        {
-            isWatchingAd = true;
-            await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
-            isWatchingAd = false;
-        }
-    }
-#endregion
 
-    void Start()
-    {
-        coinCountText.text = numCoinsToReceive.ToString();
-    }
+    void Start() => coinCountText.text = numCoinsToReceive.ToString();
 
     public void PlayClickingAudio() => (this as IAudioTrigger).PlayClickingAudio(default);
 }

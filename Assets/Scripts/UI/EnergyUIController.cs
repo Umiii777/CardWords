@@ -54,34 +54,14 @@ public class EnergyUIController : StaticAdProcessor<EnergyUIController, object>,
     private TextMeshProUGUI clockText;
 #endregion
 
-#region 按钮回调委托
-    /// <summary>
-    /// 关闭界面按钮回调
-    /// <br/><br/>
-    /// 应将 Destroy(shopUI.gameObject) 加到最后
-    /// </summary>
-    public static Action clickingClose;
     /// <summary>
     /// 购买体力按钮回调
     /// </summary>
     public static Func<int, Task> clickingBuy;
-#endregion
 
-#region 按钮回调方法
-    public void OnClickClose() => ProcessClicking(clickingClose);
     public async void OcClickBuy(string price) => await ProcessClicking(clickingBuy, int.Parse(price));
-    public async void OnClickReceive()
-    {
-        isWatchingAd = true;
-        await (clickingWatchAd is null ? Task.CompletedTask : clickingWatchAd(default));
-        isWatchingAd = false;
-    }
-#endregion
 
-    void Start()
-    {
-        InitSharedFields();
-    }
+    void Start() => InitSharedFields();
 
     private void InitSharedFields()
     {
