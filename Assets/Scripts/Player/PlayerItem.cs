@@ -12,7 +12,7 @@ public enum ItemType
     /// </summary>
     Shuffle
 }
-struct Prop
+public struct Prop
 {
     public Func<int> Get;
     public Action<int> Set;

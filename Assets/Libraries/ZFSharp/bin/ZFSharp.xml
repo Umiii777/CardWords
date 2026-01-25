@@ -2,16 +2,6 @@
 <doc>
 <assembly><name>ZFSharp</name></assembly>
 <members>
-<member name="F:ZFSharp.RewardCode.E">
- <summary>
- Energy - 体力
- </summary>
-</member>
-<member name="F:ZFSharp.RewardCode.C">
- <summary>
- Coin - 金币
- </summary>
-</member>
 <member name="F:ZFSharp.CheckInUIController.clickingCheckIn@">
  <summary>
  签到按钮回调
