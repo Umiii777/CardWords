@@ -97,7 +97,7 @@ public class SystemUIManager : MonoBehaviour
     /// 游戏运行时的画面最高帧率
     /// </summary>
     public const uint MAX_FPS_RUNTIME = 60;
-    public static SystemUIManager Instance;
+    public static SystemUIManager Instance { get; private set; }
 
 #region 静态委托
     /// <summary>
